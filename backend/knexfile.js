@@ -3,17 +3,16 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-export default  {
+export default {
 
   development: {
     client: 'postgresql',
     connection: {
-      database: 'Greens_international',
+      database: 'greens_international',
       user:     'postgres',
       password: '12345'
     }
   },
-
   staging: {
     client: 'postgresql',
     connection: {

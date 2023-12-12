@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-export const up = async (knex) => {
+export const up = async(knex) => {
     await knex.schema.createTable('countries', (table) => {
         table.increments('id').primary();
         table.string('country_code').notNullable();
@@ -11,7 +11,7 @@ export const up = async (knex) => {
         table.dateTime('updated_at').defaultTo(knex.fn.now()).notNullable();
 
     });
-}
+};
 
 /**
  * @param { import("knex").Knex } knex
@@ -19,4 +19,4 @@ export const up = async (knex) => {
  */
 export const down = async (knex) => {
     return knex.schema.dropTable('countries');
-}
+};

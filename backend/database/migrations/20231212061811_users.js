@@ -8,17 +8,17 @@ export const up = async (knex) => {
         table.string('usr_firstname').notNullable();
         table.string('usr_lastname').notNullable();
         table.string('usr_mobile_number').notNullable();
-        table.integer('usr_mobile_country_code').notNullable();
-        table.string('password').notNullable();
-        table.string('user_designation').notNullable();
-        table.integer('user_company').notNullable();
+        table.integer('usr_mobile_country_code').unsigned().references('id').inTable('countries');
+        table.string('usr_password').notNullable();
+        table.string('usr_email').notNullable();
+        table.string('usr_designation').notNullable();
+        table.integer('usr_company').unsigned().references('id').inTable('company');
         table.boolean('usr_tos_accepted').notNullable();
         table.boolean('usr_newsletter_accepted').notNullable();
         table.dateTime('created_at').defaultTo(knex.fn.now()).notNullable();
         table.dateTime('updated_at').defaultTo(knex.fn.now()).notNullable();
-
-    })
-}
+    });
+};
 
 /**
  * @param { import("knex").Knex } knex
@@ -26,4 +26,4 @@ export const up = async (knex) => {
  */
 export const down = async (knex) => {
     return knex.schema.dropTable('users');
-}
+};
