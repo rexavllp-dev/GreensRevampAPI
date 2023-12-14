@@ -16,6 +16,15 @@ export const up = async (knex) => {
         table.dateTime('updated_at').defaultTo(knex.fn.now()).notNullable();
 
     });
+
+    await knex.raw(`
+    CREATE TRIGGER update_timestamp
+    BEFORE UPDATE
+    ON company
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_timestamp();
+  `);
+  
 };
 
 /**

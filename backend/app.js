@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv'
 import userRoute from './api/routes/userRoute.js';
 import companyRoute from './api/routes/companyRoute.js';
 import countryRoute from './api/routes/countryRoute.js';
@@ -11,6 +12,7 @@ const corsOptions = {
   origin: true,
 };
 
+dotenv.config()
 
 
 // middlewares
@@ -29,6 +31,8 @@ app.get('/', (req,res) => {
     res.json("Greens_international Server is Online")
 });
 
+
+ 
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)

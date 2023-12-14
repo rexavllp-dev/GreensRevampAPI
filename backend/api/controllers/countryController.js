@@ -1,8 +1,6 @@
 import { createCountry } from "../models/countryModels.js";
 
 
-
-
 // creating a country functions 
 export const registerCountry = async (req, res) => {
     try {
