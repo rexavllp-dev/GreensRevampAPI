@@ -44,24 +44,36 @@ export const getUserByEmail = async (usr_email) => {
 
 // Store the reset token in the database
 
-export const userforgotPassword = async (usr_email) => {
+export const userForgotPassword = async (usr_email) => {
     const user = await db("users").select("*").where({ usr_email }).first();
     return user;
 }
 
 //update reset token
 export const updateResetToken = async (usr_email, token, expiresAt) => {
-    return db('users').where({ usr_email }).update({ resetToken: token, reset_token_expires_at: expiresAt })
+    return db('users').where({ usr_email }).update({ reset_token: token, reset_token_expires_at: expiresAt })
 }
 
 //update password and then clear the resetToken and exipry Date from database
 export const updatePassword = async (id, hashedPassword) => {
     return db("users").where({ id }).update({
         usr_password: hashedPassword,
-        resetToken: null,
+        reset_token: null,
         reset_token_expires_at: null
     })
 }
+
+
+// find resetToken from database
+
+export const findByResetToken = async (reset_token) => {
+    // console.log(resetToken)
+    const user = await db("users").select("*").where({ reset_token }).first();
+    return user;
+}
+
+// forgot password end here
+// ________________________________________________________________________________________________________________________________________________________________________________________________________________
 
 
 // refresh Token 
@@ -69,23 +81,23 @@ export const updatePassword = async (id, hashedPassword) => {
 export const refreshTokenModel = {
 
     // create Token to database
-    saveRefreshToken:async(refreshToken, userId) => {
-        
-        return await db('users').where({id:userId}).update({ refresh_token:refreshToken});
-    },   
+    saveRefreshToken: async (refreshToken, userId) => {
+
+        return await db('users').where({ id: userId }).update({ refresh_token: refreshToken });
+    },
 
     // Find Token from database
 
-    findRefreshToken:async (userId, refreshToken) => {
-        return await db('users').where({id:userId, refresh_token:refreshToken}).first();
+    findRefreshToken: async (userId, refreshToken) => {
+        return await db('users').where({ id: userId, refresh_token: refreshToken }).first();
     },
 
     // update token from database
 
-        updateResetToken:async(userId, refresh_token) => {
-            return await db('users').where({id:userId}).update({refresh_token})
-        }
-    
+    updateResetToken: async (userId, refresh_token) => {
+        return await db('users').where({ id: userId }).update({ refresh_token })
+    }
+
 };
 
 

@@ -351,16 +351,16 @@ export const refreshAccessToken = async (req, res) => {
         // verify the refresh token
 
         const decoded = jwt.verify(refresh_token, process.env.JWT_REFRESH);
-        
+
 
 
 
         // check if refreshToken exist in database
 
         const storedToken = await refreshTokenModel.findRefreshToken(decoded.userId, refresh_token);
-        
+
         if (!storedToken) {
-              return res.status(401).json({ message: 'Invalid refresh token' });
+            return res.status(401).json({ message: 'Invalid refresh token' });
         }
 
         // If the refresh token is valid, generate a new access token
@@ -373,7 +373,7 @@ export const refreshAccessToken = async (req, res) => {
         const newRefreshToken = generateRefreshToken(user);
         await refreshTokenModel.updateResetToken(decoded.userId, newRefreshToken);
 
-        return res.json({ accessToken: newAccessToken, refresh_token: newAccessToken })
+        return res.status(200).json({ status: 200, accessToken: newAccessToken, refresh_token: newAccessToken, message: 'Token regenerated successfully' })
     } catch (error) {
         console.log(error);
 

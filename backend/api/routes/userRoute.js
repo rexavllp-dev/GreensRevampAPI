@@ -7,6 +7,7 @@ import {
     getUserInformation,
     loginWithOtp,
     loginWithPassword,
+    refreshAccessToken,
     registerUser,
     resendEmail,
     resendOtp,
@@ -17,6 +18,7 @@ import {
     verifyOtp
 
 } from '../controllers/userController.js';
+import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
 
 
 
@@ -35,16 +37,28 @@ router.post('/register', registerUser);
 router.post('/login', loginWithPassword);
 // login with otp 
 router.post('/login-otp', loginWithOtp);
+
+// refresh token
+router.post('/refresh-token', refreshAccessToken);
+
 // verify email
 router.get('/verify-email', verifyEmail);
 // verify register  otp
 router.post('/verify-otp', verifyOtp);
 // verify login otp
 router.post('/verify-login-otp', verifyLoginOtp);
+
 // for email resend
 router.post('/resendemail', resendEmail);
 // for mobile resend
 router.get('/resendotp/:token', resendOtp);
+
+// forgot password
+router.post('/forgot-password', forgotPassword);
+// reset password 
+router.post('/reset-password', resetPassword);
+
+
 // get single user
 router.get('/:id', getSingleUser);
 router.get('/getuserinfo/:token', getUserInformation);
