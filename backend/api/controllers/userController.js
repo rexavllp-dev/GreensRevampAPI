@@ -420,7 +420,7 @@ export const loginWithOtp = async (req, res) => {
 
 
         // save refresh token to the database
-        const saveToken = await refreshTokenModel.saveRefreshToken(refreshToken,existingUser.id)
+        const saveToken = await refreshTokenModel.saveRefreshToken(refreshToken,existingUser.id);
 
 
 
