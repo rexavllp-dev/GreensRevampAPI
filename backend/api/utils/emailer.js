@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 
 
  export const sendVerificationEmail = async (usr_email, token) => {
+  console.log(usr_email);
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -11,10 +12,10 @@ import nodemailer from 'nodemailer';
     },
   });
 
-  const verificationLink = `http://localhost:3000/verify-email?token=${token}`;
+  const verificationLink = `http://localhost:3000/auth/verify-email?token=${token}`;
   const mailOptions = {
     from: process.env.FROM_GMAIL,
-    to: process.env.TO_GMAIL,
+    to: usr_email,
     subject: 'Email Verification',
     text: `Click the following link to verify your email: ${verificationLink}`,
   };

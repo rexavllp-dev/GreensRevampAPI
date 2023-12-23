@@ -1,5 +1,6 @@
 import express from 'express';
-import { registerCountry } from '../controllers/countryController.js';
+import { getAllCountries, registerCountry } from '../controllers/countryController.js';
+
 
 
 
@@ -9,7 +10,10 @@ const router = express.Router();
 
 
 // register  routes
-router.post('/', registerCountry);
+router.post('/',registerCountry);
+
+// get all countries
+router.get('/getall', getAllCountries)
 
 
 export default router;
