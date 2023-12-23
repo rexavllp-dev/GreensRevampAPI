@@ -35,7 +35,7 @@ export const sendPasswordResetEmail = async (usr_email, token) => {
       pass: process.env.APP_PASSWORD,
     },
   });
-  const resetPassLink = `http://localhost:3000/verify-email?token=${token}`;
+  const resetPassLink = `http://localhost:3000/auth/reset?token=${token}`;
   const mailOptions = {
     from: process.env.FROM_GMAIL,
     to: usr_email,

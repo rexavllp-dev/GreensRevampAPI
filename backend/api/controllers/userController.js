@@ -439,7 +439,7 @@ export const loginWithOtp = async (req, res) => {
         console.log(sendOtp);
         if (sendOtp) {
             console.log(sendOtp);
-            return res.status(200).json({ status:200, result:{ accessToken, refreshToken },message: 'OTP sent successfully' });
+            return res.status(200).json({ status:200, result:{ accessToken, refreshToken }, message: 'OTP sent successfully' });
         } else {
             console.log();
             return res.status(500).json({ message: 'Failed to send OTP' });
