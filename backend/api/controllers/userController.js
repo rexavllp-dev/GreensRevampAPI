@@ -411,7 +411,23 @@ export const loginWithOtp = async (req, res) => {
         }
 
         // token
+        //create token
 
+        const accessToken = generateAccessToken(existingUser)
+
+        const refreshToken = generateRefreshToken(existingUser)
+ 
+
+
+        // save refresh token to the database
+        const saveToken = await refreshTokenModel.saveRefreshToken(refreshToken,existingUser.id)
+
+
+
+        
+   console.log(accessToken);
+   console.log(refreshToken);
+ 
 
         // generate otp
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -423,7 +439,7 @@ export const loginWithOtp = async (req, res) => {
         console.log(sendOtp);
         if (sendOtp) {
             console.log(sendOtp);
-            return res.status(200).json({ message: 'OTP sent successfully' });
+            return res.status(200).json({ status:200, result:{ accessToken, refreshToken },message: 'OTP sent successfully' });
         } else {
             console.log();
             return res.status(500).json({ message: 'Failed to send OTP' });
@@ -618,8 +634,11 @@ export const verifyLoginOtp = async (req, res) => {
     }
 
     if (user && user.otp === otp) {
+
+
         // Clear OTP after successful verification
         await updateOtp(user.id);
+
         return res.status(200).json({ message: 'otp verified successfully, you are logged in successfully' });
     } else {
         return res.status(500).json({ message: 'internal server error please try again' });

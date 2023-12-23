@@ -19,7 +19,7 @@ const sendVerificationCode = async ( usr_mobile_number, otp ) => {
   console.log( otp);
     try {
         const message = await client.messages.create({
-            body: `Your verification code is: ${ otp}`,
+            body: `Your verification code is: ${otp}`,
             from: twilioPhoneNumber,
             to: usr_mobile_number
         });
