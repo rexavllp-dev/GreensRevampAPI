@@ -18,3 +18,10 @@ export const checkCompanyExist = async (company_trn_number) => {
   const company = await db('company').select('id').where({ company_trn_number });
   return company;
 };
+
+
+// image upload and resize 
+export const saveFileRecord = async (vatImg) => {
+const images = await db('company').insert({company_vat_certificate: vatImg}).returning('*');
+return images;
+};

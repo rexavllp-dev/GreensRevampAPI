@@ -120,10 +120,11 @@ export const updateUserVerificationStatus = async (userId, email_verified) => {
 };
 
 
-// mobile verification
+// mobile "verification"
 
 
 export const getUserById = async (usr_id) => {
+    console.log("userId" , usr_id);
     const user = await db('users').select("*").where({ id: usr_id }).first();
     return user;
 };
@@ -169,22 +170,41 @@ export const findUserById = async (id) => {
 // gmail authentication
 
 export const getUserByGoogleId = async (googleId) => {
-    const user = await db('users').where({ google_id : googleId }).first();
+    const user = await db('users').where({ google_id: googleId }).first();
     return user;
 };
 
 export const createGoogleUser = async (googleId, displayName) => {
-   
+
     const names = displayName.split(' ');
     console.log(names);
-    const user = await db('users').insert({ 
+    const user = await db('users').insert({
         google_id: googleId,
-         display_name: displayName,
-         usr_firstname : names[0],
-         usr_lastname : names[1],
-         usr_mobile_number
+        display_name: displayName,
+        usr_firstname: names[0],
+        usr_lastname: names[1],
     });
-   
+
+    return user;
+};
+
+
+// facebook authentication
+
+export const getUserByFacebook = async (facebookId) => {
+    const user = await db('users').where({ facebook_id: facebookId }).first();
+    return user;
+};
+
+
+export const createFacebookUser = async (facebookId, displayName) => {
+    const names = displayName.split(' ');
+    const user = await db('users').insert({
+        facebook_id : facebookId,
+        display_name : displayName,
+        usr_firstname: names[0],
+        usr_lastname: names[1],
+    })
     return user;
 };
 

@@ -4,10 +4,10 @@ import { Readable } from 'stream';
 import sharp from 'sharp';
 
 const s3Client = new S3Client({
-  region: 'your-s3-region',
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: 'your-access-key-id',
-    secretAccessKey: 'your-secret-access-key',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -18,7 +18,7 @@ export const upload = multer({
 
 export const uploadToS3 = async (file) => {
   const s3Params = {
-    Bucket: 'your-s3-bucket-name',
+    Bucket: process.env.S3_BUCKET_NAME,
     Key: `${Date.now().toString()}`,
     Body: file.buffer,
     ACL: 'public-read',
