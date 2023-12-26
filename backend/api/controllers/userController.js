@@ -308,8 +308,6 @@ export const refreshAccessToken = async (req, res) => {
 
 
 
-
-
 // login with otp
 export const loginWithOtp = async (req, res) => {
     const { usr_mobile_number } = req.body;
@@ -365,7 +363,6 @@ export const loginWithOtp = async (req, res) => {
             console.log(sendOtp);
             return res.status(200).json({ status:200, result:{ accessToken, refreshToken }, message: 'OTP sent successfully' });
         } else {
-            console.log();
             return res.status(500).json({ message: 'Failed to send OTP' });
         }
 
@@ -389,17 +386,20 @@ export const verifyEmail = async (req, res) => {
 
         const decoded = jwt.verify(token, process.env.DECODED);
         const userId = decoded.userId;
-        console.log(decoded);
+        // console.log(decoded);
 
         // Update user verification status
         const email_verified = await updateUserVerificationStatus(userId, true);
-
+           // generate otp
+           const otp = Math.floor(100000 + Math.random() * 900000).toString();
+           const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
         // Set OTP expiry time (e.g., 5 minutes from now)
         if (email_verified) {
-            const user = await getUserById(userId);
+          const user = await updateRegisterOtp(userId , otp, otpExpiry)
+          console.log(user);
 
             // Send OTP via SMS
-            await sendVerificationCode(user.usr_mobile_number, user.otp, user.otp_expiry);
+            await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, user[0].otp_expiry);
 
 
 

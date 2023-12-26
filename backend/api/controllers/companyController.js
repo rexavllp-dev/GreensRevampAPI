@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 import { resizeAndUpload, upload } from "../services/fileServices.js";
-import { checkUserExist, createUser, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateUserVerificationStatus } from "../models/userModel.js";
+import { checkUserExist, createUser, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import { sendVerificationEmail } from "../utils/emailer.js";
 import sendVerificationCode from "../utils/mobileOtp.js";
@@ -120,12 +120,7 @@ export const registerCompany = async (req, res) => {
         // password hash using bcrypt 
         const hashedPassword = await bcrypt.hash(usr_password, 12);
 
-        // Generate a random 6-digit verification code
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
-
-
-
+  
         const { error } = schema.validate(validate_data, joiOptions);
         if (error) {
             console.log(error);
@@ -160,8 +155,6 @@ export const registerCompany = async (req, res) => {
             usr_tos_accepted,
             usr_newsletter_accepted,
             email_verified: false,
-            otp: otp.toString(),
-            otp_expiry: otpExpiry,
             usr_company: newCompany[0].id,
         });
 
@@ -213,24 +206,26 @@ export const registerCompany = async (req, res) => {
 // #region email verification 
 
 export const verifyEmail = async (req, res) => {
-
+    
     const token = req.query.token;
     console.log(token);
     try {
         const decoded = jwt.verify(token, process.env.DECODED);
         const userId = decoded.userId;
-        console.log(decoded);
+        // console.log(decoded);
 
         // Update user verification status
         const email_verified = await updateUserVerificationStatus(userId, true);
 
         // Set OTP expiry time (e.g., 5 minutes from now)
 
-
+  // Generate a random 6-digit verification code
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
 
         if (email_verified) {
-            const user = await getUserById(userId);
-
+            const user = await updateRegisterOtp(userId , otp, otpExpiry)
+            console.log(user);
             // Send OTP via SMS
             await sendVerificationCode(user.usr_mobile_number, user.otp, user.otp_expiry);
 

@@ -154,7 +154,7 @@ export const updateRegisterOtp = async (id, otp, otpExpiry) => {
     const user = await db('users').where({ id }).update({
         otp: otp,
         otp_expiry: otpExpiry
-    });
+    }).returning('*');
     return user;
 };
 
