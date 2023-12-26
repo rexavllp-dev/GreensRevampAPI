@@ -3,11 +3,7 @@ import bcrypt from 'bcrypt';
 import {
     checkUserExist,
     createUser,
-    createUserWithFacebook,
-    createUserWithGoogle,
     deleteAUser,
-    findUserByFacebookId,
-    findUserByGoogleId,
     getUserByEmail,
     getUserById,
     getUserByPhoneNumber,
@@ -25,84 +21,12 @@ import getErrorsInArray from '../helpers/getErrors.js';
 import jwt from 'jsonwebtoken';
 import { sendVerificationEmail } from '../utils/emailer.js';
 import sendVerificationCode from '../utils/mobileOtp.js';
-import passport from '../middleware/passport-config.js';
 import validateAuth from '../middleware/validateAuth.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 
 
 // gmail and facebook authentication 
 // gmail  authentication 
-
-export const googleAuth = passport.authenticate('google', { scope: ['profile', 'email'] });
-
-
-export const googleAuthCallback = async (req, res) => {
-    try {
-        const { id, emails } = req.user.profile;
-
-        // Check if the user already exists in the database
-        const user = await findUserByGoogleId(id);
-
-        if (user) {
-            req.login(user, (err) => {
-                if (err) throw err;
-                return res.redirect('/');
-            });
-        } else {
-
-            // If the user doesn't exist, create a new user in the database
-            const newUser = await createUserWithGoogle(id, emails[0].value);
-            req.login(newUser[0], (err) => {
-                if (err) throw err;
-                return res.redirect('/');
-            });
-        }
-    } catch (error) {
-        console.error(error);
-        res.redirect('/');
-    }
-};
-
-//   facebook authentication 
-export const facebookAuth = passport.authenticate('facebook', { scope: ['email'] });
-
-export const facebookAuthCallback = async (req, res) => {
-    try {
-        const { id, emails } = req.user;
-
-        // Check if the user already exists in the database
-        const user = await findUserByFacebookId(id);
-
-        if (user) {
-            req.login(user, (err) => {
-                if (err) throw err;
-                return res.redirect('/');
-            });
-        } else {
-
-            // If the user doesn't exist, create a new user in the database
-            const newUser = await createUserWithFacebook(id, emails[0].value);
-            req.login(newUser[0], (err) => {
-                if (err) throw err;
-                return res.redirect('/');
-            });
-        }
-    } catch (error) {
-        console.error(error);
-        res.redirect('/');
-    }
-};
-
-
-export const getUserInfo = (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json(req.user);
-    } else {
-        res.send('Not authenticated');
-    }
-};
-
-
 
 
 // ________________________________________________________________________________________________________________________________________________________________________________

@@ -16,9 +16,10 @@ import {
     verifyEmail,
     verifyLoginOtp,
     verifyOtp
-
 } from '../controllers/userController.js';
+
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
+import passport from 'passport';
 
 
 
@@ -69,6 +70,15 @@ router.put('/update_mobile_number/:token', updateMobileUsingToken);
 // delete a user
 router.delete('/deleteUser/:id', deleteUser);
 
+// google authentication routes
 
+router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/'}),
+(req,res) => res.redirect("/"));
+
+// router.get('/', (req,res) => {
+//     res.send( req.user ? req.user: 'Not logged in, login with Google');
+// });
 
 export default router;

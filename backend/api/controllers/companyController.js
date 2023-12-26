@@ -353,48 +353,48 @@ export const verifyOtp = async (req, res) => {
 
 
 // Get a single user
-// export const getSingleUser = async (req, res) => {
-//     const { id } = req.params;
-//     try {
-//         const user = await getUserById(id);
+export const getSingleUser = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await getUserById(id);
 
-//         if (!user) {
+        if (!user) {
 
-//             return res.status(404).json({
-//                 status: 404,
-//                 success: false,
-//                 message: "User not found"
-//             });
-//         }
-//         res.status(200).json({
-//             status: 200,
-//             success: true,
-//             message: "User successfully found",
-//             result: user,
-//         });
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "User not found"
+            });
+        }
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "User successfully found",
+            result: user,
+        });
 
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({
-//             status: 500,
-//             success: false,
-//             message: "Failed to get user! Please try again later."
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to get user! Please try again later."
 
-//         });
-//     }
-// };
-
-
+        });
+    }
+};
 
 
-// // delete a user
-// export const deleteUser = async (req, res) => {
-//     const userId = req.params.id;
-//     try {
-//         const deleteSingleUser = await deleteAUser(userId); 
-//         return res.status(200).json({ success: true, message: 'User deleted successfully', result: deleteSingleUser });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({ success: false, message: 'Internal Server Error' });
-//     }
-// }
+
+
+// delete a user
+export const deleteUser = async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const deleteSingleUser = await deleteAUser(userId); 
+        return res.status(200).json({ success: true, message: 'User deleted successfully', result: deleteSingleUser });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+}

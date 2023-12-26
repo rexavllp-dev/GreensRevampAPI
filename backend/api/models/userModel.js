@@ -47,12 +47,12 @@ export const getUserByEmail = async (usr_email) => {
 export const userForgotPassword = async (usr_email) => {
     const user = await db("users").select("*").where({ usr_email }).first();
     return user;
-}
+};
 
 //update reset token
 export const updateResetToken = async (usr_email, token, expiresAt) => {
     return db('users').where({ usr_email }).update({ reset_token: token, reset_token_expires_at: expiresAt })
-}
+};
 
 //update password and then clear the resetToken and exipry Date from database
 export const updatePassword = async (id, hashedPassword) => {
@@ -61,7 +61,7 @@ export const updatePassword = async (id, hashedPassword) => {
         reset_token: null,
         reset_token_expires_at: null
     })
-}
+};
 
 
 // find resetToken from database
@@ -70,7 +70,7 @@ export const findByResetToken = async (reset_token) => {
     // console.log(resetToken)
     const user = await db("users").select("*").where({ reset_token }).first();
     return user;
-}
+};
 
 // forgot password end here
 // ________________________________________________________________________________________________________________________________________________________________________________________________________________
@@ -107,7 +107,7 @@ export const refreshTokenModel = {
 export const insertRefreshToken = async (userId, refreshToken) => {
     const user = db('users').insert({ id: userId, refresh_token: refreshToken });
     return user;
-}
+};
 
 // email verification
 export const updateUserVerificationStatus = async (userId, email_verified) => {
@@ -117,7 +117,7 @@ export const updateUserVerificationStatus = async (userId, email_verified) => {
         .returning('*');
 
     return updatedUser && updatedUser.email_verified;
-}
+};
 
 
 // mobile verification
@@ -156,39 +156,7 @@ export const updateRegisterOtp = async (id, otp, otpExpiry) => {
         otp_expiry: otpExpiry
     });
     return user;
-}
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Facebook gmail authentication
-
-// Function to find a user by their Google ID
-
-export const findUserByGoogleId = async (googleId) => {
-    const user = await db('users').where({ google_id: googleId }).first();
-    return user;
 };
-
-// Function to create a new user with Google authentication
-
-export const createUserWithGoogle = async (googleId, email) => {
-    const user = await db('users').insert({ google_id: googleId, usr_email: email }).returning('*');
-    return user;
-};
-
-// Function to find a user by their Facebook ID
-
-export const findUserByFacebookId = async (facebookId) => {
-    const user = await db('users').where({ facebook_id: facebookId }).first();
-    return user;
-};
-
-// Function to create a new user with Facebook authentication
-
-export const createUserWithFacebook = async (facebookId, email) => {
-    const user = await db('users').insert({ facebook_id: facebookId, usr_email: email }).returning('*');
-    return user;
-};
-
 
 export const findUserById = async (id) => {
     const user = await db('users').where({ id }).first();
@@ -196,8 +164,28 @@ export const findUserById = async (id) => {
 };
 
 
+// _________________________________________________________________________________________________________________________________________
 
+// gmail authentication
 
+export const getUserByGoogleId = async (googleId) => {
+    const user = await db('users').where({ google_id : googleId }).first();
+    return user;
+};
 
+export const createGoogleUser = async (googleId, displayName) => {
+   
+    const names = displayName.split(' ');
+    console.log(names);
+    const user = await db('users').insert({ 
+        google_id: googleId,
+         display_name: displayName,
+         usr_firstname : names[0],
+         usr_lastname : names[1],
+         usr_mobile_number
+    });
+   
+    return user;
+};
 
 

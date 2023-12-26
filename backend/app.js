@@ -4,14 +4,16 @@ import dotenv from 'dotenv'
 import userRoute from './api/routes/userRoute.js';
 import companyRoute from './api/routes/companyRoute.js';
 import countryRoute from './api/routes/countryRoute.js';
-import knexSessionStore from 'connect-session-knex';
 import session from 'express-session';
-import db from './config/dbConfig.js';
-import passport from './api/middleware/passport-config.js';
+import passport from 'passport';
+import './api/utils/passport-config.js';
+
+
+dotenv.config();
 
 const app = express();
 
-const KnexSessionStore = knexSessionStore(session);
+
 
 const PORT =  5000;
 const corsOptions = {
@@ -19,20 +21,21 @@ const corsOptions = {
   origin: true,
 };
 
-dotenv.config()
+// set up session
+app.use(
+  session({
+    secret: 'secret-key',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// Initialize Passport and restore authentication state from the session
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 // middlewares
-
-app.use(session({
-  secret: 'your_secret_key',
-  resave: false,
-  saveUninitialized: false,
-  store: new KnexSessionStore({ knex: db }),
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -41,7 +44,7 @@ app.use(express.json());
 app.use('/api/v1/users',userRoute);
 app.use('/api/v1/company',companyRoute);
 app.use('/api/v1/country',countryRoute);
-// app.use('/api/v1/authwithgooglefacebook', )
+
 
 
 
