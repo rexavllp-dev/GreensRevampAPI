@@ -18,6 +18,6 @@ const validateAuth = (token) => {
             }
         })
     })
-}
+};
 
 export default validateAuth;
