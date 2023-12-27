@@ -13,6 +13,7 @@ import {
     updateOtp,
     updateRegisterOtp,
     updateUserVerificationStatus,
+    getAllUsersData
 } from "../models/userModel.js";
 
 import Joi from 'joi';
@@ -31,6 +32,27 @@ import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 
 // ________________________________________________________________________________________________________________________________________________________________________________
 
+//Get all users 
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await getAllUsersData();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Users fetch successfull ",
+            result: users
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to retrieve users!."
+
+        });
+    }
+}
 
 export const registerUser = async (req, res) => {
 
@@ -142,7 +164,7 @@ export const registerUser = async (req, res) => {
 
 
         // jwt user token 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "6000s" });
 
         // Send email verification link
         await sendVerificationEmail(usr_email, token);
@@ -186,8 +208,8 @@ export const loginWithPassword = async (req, res) => {
         const existingUser = await getUserByEmail(usr_email);
 
         if (!existingUser) {
-            return res.status(401).json({
-                status: 401,
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: "User not found!"
             });
@@ -199,8 +221,8 @@ export const loginWithPassword = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(usr_password, existingUser?.usr_password);
 
         if (!isPasswordCorrect) {
-            return res.status(401).json({
-                status: 401,
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: "Invalid email or password!"
             });
@@ -209,7 +231,7 @@ export const loginWithPassword = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
-            return res.status(401).json({ status: 401, error: 'Email and mobile must be verified to login' });
+            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
         }
 
         //create token
@@ -261,7 +283,7 @@ export const loginWithPassword = async (req, res) => {
 
 
 // Refresh Token
-  
+
 export const refreshAccessToken = async (req, res) => {
 
     const { refresh_token } = req.body;
@@ -325,8 +347,8 @@ export const loginWithOtp = async (req, res) => {
 
         if (!existingUser) {
 
-            return res.status(401).json({
-                status: 401,
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: "Mobile number not found , please register your mobile number!"
             });
@@ -334,7 +356,7 @@ export const loginWithOtp = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
-            return res.status(401).json({ status: 401, error: 'Email and mobile must be verified to login' });
+            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
         }
 
         // token
@@ -343,18 +365,18 @@ export const loginWithOtp = async (req, res) => {
         const accessToken = generateAccessToken(existingUser)
 
         const refreshToken = generateRefreshToken(existingUser)
- 
+
 
 
         // save refresh token to the database
-        const saveToken = await refreshTokenModel.saveRefreshToken(refreshToken,existingUser.id);
+        const saveToken = await refreshTokenModel.saveRefreshToken(refreshToken, existingUser.id);
 
 
 
-        
-   console.log(accessToken);
-   console.log(refreshToken);
- 
+
+        console.log(accessToken);
+        console.log(refreshToken);
+
 
         // generate otp
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -366,7 +388,7 @@ export const loginWithOtp = async (req, res) => {
         console.log(sendOtp);
         if (sendOtp) {
             console.log(sendOtp);
-            return res.status(200).json({ status:200, result:{ accessToken, refreshToken }, message: 'OTP sent successfully' });
+            return res.status(200).json({ status: 200, result: { accessToken, refreshToken }, message: 'OTP sent successfully' });
         } else {
             return res.status(500).json({ message: 'Failed to send OTP' });
         }
@@ -395,13 +417,13 @@ export const verifyEmail = async (req, res) => {
 
         // Update user verification status
         const email_verified = await updateUserVerificationStatus(userId, true);
-           // generate otp
-           const otp = Math.floor(100000 + Math.random() * 900000).toString();
-           const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+        // generate otp
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
         // Set OTP expiry time (e.g., 5 minutes from now)
         if (email_verified) {
-          const user = await updateRegisterOtp(userId , otp, otpExpiry)
-          console.log(user);
+            const user = await updateRegisterOtp(userId, otp, otpExpiry)
+            console.log(user);
 
             // Send OTP via SMS
             await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, user[0].otp_expiry);

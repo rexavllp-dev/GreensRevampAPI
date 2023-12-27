@@ -1,5 +1,13 @@
 import db from '../../config/dbConfig.js';
 
+// Get all users
+export const getAllUsersData = async () => {
+
+    const allUsers = await db("users").select("*");
+    return allUsers;
+
+};
+
 // creating a function createUser for register a user 
 export const createUser = async (data) => {
 
