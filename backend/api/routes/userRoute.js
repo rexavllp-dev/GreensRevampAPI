@@ -1,8 +1,8 @@
 import express from 'express';
 import {
-
+ 
     deleteUser,
-    getAllUsers,
+   
     getSingleUser,
     getUserInformation,
     loginWithOtp,
@@ -32,8 +32,7 @@ import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailControl
 const router = express.Router();
 
 
-//get all users
-router.get('/all', getAllUsers)
+
 // register routes
 router.post('/register', registerUser);
 // login user
@@ -76,8 +75,7 @@ router.delete('/deleteUser/:id', deleteUser);
 
 router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }),
-    (req, res) => res.redirect("/"));
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/'}),googleAuth);
 
 // router.get('/', (req,res) => {
 //     res.send( req.user ? req.user: 'Not logged in, login with Google');
@@ -87,7 +85,6 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 
 router.get("/auth/facebook", passport.authenticate('facebook', { scope: ['profile', 'email'] }));
 
-router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }),
-    (req, res) => res.redirect("/"));
+router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/'}),facebookAuth);
 
 export default router;
