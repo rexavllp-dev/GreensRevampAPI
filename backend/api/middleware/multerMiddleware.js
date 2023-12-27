@@ -1,7 +1,7 @@
+
 import multer from "multer";
 import multerS3 from "multer-s3";
 import { S3Client } from "@aws-sdk/client-s3";
-// import sharp from "sharp";
 
 const s3 = new S3Client({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -15,19 +15,11 @@ export const upload = multer({
         bucket: process.env.S3_BUCKET_NAME,
         ACL: 'public-read',
         metadata: function (req, file, cb) {
-            // if file is an image resize the image using resizeAndUpload
-            // if (file.mimetype.startsWith('image')) {
-            //     resizeAndUpload(file).then((resizedFile) => {
-            //         cb(null, { fieldName: resizedFile.fieldname });
-            //     });
-            // } else {
-            //      cb(null, { fieldName: file.fieldname });
-            // }
-
+            console.log(file);
             cb(null, { fieldName: file.fieldname });
         },
         key: function (req, file, cb) {
-            cb(null, Date.now().toString())
+            cb(null, Date.now().toString() + '-' + file.originalname);
         }
     })
 });
@@ -62,3 +54,16 @@ export const upload = multer({
 //             });
 //     });
 // };
+
+
+
+
+
+// if file is an image resize the image using resizeAndUpload
+            // if (file.mimetype.startsWith('image')) {
+            //     resizeAndUpload(file).then((resizedFile) => {
+            //         cb(null, { fieldName: resizedFile.fieldname });
+            //     });
+            // } else {
+            //      cb(null, { fieldName: file.fieldname });
+            // }

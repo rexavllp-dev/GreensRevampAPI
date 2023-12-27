@@ -21,7 +21,7 @@ export const checkCompanyExist = async (company_trn_number) => {
 
 
 // image upload and resize 
-export const saveFileRecord = async (vatImg) => {
-const images = await db('company').insert({company_vat_certificate: vatImg}).returning('*');
+export const saveFileRecord = async (company_vat_certificate, company_trade_license) => {
+const images = await db('company').insert({ company_vat_certificate, company_trade_license }).returning('*');
 return images;
 };

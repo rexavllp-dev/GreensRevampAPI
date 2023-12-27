@@ -1,6 +1,8 @@
 import express from 'express';
 import { registerCompany } from '../controllers/companyController.js';
-import { upload } from '../middleware/multerMiddleware.js';
+import { uploadAndResizeImage } from '../controllers/imageController.js';
+import { uploadFiles } from '../middleware/uploadFiles.js';
+
 
 
 
@@ -13,9 +15,7 @@ const router = express.Router();
 router.post('/', registerCompany);
 
 // upload image
-router.post('/upload', upload.array('photos', 3), function(req, res, next) {
-    res.send('Successfully uploaded ' + req.files.length + ' files!')
-  })
+router.post('/upload', uploadFiles({ key: 'image', name: 'image', formatType: 'image' }), uploadAndResizeImage);
 
 
 export default router;

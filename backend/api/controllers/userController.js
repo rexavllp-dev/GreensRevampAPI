@@ -287,14 +287,11 @@ export const loginWithPassword = async (req, res) => {
 export const refreshAccessToken = async (req, res) => {
 
     const { refresh_token } = req.body;
-    console.log('yeah it is called')
-
-    console.log(refresh_token)
 
 
     try {
         if (!refresh_token) {
-            return res.status(404).json({ message: "Refresh token is required" })
+            return res.status(401).json({ message: "Refresh token is required" })
         }
 
         // verify the refresh token
@@ -308,10 +305,8 @@ export const refreshAccessToken = async (req, res) => {
 
         const storedToken = await refreshTokenModel.findRefreshToken(decoded.userId, refresh_token);
 
-        console.log(storedToken)
-
         if (!storedToken) {
-            return res.status(404).json({ message: 'Invalid refresh token' });
+            return res.status(401).json({ message: 'Invalid refresh token' });
         }
 
         // If the refresh token is valid, generate a new access token
@@ -324,11 +319,11 @@ export const refreshAccessToken = async (req, res) => {
         const newRefreshToken = generateRefreshToken(user);
         await refreshTokenModel.updateResetToken(decoded.userId, newRefreshToken);
 
-        return res.status(200).json({ status: 200, accessToken: newAccessToken, refresh_token: newRefreshToken, message: 'Token regenerated successfully' })
+        return res.status(200).json({ status: 200, accessToken: newAccessToken, refresh_token: newAccessToken, message: 'Token regenerated successfully' })
     } catch (error) {
         console.log(error);
 
-        return res.status(404).json({ message: 'Invalid refresh token' });
+        return res.status(401).json({ message: 'Invalid refresh token' });
     }
 
 }
