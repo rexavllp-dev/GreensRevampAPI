@@ -15,7 +15,8 @@ import {
     updateMobileUsingToken,
     verifyEmail,
     verifyLoginOtp,
-    verifyOtp
+    verifyOtp,
+    getAllUsers
 } from '../controllers/userController.js';
 
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
@@ -32,7 +33,8 @@ import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailControl
 const router = express.Router();
 
 
-
+//get all users
+router.get('/all', getAllUsers)
 // register routes
 router.post('/register', registerUser);
 // login user

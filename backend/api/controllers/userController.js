@@ -13,6 +13,7 @@ import {
     updateOtp,
     updateRegisterOtp,
     updateUserVerificationStatus,
+    getAllUsersData
 } from "../models/userModel.js";
 
 import Joi from 'joi';
@@ -30,6 +31,28 @@ import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 
 
 // ________________________________________________________________________________________________________________________________________________________________________________
+
+//Get all users 
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await getAllUsersData();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Users fetch successfull ",
+            result: users
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to retrieve users!."
+
+        });
+    }
+}
 
 
 export const registerUser = async (req, res) => {
