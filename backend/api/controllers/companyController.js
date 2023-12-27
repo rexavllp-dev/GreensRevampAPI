@@ -2,7 +2,6 @@ import { checkCompanyExist, createCompany } from "../models/companyModel.js";
 import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
-import { resizeAndUpload, upload } from "../services/fileServices.js";
 import { checkUserExist, createUser, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import { sendVerificationEmail } from "../utils/emailer.js";
