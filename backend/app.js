@@ -7,6 +7,7 @@ import countryRoute from './api/routes/countryRoute.js';
 import session from 'express-session';
 import passport from 'passport';
 import './api/utils/passport-config.js';
+import fileUpload from 'express-fileupload';
 
 
 dotenv.config();
@@ -39,7 +40,8 @@ app.use(passport.session());
 
 app.use(cors(corsOptions));
 app.use(express.json());
-
+app.use(fileUpload());
+app.use('/public', express.static('public'));
 
 app.use('/api/v1/users',userRoute);
 app.use('/api/v1/company',companyRoute);

@@ -7,6 +7,17 @@ import bcrypt from 'bcrypt';
 import { sendVerificationEmail } from "../utils/emailer.js";
 import sendVerificationCode from "../utils/mobileOtp.js";
 import jwt from 'jsonwebtoken';
+import aws from 'aws-sdk';
+import Jimp from "jimp";
+
+const awsConfig = ({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+    bucketName: process.env.S3_BUCKET_NAME
+});
+
+const s3 = new aws.S3(awsConfig)
 
 // creating a company functions 
 export const registerCompany = async (req, res) => {
@@ -30,30 +41,32 @@ export const registerCompany = async (req, res) => {
         company_name,
         company_landline,
         company_landline_country_code,
-        company_vat_certificate,
         company_trn_number,
-        company_trade_license,
         company_trade_license_expiry,
 
     } = req.body;
-    company_trade_license = 'hjhshsdhjd'
-    company_vat_certificate = 'dwsdsdsdsds'
-    // console.log(company_landline_country_code);
+
+    const files = req.files;
+    const { company_vat_certificate, company_trade_license } = files;
 
     try {
 
-        const existingCompany = await checkCompanyExist( company_trn_number );
-        if(existingCompany.length) {
+
+
+
+
+        const existingCompany = await checkCompanyExist(company_trn_number);
+        if (existingCompany.length) {
             return res.status(409).json({
                 status: 409,
                 success: false,
                 message: "Company already exist",
-                
+
             });
         }
 
         const existingUser = await checkUserExist(usr_mobile_number, usr_email);
-        if(existingUser.length) {
+        if (existingUser.length) {
             return res.status(409).json({
                 status: 409,
                 success: false,
@@ -109,27 +122,58 @@ export const registerCompany = async (req, res) => {
             company_name,
             company_landline,
             company_landline_country_code,
-            company_vat_certificate,
+            // company_vat_certificate,
             company_trn_number,
-            company_trade_license,
+            // company_trade_license,
             company_trade_license_expiry,
 
         };
 
-        // password hash using bcrypt 
-        const hashedPassword = await bcrypt.hash(usr_password, 12);
 
-  
-        const { error } = schema.validate(validate_data, joiOptions);
-        if (error) {
-            console.log(error);
-            return res.status(500).json({
-                status: 500,
+
+        // const { error } = schema.validate(validate_data, joiOptions);
+        // if (error) {
+        //     console.log(error);
+        //     return res.status(500).json({
+        //         status: 500,
+        //         success: false,
+        //         message: "Validation Error",
+        //         error: getErrorsInArray(error?.details),
+        //     });
+        // };
+
+
+        if (!req.files) {
+            return res.status(400).json({
+                status: 400,
                 success: false,
-                message: "Validation Error",
-                error: getErrorsInArray(error?.details),
+                message: "No image provided",
             });
+        }
+
+        let company_vat_certificate;
+        let  company_trade_license;
+
+        for (const field in files) {
+            const file = files[field];
+
+            console.log(file);
+            // upload resized to s3 
+            const uploadParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `images/${file.name}`,
+                Body: file.data,
+                ContentType: file.mimetype,
+            };
+
+            const s3Data = await s3.upload(uploadParams).promise();
+            if(field === "company_vat_certificate" ) {
+                company_vat_certificate = s3Data.Location
+            } else {
+                company_trade_license = s3Data.Location
+            }
         };
+
 
         const newCompany = await createCompany({
             company_name,
@@ -142,6 +186,8 @@ export const registerCompany = async (req, res) => {
         });
 
 
+        // password hash using bcrypt 
+        const hashedPassword = await bcrypt.hash(usr_password, 12);
 
         const newUser = await createUser({
             usr_firstname,
@@ -164,7 +210,7 @@ export const registerCompany = async (req, res) => {
         // Send email verification link
         await sendVerificationEmail(usr_email, token);
 
-     
+
 
 
         res.status(201).json({
@@ -189,7 +235,7 @@ export const registerCompany = async (req, res) => {
 
         });
 
-         
+
 
     } catch (error) {
         console.log(error);
@@ -205,7 +251,7 @@ export const registerCompany = async (req, res) => {
 // #region email verification 
 
 export const verifyEmail = async (req, res) => {
-    
+
     const token = req.query.token;
     console.log(token);
     try {
@@ -218,12 +264,12 @@ export const verifyEmail = async (req, res) => {
 
         // Set OTP expiry time (e.g., 5 minutes from now)
 
-  // Generate a random 6-digit verification code
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+        // Generate a random 6-digit verification code
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
 
         if (email_verified) {
-            const user = await updateRegisterOtp(userId , otp, otpExpiry)
+            const user = await updateRegisterOtp(userId, otp, otpExpiry)
             console.log(user);
             // Send OTP via SMS
             await sendVerificationCode(user.usr_mobile_number, user.otp, user.otp_expiry);
@@ -385,7 +431,7 @@ export const getSingleUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     const userId = req.params.id;
     try {
-        const deleteSingleUser = await deleteAUser(userId); 
+        const deleteSingleUser = await deleteAUser(userId);
         return res.status(200).json({ success: true, message: 'User deleted successfully', result: deleteSingleUser });
     } catch (error) {
         console.error(error);
