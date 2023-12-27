@@ -122,25 +122,23 @@ export const registerCompany = async (req, res) => {
             company_name,
             company_landline,
             company_landline_country_code,
-            // company_vat_certificate,
             company_trn_number,
-            // company_trade_license,
             company_trade_license_expiry,
 
         };
 
 
 
-        // const { error } = schema.validate(validate_data, joiOptions);
-        // if (error) {
-        //     console.log(error);
-        //     return res.status(500).json({
-        //         status: 500,
-        //         success: false,
-        //         message: "Validation Error",
-        //         error: getErrorsInArray(error?.details),
-        //     });
-        // };
+        const { error } = schema.validate(validate_data, joiOptions);
+        if (error) {
+            console.log(error);
+            return res.status(500).json({
+                status: 500,
+                success: false,
+                message: "Validation Error",
+                error: getErrorsInArray(error?.details),
+            });
+        };
 
 
         if (!req.files) {

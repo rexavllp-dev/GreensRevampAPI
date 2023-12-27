@@ -20,6 +20,7 @@ import {
 
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
 import passport from 'passport';
+import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailController.js';
 
 
 

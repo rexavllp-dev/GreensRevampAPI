@@ -34,18 +34,23 @@ passport.use(
     }
   )
 );
+
+
 passport.serializeUser((user, done) => {
   done(null, user);
 });
+
 passport.deserializeUser(async (user, done) => {
   console.log(user);
   try {
-    const userData = await getUserById(user?.id);
-    done(null, userData);
+    // const userData = await getUserById(user?.id);
+    done(null, user);
   } catch (error) {
     done(error);
   }
 });
+
+
 
 
 // facebook
@@ -85,8 +90,8 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (user, done) => {
   // console.log(user);
   try {
-    const userData = await getUserById(user?.id);
-    done(null, userData);
+    // const userData = await getUserById(user?.id);
+    done(null, user);
   } catch (error) {
     done(error);
   }

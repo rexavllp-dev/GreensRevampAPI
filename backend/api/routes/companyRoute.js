@@ -12,10 +12,7 @@ import { uploadFiles } from '../middleware/uploadFiles.js';
 const router = express.Router();
 
 // register  routes
-router.post('/', registerCompany);
-
-// upload image
-router.post('/upload', uploadFiles({ key: 'image', name: 'image', formatType: 'image' }), uploadAndResizeImage);
+router.post('/register-company', registerCompany);
 
 
 export default router;
