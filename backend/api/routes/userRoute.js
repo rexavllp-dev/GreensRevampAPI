@@ -2,7 +2,6 @@ import express from 'express';
 import {
 
     deleteUser,
-
     getSingleUser,
     getUserInformation,
     loginWithOtp,
@@ -13,10 +12,10 @@ import {
     resendOtp,
     updateEmailUsingToken,
     updateMobileUsingToken,
+    updateUserDetails,
     verifyEmail,
     verifyLoginOtp,
-    verifyOtp,
-    getAllUsers
+    verifyOtp
 } from '../controllers/userController.js';
 
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
@@ -33,8 +32,7 @@ import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailControl
 const router = express.Router();
 
 
-//get all users
-router.get('/all', getAllUsers)
+
 // register routes
 router.post('/register', registerUser);
 // login user
@@ -70,6 +68,8 @@ router.get('/getuserinfo/:token', getUserInformation);
 router.put('/update_email/:token', updateEmailUsingToken);
 // update using mobile number  using token
 router.put('/update_mobile_number/:token', updateMobileUsingToken);
+// update the user details 
+router.put('/update-user/:userId', updateUserDetails);
 // delete a user
 router.delete('/deleteUser/:id', deleteUser);
 
