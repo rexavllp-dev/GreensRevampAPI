@@ -15,17 +15,18 @@ passport.use(
       callbackURL: 'http://localhost:5000/api/v1/users/auth/google/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
-     
+
       try {
-       
+
         const user = await getUserByGoogleId(profile.id);
-     
+
         if (user) {
           return done(null, user);
         }
         const newUser = await createGoogleUser(
           profile.id,
-          profile.displayName
+          profile.displayName,
+          profile?.emails[0]?.value
         );
         return done(null, newUser);
       } catch (error) {
@@ -63,7 +64,7 @@ passport.use(
       callbackURL: 'http://localhost:5000/api/v1/users/auth/facebook/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
-     
+
       try {
         console.log(profile);
         const user = await getUserByFacebook(profile.id);
@@ -72,9 +73,11 @@ passport.use(
         if (user) {
           return done(null, user);
         }
+        console.log(profile);
         const newUser = await createFacebookUser(
           profile.id,
-          profile.displayName
+          profile.displayName,
+          profile?.emails[0]?.value
         );
         return done(null, newUser);
       } catch (error) {
