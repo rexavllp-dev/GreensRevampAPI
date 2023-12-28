@@ -1,7 +1,6 @@
 import express from 'express';
 import { registerCompany } from '../controllers/companyController.js';
-import { uploadAndResizeImage } from '../controllers/imageController.js';
-import { uploadFiles } from '../middleware/uploadFiles.js';
+
 
 
 

@@ -174,6 +174,7 @@ export const findUserById = async (id) => {
 };
 
 
+
 // _________________________________________________________________________________________________________________________________________
 
 // gmail authentication
@@ -216,5 +217,6 @@ export const createFacebookUser = async (facebookId, displayName) => {
     })
     return user;
 };
+
 
 

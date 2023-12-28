@@ -79,9 +79,6 @@ router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 
 
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/'}),googleAuth);
 
-// router.get('/', (req,res) => {
-//     res.send( req.user ? req.user: 'Not logged in, login with Google');
-// });
 
 // facebook authentication routes
 
