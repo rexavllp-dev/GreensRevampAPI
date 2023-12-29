@@ -1,21 +1,18 @@
 import db from '../../config/dbConfig.js';
 
-
-// Get all users
-export const getAllUsersData = async () => {
-
-    const allUsers = await db("users").select("*");
-    return allUsers;
-
-};
-
 // creating a function createUser for register a user 
 export const createUser = async (data) => {
-
     const newUser = await db("users").insert(data).returning('*');
     return newUser;
-
 };
+
+// update the user details
+export const updateUser = async (userId, newData) => {
+    const user = await db('users').where({ id: userId }).update( newData ).returning('*');
+    return user;
+};
+
+
 //  check user exist
 export const checkUserExist = async (usr_mobile_number, usr_email) => {
     const user = await db('users').select('id').where({ usr_mobile_number }).orWhere({ usr_email });
@@ -133,7 +130,7 @@ export const updateUserVerificationStatus = async (userId, email_verified) => {
 
 
 export const getUserById = async (usr_id) => {
-    console.log("userId" , usr_id);
+    // console.log("userId" , usr_id);
     const user = await db('users').select("*").where({ id: usr_id }).first();
     return user;
 };
@@ -172,6 +169,8 @@ export const findUserById = async (id) => {
     const user = await db('users').where({ id }).first();
     return user
 };
+
+
 
 
 

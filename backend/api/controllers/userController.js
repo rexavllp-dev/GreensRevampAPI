@@ -12,8 +12,8 @@ import {
     updateMobile,
     updateOtp,
     updateRegisterOtp,
+    updateUser,
     updateUserVerificationStatus,
-    getAllUsersData
 } from "../models/userModel.js";
 
 import Joi from 'joi';
@@ -31,28 +31,6 @@ import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 
 
 // ________________________________________________________________________________________________________________________________________________________________________________
-
-//Get all users 
-export const getAllUsers = async (req, res) => {
-    try {
-        const users = await getAllUsersData();
-
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Users fetch successfull ",
-            result: users
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to retrieve users!."
-
-        });
-    }
-}
 
 
 export const registerUser = async (req, res) => {
@@ -138,6 +116,7 @@ export const registerUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(usr_password, 12);
         // Generate a random 6-digit verification code
+
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
 
@@ -149,6 +128,7 @@ export const registerUser = async (req, res) => {
             usr_mobile_number,
             usr_mobile_country_code,
             usr_email,
+
             //  hashed password initialize to usr_password
             usr_password: hashedPassword,
             usr_designation,
@@ -156,8 +136,6 @@ export const registerUser = async (req, res) => {
             usr_newsletter_accepted,
             email_verified: false,
             mobile_verified: false,
-            otp: otp.toString(),
-            otp_expiry: otpExpiry,
 
         });
 
@@ -191,7 +169,7 @@ export const registerUser = async (req, res) => {
 
     } catch (error) {
 
-        console.log(error);
+        // console.log(error);
         res.status(500).json({
             status: 500,
             success: false,
@@ -738,5 +716,41 @@ export const updateMobileUsingToken = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to update mobile' });
+    }
+}
+
+
+// update using details 
+
+export const updateUserDetails = async (req,res) => {
+    const userId = req.params.userId;
+    const newData = req.body 
+
+    try {
+
+        const existingUser = await getUserById(userId);
+        if(!existingUser) {
+            return res.status(404).json({
+              status:404,
+              success:false,
+              message:"User not found",
+            });
+        }
+        
+        const updatedUser = await updateUser(userId, newData);
+        res.status(201).json({
+          status:201,
+          success:true,
+          message: "User updated successfully",
+          result:newData,
+        });
+    } catch (error) {
+       
+        res.status(400).json({
+          status:400,
+          success:false,
+          message:"failed to update the user",
+          error:error
+        });
     }
 }
