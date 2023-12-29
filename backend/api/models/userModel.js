@@ -208,14 +208,13 @@ export const getUserByFacebook = async (facebookId) => {
 };
 
 
-export const createFacebookUser = async (facebookId, displayName, email) => {
+export const createFacebookUser = async (facebookId, displayName) => {
     const names = displayName.split(' ');
     const user = await db('users').insert({
         facebook_id : facebookId,
         display_name : displayName,
         usr_firstname: names[0],
         usr_lastname: names[1],
-        usr_email: email
     }).returning('*');
     return user;
 };

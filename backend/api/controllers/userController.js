@@ -168,7 +168,7 @@ export const registerUser = async (req, res) => {
         const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
 
         // Send email verification link
-        await sendVerificationEmail(usr_email, token);
+        await sendVerificationEmail(usr_email, token, 'individual');
 
         res.status(201).json({
             status: 201,
@@ -361,18 +361,18 @@ export const loginWithOtp = async (req, res) => {
         const accessToken = generateAccessToken(existingUser)
 
         const refreshToken = generateRefreshToken(existingUser)
- 
+
 
 
         // save refresh token to the database
-        const saveToken = await refreshTokenModel.saveRefreshToken(refreshToken,existingUser.id);
+        const saveToken = await refreshTokenModel.saveRefreshToken(refreshToken, existingUser.id);
 
 
 
-        
-   console.log(accessToken);
-   console.log(refreshToken);
- 
+
+        console.log(accessToken);
+        console.log(refreshToken);
+
 
         // generate otp
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -384,7 +384,7 @@ export const loginWithOtp = async (req, res) => {
         console.log(sendOtp);
         if (sendOtp) {
             console.log(sendOtp);
-            return res.status(200).json({ status:200, result:{ accessToken, refreshToken }, message: 'OTP sent successfully' });
+            return res.status(200).json({ status: 200, result: { accessToken, refreshToken }, message: 'OTP sent successfully' });
         } else {
             return res.status(500).json({ message: 'Failed to send OTP' });
         }
@@ -413,13 +413,13 @@ export const verifyEmail = async (req, res) => {
 
         // Update user verification status
         const email_verified = await updateUserVerificationStatus(userId, true);
-           // generate otp
-           const otp = Math.floor(100000 + Math.random() * 900000).toString();
-           const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+        // generate otp
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
         // Set OTP expiry time (e.g., 5 minutes from now)
         if (email_verified) {
-          const user = await updateRegisterOtp(userId , otp, otpExpiry)
-          console.log(user);
+            const user = await updateRegisterOtp(userId, otp, otpExpiry)
+            console.log(user);
 
             // Send OTP via SMS
             await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, user[0].otp_expiry);
@@ -527,6 +527,7 @@ export const resendOtp = async (req, res) => {
 
 export const verifyOtp = async (req, res) => {
     const { token, otp } = req.body;
+    const { from } = req.query;
 
     try {
         const userInfo = await validateAuth(token);
@@ -674,6 +675,7 @@ export const deleteUser = async (req, res) => {
 
 export const updateEmailUsingToken = async (req, res) => {
     const { token } = req.params;
+    const { from } = req.query;
     const { usr_email } = req.body;
     console.log(token);
 
@@ -692,7 +694,7 @@ export const updateEmailUsingToken = async (req, res) => {
         await updateEmail(user.userId, usr_email);
 
 
-        await sendVerificationEmail(usr_email, token);
+        await sendVerificationEmail(usr_email, token, from);
         console.log(usr_email);
 
         res.status(200).json({

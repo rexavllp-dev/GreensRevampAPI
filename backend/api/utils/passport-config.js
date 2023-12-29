@@ -77,7 +77,6 @@ passport.use(
         const newUser = await createFacebookUser(
           profile.id,
           profile.displayName,
-          profile?.emails[0]?.value
         );
         return done(null, newUser);
       } catch (error) {
