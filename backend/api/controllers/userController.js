@@ -187,8 +187,8 @@ export const loginWithPassword = async (req, res) => {
         const existingUser = await getUserByEmail(usr_email);
 
         if (!existingUser) {
-            return res.status(401).json({
-                status: 401,
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: "User not found!"
             });
@@ -200,8 +200,8 @@ export const loginWithPassword = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(usr_password, existingUser?.usr_password);
 
         if (!isPasswordCorrect) {
-            return res.status(401).json({
-                status: 401,
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: "Invalid email or password!"
             });
@@ -210,7 +210,7 @@ export const loginWithPassword = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
-            return res.status(401).json({ status: 401, error: 'Email and mobile must be verified to login' });
+            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
         }
 
         //create token
