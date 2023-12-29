@@ -47,7 +47,6 @@ export const registerCompany = async (req, res) => {
     } = req.body;
 
     const files = req.files;
-    const { company_vat_certificate, company_trade_license } = files;
 
     try {
 
@@ -206,7 +205,7 @@ export const registerCompany = async (req, res) => {
         const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
 
         // Send email verification link
-        await sendVerificationEmail(usr_email, token);
+        await sendVerificationEmail(usr_email, token, 'company');
 
 
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import {
- 
+
     deleteUser,
     getSingleUser,
     getUserInformation,
@@ -77,13 +77,13 @@ router.delete('/deleteUser/:id', deleteUser);
 
 router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/'}),googleAuth);
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), googleAuth);
 
 
 // facebook authentication routes
 
 router.get("/auth/facebook", passport.authenticate('facebook', { scope: ['profile', 'email'] }));
 
-router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/'}), facebookAuth);
+router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), facebookAuth);
 
 export default router;
