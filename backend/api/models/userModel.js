@@ -183,7 +183,7 @@ export const getUserByGoogleId = async (googleId) => {
     return user;
 };
 
-export const createGoogleUser = async (googleId, displayName, email) => {
+export const createGoogleUser = async (googleId, displayName) => {
 
     const names = displayName.split(' ');
     console.log(names);
@@ -192,8 +192,7 @@ export const createGoogleUser = async (googleId, displayName, email) => {
         display_name: displayName,
         usr_firstname: names[0],
         usr_lastname: names[1],
-        usr_email: email
-    }).returning('*');
+    });
 
     return user;
 };
@@ -214,8 +213,9 @@ export const createFacebookUser = async (facebookId, displayName) => {
         display_name : displayName,
         usr_firstname: names[0],
         usr_lastname: names[1],
-    }).returning('*');
+    })
     return user;
 };
+
 
 
