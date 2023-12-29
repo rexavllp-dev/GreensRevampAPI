@@ -362,7 +362,7 @@ export const loginWithOtp = async (req, res) => {
         console.log("phone number", existingUser.usr_mobile_number);
         console.log("otp", otp);
         console.log("sendotps", sendOtp);
-        
+
         // if (sendOtp) {
         //     // console.log("sendotps", sendOtp);
         //     return res.status(200).json({
@@ -550,31 +550,29 @@ export const verifyOtp = async (req, res) => {
         if (from === 'individual') {
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
-            return res.status(210).json({
+            return res.status(201).json({
                 status: 201,
                 success: true,
-                message: "Individual registration",
+                message: "OTP verified successfully",
                 result: {
+                    user: {
+                        id: user.id,
+                        usr_email: user.usr_email,
+                        usr_firstname: user.usr_firstname,
+                        usr_lastname: user.usr_lastname,
+                    },
                     accessToken,
                     refreshToken
                 }
             });
-        };
+        } else {
+            // Perform additional user registration steps if needed
+            res.status(200).json({
+                status: 200,
+                message: 'OTP verified successfully',
+            });
+        }
 
-        // Perform additional user registration steps if needed
-        res.status(200).json({
-            status: 200,
-            message: 'OTP verified successfully',
-            result: {
-
-                id: user.id,
-                usr_email: user.usr_email,
-                usr_firstname: user.usr_firstname,
-                usr_lastname: user.usr_lastname,
-
-
-            }
-        });
 
     } catch (error) {
         console.log(error);
