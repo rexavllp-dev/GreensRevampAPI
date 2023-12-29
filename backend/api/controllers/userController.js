@@ -358,11 +358,16 @@ export const loginWithOtp = async (req, res) => {
 
         await updateRegisterOtp(existingUser.id, otp, otpExpiry)
 
-        const sendOtp = await sendVerificationCode(existingUser.usr_mobile_number, otp)
-        console.log(sendOtp);
+        const sendOtp = await sendVerificationCode(existingUser.usr_mobile_number, otp);
+        console.log("phone number", existingUser.usr_mobile_number);
+        console.log("otp", otp);
+        console.log("sendotps", sendOtp);
         if (sendOtp) {
-            console.log(sendOtp);
-            return res.status(200).json({ status: 200, result: { accessToken, refreshToken }, message: 'OTP sent successfully' });
+            // console.log("sendotps", sendOtp);
+            return res.status(200).json({
+                status: 200,
+                message: 'OTP sent successfully',
+            });
         } else {
             return res.status(500).json({ message: 'Failed to send OTP' });
         }
@@ -509,6 +514,7 @@ export const verifyOtp = async (req, res) => {
 
     try {
         const userInfo = await validateAuth(token);
+        // OTP valid for 5 minutes
         // Check if OTP is valid and not expired
         const user = await getUserById(userInfo.userId);
         if (!user) {
@@ -519,12 +525,10 @@ export const verifyOtp = async (req, res) => {
             });
         }
 
-        console.log(user);
-        console.log(user.otp);
         // console.log(user.otp_expiry);
 
         if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
-            console.log(otp);
+            console.log("otp", otp);
             console.log(user.otp);
             console.log(user.otp_expiry);
             console.log(user.id);
@@ -536,12 +540,36 @@ export const verifyOtp = async (req, res) => {
             await updateOtp(user.id, true);
 
         }
-        if(from === 'individual') {
-            
+
+        if (from === 'individual') {
+            const accessToken = generateAccessToken(user);
+            const refreshToken = generateRefreshToken(user);
+            return res.status(210).json({
+                status: 201,
+                success: true,
+                message: "Individual registration",
+                result: {
+                    accessToken,
+                    refreshToken
+                }
+            });
         };
-        
+
         // Perform additional user registration steps if needed
-        res.status(200).json({ status: 200, message: 'OTP verified successfully' });
+        res.status(200).json({
+            status: 200,
+            message: 'OTP verified successfully',
+            result: {
+
+                id: user.id,
+                usr_email: user.usr_email,
+                usr_firstname: user.usr_firstname,
+                usr_lastname: user.usr_lastname,
+
+
+            }
+        });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: 500, message: 'Failed otp verification', error: error });
@@ -556,10 +584,11 @@ export const verifyLoginOtp = async (req, res) => {
 
     // Check if OTP is valid and not expired
     const user = await getUserByPhoneNumber(usr_mobile_number);
-    console.log(otp);
+    // console.log(user);
+    // console.log(otp);
     if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
-        console.log(user.otp);
-        console.log(user.otp_expiry);
+        // console.log(user.otp);
+        // console.log(user.otp_expiry);
         return res.status(401).json({ error: 'Invalid OTP or OTP expired' });
     }
 
@@ -569,7 +598,22 @@ export const verifyLoginOtp = async (req, res) => {
         // Clear OTP after successful verification
         await updateOtp(user.id);
 
-        return res.status(200).json({ message: 'otp verified successfully, you are logged in successfully' });
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        return res.status(200).json({
+            message: 'otp verified successfully, you are logged in successfully',
+            result: {
+                accessToken,
+                refreshToken,
+                user: {
+                    id: user.id,
+                    usr_email: user.usr_email,
+                    usr_firstname: user.usr_firstname,
+                    usr_lastname: user.usr_lastname,
+                }
+            }
+        });
     } else {
         return res.status(500).json({ message: 'internal server error please try again' });
     }
@@ -726,35 +770,35 @@ export const updateMobileUsingToken = async (req, res) => {
 
 // update using details 
 
-export const updateUserDetails = async (req,res) => {
+export const updateUserDetails = async (req, res) => {
     const userId = req.params.userId;
-    const newData = req.body 
+    const newData = req.body
 
     try {
 
         const existingUser = await getUserById(userId);
-        if(!existingUser) {
+        if (!existingUser) {
             return res.status(404).json({
-              status:404,
-              success:false,
-              message:"User not found",
+                status: 404,
+                success: false,
+                message: "User not found",
             });
         }
-        
+
         const updatedUser = await updateUser(userId, newData);
         res.status(201).json({
-          status:201,
-          success:true,
-          message: "User updated successfully",
-          result:newData,
+            status: 201,
+            success: true,
+            message: "User updated successfully",
+            result: newData,
         });
     } catch (error) {
-       
+
         res.status(400).json({
-          status:400,
-          success:false,
-          message:"failed to update the user",
-          error:error
+            status: 400,
+            success: false,
+            message: "failed to update the user",
+            error: error
         });
     }
 }
