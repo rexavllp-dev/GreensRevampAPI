@@ -362,15 +362,21 @@ export const loginWithOtp = async (req, res) => {
         console.log("phone number", existingUser.usr_mobile_number);
         console.log("otp", otp);
         console.log("sendotps", sendOtp);
-        if (sendOtp) {
-            // console.log("sendotps", sendOtp);
-            return res.status(200).json({
-                status: 200,
-                message: 'OTP sent successfully',
-            });
-        } else {
-            return res.status(500).json({ message: 'Failed to send OTP' });
-        }
+        
+        // if (sendOtp) {
+        //     // console.log("sendotps", sendOtp);
+        //     return res.status(200).json({
+        //         status: 200,
+        //         message: 'OTP sent successfully',
+        //     });
+        // } else {
+        //     return res.status(500).json({ message: 'Failed to send OTP' });
+        // }
+
+        return res.status(200).json({
+            status: 200,
+            message: 'OTP sent successfully',
+        });
 
 
     } catch (error) {
@@ -406,10 +412,10 @@ export const verifyEmail = async (req, res) => {
 
             // Send OTP via SMS
             await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, user[0].otp_expiry);
-
-
-
-            res.status(200).json({ status: 200, message: 'Email verification successful, Check your mobile for verification' });
+            return res.status(200).json({
+                status: 200,
+                message: 'Email verification successful, Check your mobile for verification'
+            });
         } else {
             res.status(400).json({ message: 'User not found or already verified.' });
         }
