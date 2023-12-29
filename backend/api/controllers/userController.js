@@ -550,10 +550,10 @@ export const verifyOtp = async (req, res) => {
         if (from === 'individual') {
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
-            return res.status(210).json({
+            return res.status(201).json({
                 status: 201,
                 success: true,
-                message: "Individual registration",
+                message: 'OTP verified successfully',
                 result: {
                     accessToken,
                     refreshToken
