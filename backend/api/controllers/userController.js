@@ -536,6 +536,10 @@ export const verifyOtp = async (req, res) => {
             await updateOtp(user.id, true);
 
         }
+        if(from === 'individual') {
+            
+        };
+        
         // Perform additional user registration steps if needed
         res.status(200).json({ status: 200, message: 'OTP verified successfully' });
     } catch (error) {
