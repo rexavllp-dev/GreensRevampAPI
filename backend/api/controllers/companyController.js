@@ -1,5 +1,6 @@
 import { checkCompanyExist, createCompany } from "../models/companyModel.js";
 import Joi from 'joi';
+import JoiDate from '@joi/date';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 import { checkUserExist, createUser, deleteAUser, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
@@ -80,7 +81,7 @@ export const registerCompany = async (req, res) => {
 
 
 
-
+        const JoiExtended = Joi.extend(JoiDate);
         // Register company validation 
         const schema = Joi.object({
             usr_firstname: Joi.string().required().label("First Name"),
@@ -100,11 +101,12 @@ export const registerCompany = async (req, res) => {
             company_vat_certificate: Joi.string().label("Vat Certificate"),
             company_trn_number: Joi.number().required().label("Trn Number"),
             company_trade_license: Joi.string().label("Trade License"),
-            company_trade_license_expiry: Joi.date().required().label("Trade License Expiry Date"),
+            company_trade_license_expiry: JoiExtended.date().raw().format("DD/MM/YYYY").required().label("Trade License Expiry Date"),
 
         });
 
         // Register company validation data
+        
 
         const validate_data = {
             usr_firstname,
