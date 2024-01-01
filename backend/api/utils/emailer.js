@@ -1,11 +1,13 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv'
 
+dotenv.config();
 
 // verify email
  export const sendVerificationEmail = async (usr_email, token, from) => {
   console.log(usr_email);
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'outlook',
     auth: {
       user: process.env.USER_GMAIL,
       pass: process.env.APP_PASSWORD,

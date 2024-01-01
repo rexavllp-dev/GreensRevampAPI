@@ -71,6 +71,15 @@ export const registerCompany = async (req, res) => {
             });
         }
 
+
+        // Function to check if the file size is under 5MB
+        // const isFileSizeValid = (file) => {
+        //     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        //     return file.size <= maxSize;
+        // };
+
+
+
         if (req.file) {
             const resizedUrl = await resizeAndUpload(req.file);
             company_trade_license = resizedUrl;
@@ -152,6 +161,16 @@ export const registerCompany = async (req, res) => {
 
         for (const field in files) {
             const file = files[field];
+
+
+            // Check if the file size is under 5MB
+            // if (!isFileSizeValid(file)) {
+            //     return res.status(400).json({
+            //         status: 400,
+            //         success: false,
+            //         message: "Image size should be under 5MB.",
+            //     });
+            // }
 
 
             // Check if the file is a PDF or JPEG before processing

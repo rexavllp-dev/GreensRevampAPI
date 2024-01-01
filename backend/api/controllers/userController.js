@@ -798,7 +798,6 @@ export const updateMobileUsingToken = async (req, res) => {
 
 
 // update using details 
-
 export const updateUserDetails = async (req, res) => {
     const userId = req.params.userId;
     const newData = req.body
