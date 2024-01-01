@@ -4,6 +4,7 @@ import {
     checkUserExist,
     createUser,
     deleteAUser,
+    getAllUsersData,
     getUserByEmail,
     getUserById,
     getUserByPhoneNumber,
@@ -32,6 +33,28 @@ import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 
 // ________________________________________________________________________________________________________________________________________________________________________________
 
+
+//Get all users by admin
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await getAllUsersData();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Users fetch successfull ",
+            result: users
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to retrieve users!."
+
+        });
+    }
+}
 
 export const registerUser = async (req, res) => {
 
@@ -593,7 +616,7 @@ export const verifyLoginOtp = async (req, res) => {
     if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
         // console.log(user.otp);
         // console.log(user.otp_expiry);
-        return res.status(401).json({ error: 'Invalid OTP or OTP expired' });
+        return res.status(404).json({ error: 'Invalid OTP or OTP expired' });
     }
 
     if (user && user.otp === otp) {
@@ -606,6 +629,8 @@ export const verifyLoginOtp = async (req, res) => {
         const refreshToken = generateRefreshToken(user);
 
         return res.status(200).json({
+            status: 200,
+            success: true,
             message: 'otp verified successfully, you are logged in successfully',
             result: {
                 accessToken,

@@ -2,6 +2,7 @@ import express from 'express';
 import {
 
     deleteUser,
+    getAllUsers,
     getSingleUser,
     getUserInformation,
     loginWithOtp,
@@ -32,7 +33,8 @@ import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailControl
 const router = express.Router();
 
 
-
+//get all users
+router.get('/all', getAllUsers)
 // register routes
 router.post('/register', registerUser);
 // login user
