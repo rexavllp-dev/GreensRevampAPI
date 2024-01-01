@@ -815,8 +815,8 @@ export const updateUserDetails = async (req, res) => {
         }
 
         const updatedUser = await updateUser(userId, newData);
-        res.status(201).json({
-            status: 201,
+        res.status(200).json({
+            status: 200,
             success: true,
             message: "User updated successfully",
             result: newData,

@@ -5,7 +5,7 @@ import {  adminUserRegister, isActiveByAdmin, isNotActiveByAdmin } from '../cont
 const router = express.Router();
 
 // admin can create user
-router.post("/create_user", adminUserRegister);
+router.post("/create-user", adminUserRegister);
 
 // not suspend user
 router.put ('/activate/:userId', isActiveByAdmin);

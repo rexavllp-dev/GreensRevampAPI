@@ -92,8 +92,8 @@ export const adminUserRegister = async (req, res) => {
         // jwt user token 
         // const token = jwt.sign({ userId, usr_email, usr_firstname }, process.env.JWT_ACCESS, { expiresIn: "600s" });
 
-        res.status(201).json({
-            status: 201,
+        res.status(200).json({
+            status: 200,
             success: true,
             message: "user registration successful.",
             result: {

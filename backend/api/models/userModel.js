@@ -3,7 +3,7 @@ import db from '../../config/dbConfig.js';
 // Get all users
 export const getAllUsersData = async () => {
 
-    const allUsers = await db("users").select("*");
+    const allUsers = await db("users").leftJoin('company', 'users.usr_company', 'company.id').orderBy('users.id', 'desc').select("*");
     return allUsers;
 
 };
