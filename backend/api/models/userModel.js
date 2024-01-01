@@ -16,7 +16,7 @@ export const createUser = async (data) => {
 
 // update the user details
 export const updateUser = async (userId, newData) => {
-    const user = await db('users').where({ id: userId }).update( newData ).returning('*');
+    const user = await db('users').where({ id: userId }).update(newData).returning('*');
     return user;
 };
 
@@ -218,8 +218,8 @@ export const getUserByFacebook = async (facebookId) => {
 export const createFacebookUser = async (facebookId, displayName) => {
     const names = displayName.split(' ');
     const user = await db('users').insert({
-        facebook_id : facebookId,
-        display_name : displayName,
+        facebook_id: facebookId,
+        display_name: displayName,
         usr_firstname: names[0],
         usr_lastname: names[1],
     }).returning('*');

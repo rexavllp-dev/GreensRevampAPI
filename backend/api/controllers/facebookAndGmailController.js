@@ -1,4 +1,3 @@
-import { getUserByFacebook, getUserByGoogleId } from "../models/userModel.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 
 

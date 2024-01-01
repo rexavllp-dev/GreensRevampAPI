@@ -9,7 +9,7 @@ import { sendVerificationEmail } from "../utils/emailer.js";
 import sendVerificationCode from "../utils/mobileOtp.js";
 import jwt from 'jsonwebtoken';
 import aws from 'aws-sdk';
-import Jimp from "jimp";
+import sharp from "sharp";
 
 const awsConfig = ({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -43,6 +43,7 @@ export const registerCompany = async (req, res) => {
         company_landline,
         company_landline_country_code,
         company_trn_number,
+        company_trade_license,
         company_trade_license_expiry,
 
     } = req.body;
@@ -50,10 +51,6 @@ export const registerCompany = async (req, res) => {
     const files = req.files;
 
     try {
-
-
-
-
 
         const existingCompany = await checkCompanyExist(company_trn_number);
         if (existingCompany.length) {
@@ -106,7 +103,7 @@ export const registerCompany = async (req, res) => {
         });
 
         // Register company validation data
-        
+
 
         const validate_data = {
             usr_firstname,
@@ -141,7 +138,7 @@ export const registerCompany = async (req, res) => {
             });
         };
 
-
+        // checking if there are files
         if (!req.files) {
             return res.status(400).json({
                 status: 400,
@@ -151,27 +148,53 @@ export const registerCompany = async (req, res) => {
         }
 
         let company_vat_certificate;
-        let  company_trade_license;
+        let company_trade_license;
 
         for (const field in files) {
             const file = files[field];
 
-            console.log(file);
-            // upload resized to s3 
-            const uploadParams = {
-                Bucket: process.env.S3_BUCKET_NAME,
-                Key: `images/${file.name}`,
-                Body: file.data,
-                ContentType: file.mimetype,
-            };
 
-            const s3Data = await s3.upload(uploadParams).promise();
-            if(field === "company_vat_certificate" ) {
-                company_vat_certificate = s3Data.Location
+            // Check if the file is a PDF or JPEG before processing
+            if (file.mimetype === 'application/pdf' || file.mimetype === 'image/jpeg' || file.mimetype === 'images/png') {
+                // Resize only if it's a PDF, JPEG, PNG 
+                const resizedBuffer = await sharp(file.data)
+                    .resize({ width: 300, height: 300 }) // Adjust the dimensions as needed
+                    .toBuffer();
+
+                // Upload resized image to S3
+                const uploadParams = {
+                    Bucket: process.env.S3_BUCKET_NAME,
+                    Key: `images/${file.name}`,
+                    Body: resizedBuffer, // Use the resized buffer
+                    ContentType: file.mimetype,
+                };
+
+                const s3Data = await s3.upload(uploadParams).promise();
+
+                if (field === "company_vat_certificate") {
+                    company_vat_certificate = s3Data.Location;
+                } else {
+                    company_trade_license = s3Data.Location;
+                }
             } else {
-                company_trade_license = s3Data.Location
+                // If it's not a PDF or JPEG, upload the original file without resizing
+                const uploadParams = {
+                    Bucket: process.env.S3_BUCKET_NAME,
+                    Key: `images/${file.name}`,
+                    Body: file.data,
+                    ContentType: file.mimetype,
+                };
+
+                const s3Data = await s3.upload(uploadParams).promise();
+
+                if (field === "company_vat_certificate") {
+                    company_vat_certificate = s3Data.Location;
+                } else {
+                    company_trade_license = s3Data.Location;
+                }
             }
-        };
+        }
+
 
 
         const newCompany = await createCompany({

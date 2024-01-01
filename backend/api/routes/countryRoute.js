@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 // register  routes
-router.post('/',registerCountry);
+router.post('/', registerCountry);
 
 // get all countries
 router.get('/getall', getAllCountries)
