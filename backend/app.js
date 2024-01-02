@@ -9,6 +9,7 @@ import session from 'express-session';
 import passport from 'passport';
 import './api/utils/passport-config.js';
 import fileUpload from 'express-fileupload';
+import axios from 'axios';
 
 
 dotenv.config();
@@ -52,6 +53,30 @@ app.use('/api/v1/admin', adminRoute);
 
 app.get('/', (req,res) => {
     res.json("Greens_international Server is Online")
+});
+
+app.get('/download/:url', async function(req, res) {
+  let fileUrl = req.params.url;
+  // const fileUrl = 'https://greensecombucket.s3.ap-south-1.amazonaws.com/images/image%20%2819%29.png';
+
+  try {
+    // Make a GET request to the external API
+    const response = await axios({
+      method: 'get',
+      url: fileUrl,
+      responseType: 'stream', // This ensures the response is treated as a stream
+    });
+
+    // Set the appropriate headers for the file download
+    res.setHeader('Content-Disposition', `attachment; filename=${encodeURIComponent(fileUrl)}`);
+    // res.setHeader('Content-Type', 'image/png'); // Adjust the Content-Type based on the file type
+
+    // Pipe the response stream to the client response
+    response.data.pipe(res);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 
