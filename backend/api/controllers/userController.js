@@ -495,7 +495,7 @@ export const resendEmail = async (req, res) => {
             { expiresIn: "15d" });
 
         // Send email verification link
-        await sendVerificationEmail(usr_email, token);
+        await sendVerificationEmail(usr_email, user.usr_firstname, token);
         res.status(200).json({
             status: 200,
             success: true,
@@ -773,7 +773,7 @@ export const updateEmailUsingToken = async (req, res) => {
         await updateEmail(user.userId, usr_email);
 
 
-        await sendVerificationEmail(usr_email, token, from);
+        await sendVerificationEmail(usr_email, existingUser.usr_firstname, token, from);
         console.log(usr_email);
 
         res.status(200).json({

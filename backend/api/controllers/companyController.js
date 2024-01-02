@@ -107,7 +107,7 @@ export const registerCompany = async (req, res) => {
 
             company_landline: Joi.string().allow('').label("Landline"),
             company_landline_country_code: Joi.number().allow('').label("Country Code"),
-            
+
             company_vat_certificate: Joi.string().label("Vat Certificate"),
             company_trn_number: Joi.number().required().label("Trn Number"),
             company_trade_license: Joi.string().label("Trade License"),
@@ -359,7 +359,7 @@ export const resendEmail = async (req, res) => {
             { expiresIn: "15d" });
 
         // Send email verification link
-        await sendVerificationEmail(usr_email, token);
+        await sendVerificationEmail(usr_email, user.usr_firstname, token);
         res.status(200).json({
             status: 200,
             success: true,
