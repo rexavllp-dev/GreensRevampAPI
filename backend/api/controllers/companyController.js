@@ -101,9 +101,13 @@ export const registerCompany = async (req, res) => {
             usr_newsletter_accepted: Joi.boolean().required().label("Newsletter"),
             email_verified: Joi.boolean(),
 
+            // company field
+
             company_name: Joi.string().required().label("Company Name"),
-            company_landline: Joi.string().required().label("Landline"),
-            company_landline_country_code: Joi.number().required().label("Country Code"),
+
+            company_landline: Joi.string().allow('').label("Landline"),
+            company_landline_country_code: Joi.number().allow('').label("Country Code"),
+            
             company_vat_certificate: Joi.string().label("Vat Certificate"),
             company_trn_number: Joi.number().required().label("Trn Number"),
             company_trade_license: Joi.string().label("Trade License"),
@@ -174,7 +178,7 @@ export const registerCompany = async (req, res) => {
 
 
             // Check if the file is a PDF or JPEG before processing
-            if (file.mimetype === 'application/pdf' || file.mimetype === 'image/jpeg' || file.mimetype === 'images/png') {
+            if (file.mimetype === 'image/pdf' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
                 // Resize only if it's a PDF, JPEG, PNG 
                 const resizedBuffer = await sharp(file.data)
                     .resize({ width: 300, height: 300 }) // Adjust the dimensions as needed
