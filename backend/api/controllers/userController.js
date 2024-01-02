@@ -218,6 +218,16 @@ export const loginWithPassword = async (req, res) => {
 
         }
 
+          // Check if the user is blocked by the admin
+          if (!existingUser.is_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is blocked.Please contact admin for assistance."
+            });
+        }
+
+
         // Check if password is correct
 
         const isPasswordCorrect = await bcrypt.compare(usr_password, existingUser?.usr_password);
@@ -351,6 +361,17 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
+
+          // Check if the user is blocked by the admin
+          if (!existingUser.is_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is blocked.Please contact admin for assistance."
+            });
+        }
+
+        
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
             return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });

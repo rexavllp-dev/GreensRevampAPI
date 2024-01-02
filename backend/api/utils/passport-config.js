@@ -20,12 +20,12 @@ passport.use(
 
         const user = await getUserByGoogleId(profile.id);
 
-        const existingUser = await getUserByEmail(profile?.emails[0]?.value);
+        // const existingUser = await getUserByEmail(profile?.emails[0]?.value);
 
-        if (existingUser) {
-          // User with the same email already exists, handle it here (e.g., return the existing user)
-          return done(null, existingUser);
-        }
+        // if (existingUser) {
+        //   // User with the same email already exists, handle it here (e.g., return the existing user)
+        //   return done(null, existingUser);
+        // }
 
       
 

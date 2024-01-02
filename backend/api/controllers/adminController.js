@@ -1,5 +1,5 @@
 import { joiOptions } from "../helpers/joiOptions.js";
-import { isActive, isNotActive } from "../models/adminModel.js";
+import { isActive, isNotActive, updateUserVerificationByAdmin } from "../models/adminModel.js";
 import { checkUserExist, createUser } from "../models/userModel.js";
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
@@ -89,6 +89,11 @@ export const adminUserRegister = async (req, res) => {
         });
 
         const userId = newUser[0]?.id;
+
+
+        await updateUserVerificationByAdmin(userId);
+
+
         // jwt user token 
         // const token = jwt.sign({ userId, usr_email, usr_firstname }, process.env.JWT_ACCESS, { expiresIn: "600s" });
 

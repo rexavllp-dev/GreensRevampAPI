@@ -9,8 +9,6 @@ import { sendPasswordResetEmail } from '../utils/emailer.js';
 // Generate a unique reset token
 const generateToken = () => crypto.randomBytes(20).toString('hex');
 
-
-
 // forgot password
 export const forgotPassword = async (req, res) => {
     const { usr_email } = req.body;
