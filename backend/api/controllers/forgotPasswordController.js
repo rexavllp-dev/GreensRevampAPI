@@ -27,11 +27,16 @@ export const forgotPassword = async (req, res) => {
             });
         }
 
+        if (!user.email_verified || !user.mobile_verified) {
+            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to reset the password' });
+        }
+
+
         const token = generateToken();
         const expiresAt = new Date(Date.now() + 300000)
 
         await updateResetToken(usr_email, token, expiresAt);
-        await sendPasswordResetEmail(usr_email, user.usr_firstname, token);
+        await sendPasswordResetEmail(usr_email, user.usr_firstname, user.usr_lastname, token);
 
         return res.status(200).json({
             status: 200,

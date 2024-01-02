@@ -169,7 +169,7 @@ export const registerUser = async (req, res) => {
         const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
 
         // Send email verification link
-        await sendVerificationEmail(usr_email, token, 'individual');
+        await sendVerificationEmail(usr_email, usr_firstname, usr_lastname, token, 'individual');
 
         res.status(201).json({
             status: 201,

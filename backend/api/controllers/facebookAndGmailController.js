@@ -1,9 +1,12 @@
+
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 
 
 export const googleAuth = async (req, res) => {
     try {
 
+
+     
         const accessToken = generateAccessToken(req.user)
         const refreshToken = generateRefreshToken(req.user)
 
@@ -24,6 +27,8 @@ export const googleAuth = async (req, res) => {
 
 export const facebookAuth = async (req, res) => {
     try {
+
+    
 
         const accessToken = generateAccessToken(req.user)
         const refreshToken = generateRefreshToken(req.user)

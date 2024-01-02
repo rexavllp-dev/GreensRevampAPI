@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
-import { createFacebookUser, createGoogleUser, getUserByFacebook, getUserByGoogleId } from '../models/userModel.js';
+import { createFacebookUser, createGoogleUser, getUserByEmail, getUserByFacebook, getUserByGoogleId } from '../models/userModel.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -19,6 +19,15 @@ passport.use(
       try {
 
         const user = await getUserByGoogleId(profile.id);
+
+        const existingUser = await getUserByEmail(profile?.emails[0]?.value);
+
+        if (existingUser) {
+          // User with the same email already exists, handle it here (e.g., return the existing user)
+          return done(null, existingUser);
+        }
+
+      
 
         if (user) {
           return done(null, user);
