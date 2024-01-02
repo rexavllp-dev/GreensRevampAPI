@@ -371,7 +371,7 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
-        
+
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
             return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
@@ -835,6 +835,12 @@ export const updateUserDetails = async (req, res) => {
                 success: false,
                 message: "User not found",
             });
+        }
+
+          // Check if the password is provided in the newData
+          if (newData.usr_password) {
+            // Hash the new password
+            newData.usr_password = await bcrypt.hash(newData.usr_password, 12);
         }
 
         const updatedUser = await updateUser(userId, newData);
