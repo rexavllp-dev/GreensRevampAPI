@@ -344,8 +344,8 @@ export const loginWithOtp = async (req, res) => {
 
         if (!existingUser) {
 
-            return res.status(401).json({
-                status: 401,
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: "Mobile number not found , please register your mobile number!"
             });
@@ -353,7 +353,7 @@ export const loginWithOtp = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
-            return res.status(401).json({ status: 401, error: 'Email and mobile must be verified to login' });
+            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
         }
 
         // token
@@ -616,7 +616,10 @@ export const verifyLoginOtp = async (req, res) => {
     if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
         // console.log(user.otp);
         // console.log(user.otp_expiry);
-        return res.status(404).json({ error: 'Invalid OTP or OTP expired' });
+        return res.status(404).json({ 
+            status: 404,
+            success: false,
+            message: 'Invalid OTP or OTP expired' });
     }
 
     if (user && user.otp === otp) {
