@@ -7,6 +7,8 @@ export const googleAuth = async (req, res) => {
         const accessToken = generateAccessToken(req.user)
         const refreshToken = generateRefreshToken(req.user)
 
+        console.log(req.user)
+
         // res.status(201).json({
         //   status:201,
         //   success:true,

@@ -203,7 +203,7 @@ export const createGoogleUser = async (googleId, displayName, email) => {
         usr_email: email
     }).returning('*');
 
-    return user;
+    return user[0]
 };
 
 
@@ -223,7 +223,7 @@ export const createFacebookUser = async (facebookId, displayName) => {
         usr_firstname: names[0],
         usr_lastname: names[1],
     }).returning('*');
-    return user;
+    return user[0];
 };
 
 
