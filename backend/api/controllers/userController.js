@@ -859,4 +859,4 @@ export const updateUserDetails = async (req, res) => {
             error: error
         });
     }
-}
+};

@@ -28,8 +28,6 @@ export const googleAuth = async (req, res) => {
 export const facebookAuth = async (req, res) => {
     try {
 
-    
-
         const accessToken = generateAccessToken(req.user)
         const refreshToken = generateRefreshToken(req.user)
 

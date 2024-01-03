@@ -191,6 +191,14 @@ export const getUserByGoogleId = async (googleId) => {
     return user;
 };
 
+
+export const updateUserGoogleId = async (userId, googleId) => {
+    const user = await db('users')
+      .where({ id: userId })
+      .update({ google_id: googleId, email_verified: true });
+      return user;
+  };
+
 export const createGoogleUser = async (googleId, displayName, email) => {
 
     const names = displayName.split(' ');
@@ -200,7 +208,8 @@ export const createGoogleUser = async (googleId, displayName, email) => {
         display_name: displayName,
         usr_firstname: names[0],
         usr_lastname: names[1],
-        usr_email: email
+        usr_email: email,
+        email_verified: true,
     }).returning('*');
 
     return user[0]
