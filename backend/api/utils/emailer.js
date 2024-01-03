@@ -1,11 +1,10 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv'
-// import Greens_Logo from '../public/images/Logo.png';
-
-
 
 
 dotenv.config();
+
+
 
 // verify email
 export const sendVerificationEmail = async (usr_email, usr_firstname, token, from) => {
@@ -18,7 +17,7 @@ export const sendVerificationEmail = async (usr_email, usr_firstname, token, fro
     },
   });
 
-  const verificationLink = `http://localhost:3000/auth/verify-email?token=${token}&orgin=${from}`;
+  const verificationLink = process.env.BASE_URL`/auth/verify-email?token=${token}&orgin=${from}`;
   const mailOptions = {
     from: process.env.FROM_GMAIL,
     to: usr_email,
@@ -72,7 +71,7 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
       pass: process.env.APP_PASSWORD,
     },
   });
-  const resetPassLink = `http://localhost:3000/auth/reset?token=${token}`;
+  const resetPassLink = process.env.BASE_URL`/auth/reset?token=${token}`;
   const mailOptions = {
     from: process.env.FROM_GMAIL,
     to: usr_email,
