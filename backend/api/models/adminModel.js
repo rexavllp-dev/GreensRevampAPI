@@ -35,7 +35,6 @@ export const fetchSingleCompany = async( companyId ) => {
 
 
 
-
 export const notverifyCompany = async( companyId ) => {
     return await db('company').where({ id: companyId }).update({ verification_status: false });
 };

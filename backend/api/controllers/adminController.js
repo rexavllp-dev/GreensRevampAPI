@@ -185,12 +185,17 @@ export const isNotActiveByAdmin = async (req, res) => {
 export const approveCompanyByAdmin = async (req, res) => {
     const { companyId } = req.params;
     // Assuming fetchSingleCompany requires companyId as an argument
-    const companyData = await fetchSingleCompany(companyId);
-    console.log(companyData);
+   
+    
 
     try {
+        const companyData = await fetchSingleCompany(companyId);
+        // console.log(companyData);
         const companyStatus = await verifyCompany(companyId);
-        await 
+        const userId = companyData.id;
+        await isActive(userId);
+ 
+        
         res.status(200).json({
             status: 200,
             success: true,
@@ -215,7 +220,11 @@ export const rejectCompanyByAdmin = async (req, res) => {
     const { companyId } = req.params;
 
     try {
+        const companyData = await fetchSingleCompany(companyId);
+        console.log(companyData);
         const companyStatus = await notverifyCompany(companyId);
+        const userId = companyData.id;
+        await isNotActive(userId)
         res.status(200).json({
             status: 200,
             success: true,

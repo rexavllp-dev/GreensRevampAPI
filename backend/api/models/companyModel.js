@@ -25,3 +25,12 @@ export const saveFileRecord = async (company_vat_certificate, company_trade_lice
 const images = await db('company').insert({ company_vat_certificate, company_trade_license }).returning('*');
 return images;
 };
+
+// company verification status 
+export const iSCompanyStatusVerified = async( companyId ) => {
+  const companyData = await db('company')
+  .select("verification_status")
+  .where('company.id', companyId)
+  .first();
+  return companyData;
+};

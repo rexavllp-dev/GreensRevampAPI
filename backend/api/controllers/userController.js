@@ -25,6 +25,7 @@ import { sendVerificationEmail } from '../utils/emailer.js';
 import sendVerificationCode from '../utils/mobileOtp.js';
 import validateAuth from '../middleware/validateAuth.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
+import { iSCompanyStatusVerified } from '../models/companyModel.js';
 
 
 // gmail and facebook authentication 
@@ -208,6 +209,7 @@ export const loginWithPassword = async (req, res) => {
     try {
         //check if user exists 
         const existingUser = await getUserByEmail(usr_email);
+        console.log(existingUser);
 
         if (!existingUser) {
             return res.status(404).json({
@@ -218,8 +220,20 @@ export const loginWithPassword = async (req, res) => {
 
         }
 
-          // Check if the user is blocked by the admin
-          if (!existingUser.is_status) {
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+        
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: 'Company is not verified. Please contact admin for assistance.',
+            });
+        }
+
+
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
             return res.status(403).json({
                 status: 403,
                 success: false,
@@ -245,6 +259,11 @@ export const loginWithPassword = async (req, res) => {
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
             return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
         }
+
+
+
+
+
 
         //create token
 
@@ -362,8 +381,8 @@ export const loginWithOtp = async (req, res) => {
         }
 
 
-          // Check if the user is blocked by the admin
-          if (!existingUser.is_status) {
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
             return res.status(403).json({
                 status: 403,
                 success: false,
@@ -638,10 +657,11 @@ export const verifyLoginOtp = async (req, res) => {
     if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
         // console.log(user.otp);
         // console.log(user.otp_expiry);
-        return res.status(404).json({ 
+        return res.status(404).json({
             status: 404,
             success: false,
-            message: 'Invalid OTP or OTP expired' });
+            message: 'Invalid OTP or OTP expired'
+        });
     }
 
     if (user && user.otp === otp) {
@@ -838,8 +858,8 @@ export const updateUserDetails = async (req, res) => {
             });
         }
 
-          // Check if the password is provided in the newData
-          if (newData.usr_password) {
+        // Check if the password is provided in the newData
+        if (newData.usr_password) {
             // Hash the new password
             newData.usr_password = await bcrypt.hash(newData.usr_password, 12);
         }
