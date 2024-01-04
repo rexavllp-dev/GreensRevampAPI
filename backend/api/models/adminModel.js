@@ -23,14 +23,13 @@ export const verifyCompany = async( companyId ) => {
 };
 
 
-export const fetchSingleCompany = async( companyId ) => {
+export const fetchSingleCompany = async(companyId) => {
     const companyData = await db('company')
     .leftJoin('users', 'users.usr_company', 'company.id')
-    .select("*")
+    .select("company.*","users.*")
     .where('company.id', companyId)
     .first();
-    return companyData
-    // return await db('company').leftJoin('users', 'users.usr_company', 'users.id').orderBy('users.id', 'desc').select("*").where({ id: companyId })
+    return companyData;
 };
 
 

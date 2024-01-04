@@ -165,6 +165,8 @@ export const registerUser = async (req, res) => {
 
         const userId = newUser[0]?.id;
 
+        
+
 
         // jwt user token 
         const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
@@ -379,6 +381,17 @@ export const loginWithOtp = async (req, res) => {
                 message: "Mobile number not found , please register your mobile number!"
             });
         }
+
+         // Check if the user's company is verified
+         const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+        
+         if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+             return res.status(403).json({
+                 status: 403,
+                 success: false,
+                 message: 'Company is not verified. Please contact admin for assistance.',
+             });
+         }
 
 
         // Check if the user is blocked by the admin
