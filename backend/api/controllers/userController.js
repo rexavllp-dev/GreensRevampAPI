@@ -473,7 +473,7 @@ export const verifyEmail = async (req, res) => {
 
 // region resend email 
 export const resendEmail = async (req, res) => {
-    const { token } = req.body;
+    const { token } = req.params;
     try {
         const userInfo = await validateAuth(token);
         const user = await getUserById(userInfo.userId);

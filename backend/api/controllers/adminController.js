@@ -190,6 +190,7 @@ export const approveCompanyByAdmin = async (req, res) => {
 
     try {
         const companyStatus = await verifyCompany(companyId);
+        await 
         res.status(200).json({
             status: 200,
             success: true,
