@@ -3,7 +3,10 @@ import db from '../../config/dbConfig.js';
 // Get all users
 export const getAllUsersData = async () => {
 
-    const allUsers = await db("users").leftJoin('company', 'users.usr_company', 'company.id').orderBy('users.id', 'desc').select("*");
+    const allUsers = await db("users").leftJoin('company', 'users.usr_company', 'company.id').orderBy('users.id', 'desc')
+        .select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
+            "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
+            "company.company_trade_license_expiry", "company.verification_status");
     return allUsers;
 
 };
@@ -194,10 +197,10 @@ export const getUserByGoogleId = async (googleId) => {
 
 export const updateUserGoogleId = async (userId, googleId) => {
     const user = await db('users')
-      .where({ id: userId })
-      .update({ google_id: googleId, email_verified: true });
-      return user;
-  };
+        .where({ id: userId })
+        .update({ google_id: googleId, email_verified: true });
+    return user;
+};
 
 export const createGoogleUser = async (googleId, displayName, email) => {
 

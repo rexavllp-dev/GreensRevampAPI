@@ -246,6 +246,7 @@ export const registerCompany = async (req, res) => {
             usr_newsletter_accepted,
             email_verified: false,
             usr_company: newCompany[0].id,
+            is_status: false,
         });
 
         const userId = newUser[0]?.id;

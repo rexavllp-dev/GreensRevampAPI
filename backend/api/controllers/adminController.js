@@ -1,5 +1,5 @@
 import { joiOptions } from "../helpers/joiOptions.js";
-import { isActive, isNotActive, updateUserVerificationByAdmin } from "../models/adminModel.js";
+import { fetchSingleCompany, isActive, isNotActive, notverifyCompany, updateUserVerificationByAdmin, verifyCompany } from "../models/adminModel.js";
 import { checkUserExist, createUser } from "../models/userModel.js";
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
@@ -176,4 +176,60 @@ export const isNotActiveByAdmin = async (req, res) => {
 
 };
 
+
+
+
+
+// approve by admin  
+
+export const approveCompanyByAdmin = async (req, res) => {
+    const { companyId } = req.params;
+    // Assuming fetchSingleCompany requires companyId as an argument
+    const companyData = await fetchSingleCompany(companyId);
+    console.log(companyData);
+
+    try {
+        const companyStatus = await verifyCompany(companyId);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Company approved successfully",
+            result: companyStatus,
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            status: 400,
+            success: false,
+            message: "Failed",
+        });
+    }
+
+};
+
+
+// reject by  admin  
+export const rejectCompanyByAdmin = async (req, res) => {
+    const { companyId } = req.params;
+
+    try {
+        const companyStatus = await notverifyCompany(companyId);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Company rejected successfully",
+            result: companyStatus,
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            status: 400,
+            success: false,
+            message: "Failed",
+        });
+    }
+
+};
 

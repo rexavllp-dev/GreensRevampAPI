@@ -473,9 +473,10 @@ export const verifyEmail = async (req, res) => {
 
 // region resend email 
 export const resendEmail = async (req, res) => {
-    const { usr_email } = req.body;
+    const { token } = req.body;
     try {
-        const user = await getUserByEmail(usr_email);
+        const userInfo = await validateAuth(token);
+        const user = await getUserById(userInfo.userId);
         if (!user) {
             return res.status(404).json({
                 status: 404,
