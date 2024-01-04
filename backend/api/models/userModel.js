@@ -142,7 +142,9 @@ export const updateUserVerificationStatus = async (userId, email_verified) => {
 
 export const getUserById = async (usr_id) => {
     // console.log("userId" , usr_id);
-    const user = await db('users').select("*").where({ id: usr_id }).first();
+    const user = await db('users').leftJoin('company', 'company.id', 'users.usr_company').select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
+        "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
+        "company.company_trade_license_expiry", "company.verification_status").where({'users.id': usr_id }).first();
     return user;
 };
 

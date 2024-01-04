@@ -486,9 +486,9 @@ export const resendEmail = async (req, res) => {
         }
 
         // jwt user token 
-        const token = jwt.sign({
+        const jwtToken = jwt.sign({
             userId: user.id,
-            usr_email,
+            usr_email: user.usr_email,
             usr_firstname: user.usr_firstname,
             usr_company: user.usr_company,
         },
@@ -496,7 +496,7 @@ export const resendEmail = async (req, res) => {
             { expiresIn: "15d" });
 
         // Send email verification link
-        await sendVerificationEmail(usr_email, user.usr_firstname, token);
+        await sendVerificationEmail(user.usr_email, user.usr_firstname, jwtToken);
         res.status(200).json({
             status: 200,
             success: true,

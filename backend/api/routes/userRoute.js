@@ -53,7 +53,7 @@ router.post('/verify-otp', verifyOtp);
 router.post('/verify-login-otp', verifyLoginOtp);
 
 // for email resend
-router.post('/resendemail/:token', resendEmail);
+router.get('/resendemail/:token', resendEmail);
 // for mobile resend
 router.get('/resendotp/:token', resendOtp);
 
