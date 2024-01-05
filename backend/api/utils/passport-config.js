@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
-import { createFacebookUser, createGoogleUser, getUserByEmail, getUserByFacebook, getUserByGoogleId, updateUserGoogleId } from '../models/userModel.js';
+import { createFacebookUser, createGoogleUser, getUserByEmail, getUserByFacebook, updateUserGoogleId } from '../models/userModel.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -35,11 +35,21 @@ passport.use(
         // if (user) {
         //   return done(null, user);
         // }
+        const registrationMethod = 'google'
         const newUser = await createGoogleUser(
           profile.id,
           profile.displayName,
-          profile?.emails[0]?.value
+          profile?.emails[0]?.value,
+          registrationMethod,
         );
+
+        // const userId = profile[0]?.id;
+                
+
+        //         await updateUserRegistrationMethod(userId, registrationMethod)
+        
+
+
         return done(null, newUser);
       } catch (error) {
         return done(error);
@@ -86,9 +96,11 @@ passport.use(
           return done(null, user);
         }
         console.log(profile);
+        const registrationMethod = 'facebook'
         const newUser = await createFacebookUser(
           profile.id,
           profile.displayName,
+          registrationMethod,
         );
         return done(null, newUser);
       } catch (error) {

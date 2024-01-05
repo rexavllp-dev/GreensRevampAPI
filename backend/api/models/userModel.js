@@ -144,7 +144,7 @@ export const getUserById = async (usr_id) => {
     // console.log("userId" , usr_id);
     const user = await db('users').leftJoin('company', 'company.id', 'users.usr_company').select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
         "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
-        "company.company_trade_license_expiry", "company.verification_status").where({'users.id': usr_id }).first();
+        "company.company_trade_license_expiry", "company.verification_status").where({ 'users.id': usr_id }).first();
     return user;
 };
 
@@ -204,7 +204,7 @@ export const updateUserGoogleId = async (userId, googleId) => {
     return user;
 };
 
-export const createGoogleUser = async (googleId, displayName, email) => {
+export const createGoogleUser = async (googleId, displayName, email, registrationMethod) => {
 
     const names = displayName.split(' ');
     console.log(names);
@@ -215,6 +215,8 @@ export const createGoogleUser = async (googleId, displayName, email) => {
         usr_lastname: names[1],
         usr_email: email,
         email_verified: true,
+        registration_method: registrationMethod,
+
     }).returning('*');
 
     return user[0]
@@ -229,15 +231,21 @@ export const getUserByFacebook = async (facebookId) => {
 };
 
 
-export const createFacebookUser = async (facebookId, displayName) => {
+export const createFacebookUser = async (facebookId, displayName, registrationMethod) => {
     const names = displayName.split(' ');
     const user = await db('users').insert({
         facebook_id: facebookId,
         display_name: displayName,
         usr_firstname: names[0],
         usr_lastname: names[1],
+        registration_method: registrationMethod,
+
     }).returning('*');
     return user[0];
 };
 
+// user registration 
 
+export const updateUserRegistrationMethod = async (userId, registrationMethod) => {
+    await db('users').where({ id: userId }).update({ registration_method: registrationMethod })
+}
