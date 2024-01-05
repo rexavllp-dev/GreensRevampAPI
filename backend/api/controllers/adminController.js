@@ -3,6 +3,7 @@ import { fetchSingleCompany, isActive, isNotActive, notverifyCompany, updateUser
 import { checkUserExist, createUser } from "../models/userModel.js";
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
+import { sendVerificationApproved, sendVerificationRejected } from "../utils/emailer.js";
 
 
 
@@ -146,7 +147,7 @@ export const isActiveByAdmin = async (req, res) => {
         res.status(400).json({
             status: 400,
             success: false,
-            message: "Failed",
+            message: "Failed something went wrong",
         });
     }
 
@@ -170,7 +171,7 @@ export const isNotActiveByAdmin = async (req, res) => {
         res.status(400).json({
             status: 400,
             success: false,
-            message: "Failed",
+            message: "Failed something went wrong",
         });
     }
 
@@ -189,11 +190,15 @@ export const approveCompanyByAdmin = async (req, res) => {
 
     try {
         const companyData = await fetchSingleCompany(companyId);
-        console.log(companyData);
+        // console.log(companyData);
         const companyStatus = await verifyCompany(companyId);
         const userId = companyData?.id;
-        console.log(companyData.id);
+        // console.log(companyData.id);
+        console.log( companyData.usr_email, companyData.usr_firstname );
         await isActive(userId);
+
+        await sendVerificationApproved(companyData.usr_email, companyData.usr_firstname);
+        
  
         
         res.status(200).json({
@@ -208,7 +213,7 @@ export const approveCompanyByAdmin = async (req, res) => {
         res.status(400).json({
             status: 400,
             success: false,
-            message: "Failed",
+            message: "Failed something went wrong",
         });
     }
 
@@ -221,10 +226,13 @@ export const rejectCompanyByAdmin = async (req, res) => {
 
     try {
         const companyData = await fetchSingleCompany(companyId);
-        console.log(companyData);
+        // console.log(companyData);
         const companyStatus = await notverifyCompany(companyId);
-        const userId = companyData.id;
+        const userId = companyData?.id;
         await isNotActive(userId)
+
+        await sendVerificationRejected(companyData.usr_email, companyData.usr_firstname);
+
         res.status(200).json({
             status: 200,
             success: true,

@@ -118,3 +118,56 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
   await transporter.sendMail(mailOptions);
 }
 
+
+
+// send email for company verification 
+export const sendVerificationApproved = async (usr_email, usr_firstname) => {
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.USER_GMAIL,
+      pass: process.env.APP_PASSWORD,
+    },
+  });
+  // const resetPassLink = `${process.env.BASE_URL}/auth/reset?token=${token}`;
+  const mailOptions = {
+    from: process.env.FROM_GMAIL,
+    to: usr_email,
+    subject: 'Company Verification Approved',
+    html: `<p> Dear ${usr_firstname} </p>
+    <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
+    <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
+    <p>Thank you</p>
+  `, 
+
+  };
+  await transporter.sendMail(mailOptions);
+};
+
+
+
+// send email for company verification 
+export const sendVerificationRejected = async (usr_email, usr_firstname) => {
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.USER_GMAIL,
+      pass: process.env.APP_PASSWORD,
+    },
+  });
+ 
+  const mailOptions = {
+    from: process.env.FROM_GMAIL,
+    to: usr_email,
+    subject: 'Company Verification Rejected',
+    html: `<p> Dear ${usr_firstname} </p>
+    <p>Thank you for signing up!.Your company has been rejected,reason...</p>
+    <a href="https://react.greens-intl.ae/auth/register/">Try again</a>
+    <p>Thank you</p>
+  `, 
+
+  };
+  await transporter.sendMail(mailOptions);
+};
