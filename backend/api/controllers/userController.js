@@ -236,8 +236,7 @@ export const loginWithPassword = async (req, res) => {
                 });
             }
 
-        }
-
+        };
 
         // Check if the user is blocked by the admin
         if (!existingUser.is_status) {
@@ -387,16 +386,22 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
+     
         // Check if the user's company is verified
-        const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+        const userCompany = existingUser.usr_company;
 
-        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-            return res.status(403).json({
-                status: 403,
-                success: false,
-                message: 'Company is not verified. Please contact admin for assistance.',
-            });
-        }
+        if (!userCompany === null) {
+            const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+
+            if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: 'Company is not verified. Please contact admin for assistance.',
+                });
+            }
+
+        };
 
 
         // Check if the user is blocked by the admin
