@@ -237,6 +237,7 @@ export const registerCompany = async (req, res) => {
 
         // password hash using bcrypt 
         const hashedPassword = await bcrypt.hash(usr_password, 12);
+        const registrationMethod = "manual registration";
 
         const newUser = await createUser({
             usr_firstname,
@@ -251,6 +252,7 @@ export const registerCompany = async (req, res) => {
             email_verified: false,
             usr_company: newCompany[0].id,
             is_status: false,
+            registration_method: registrationMethod,
         });
 
         const userId = newUser[0]?.id;
