@@ -165,7 +165,7 @@ export const registerUser = async (req, res) => {
 
         const userId = newUser[0]?.id;
 
-        
+
 
 
         // jwt user token 
@@ -223,14 +223,19 @@ export const loginWithPassword = async (req, res) => {
         }
 
         // Check if the user's company is verified
-        const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
-        
-        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-            return res.status(403).json({
-                status: 403,
-                success: false,
-                message: 'Company is not verified. Please contact admin for assistance.',
-            });
+        const userCompany = existingUser.usr_company;
+
+        if (!userCompany === null) {
+            const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+
+            if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: 'Company is not verified. Please contact admin for assistance.',
+                });
+            }
+
         }
 
 
@@ -382,16 +387,16 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
-         // Check if the user's company is verified
-         const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
-        
-         if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-             return res.status(403).json({
-                 status: 403,
-                 success: false,
-                 message: 'Company is not verified. Please contact admin for assistance.',
-             });
-         }
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: 'Company is not verified. Please contact admin for assistance.',
+            });
+        }
 
 
         // Check if the user is blocked by the admin
