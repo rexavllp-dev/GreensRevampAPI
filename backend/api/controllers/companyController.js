@@ -10,6 +10,10 @@ import sendVerificationCode from "../utils/mobileOtp.js";
 import jwt from 'jsonwebtoken';
 import aws from 'aws-sdk';
 import sharp from "sharp";
+import maintenanceModeMessage from 'aws-sdk/lib/maintenance_mode_message.js';
+
+// Suppress maintenance mode warning
+maintenanceModeMessage.suppress = true;
 
 const awsConfig = ({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
