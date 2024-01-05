@@ -139,10 +139,9 @@ export const registerUser = async (req, res) => {
         // password hash using bcrypt 
 
         const hashedPassword = await bcrypt.hash(usr_password, 12);
-        // Generate a random 6-digit verification code
+       
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+       const registrationMethod = "manual registration"
 
         // creating   new user
         const newUser = await createUser({
@@ -160,6 +159,7 @@ export const registerUser = async (req, res) => {
             usr_newsletter_accepted,
             email_verified: false,
             mobile_verified: false,
+            registration_method: registrationMethod,
 
         });
 
