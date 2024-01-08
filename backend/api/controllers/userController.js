@@ -826,7 +826,19 @@ export const updateEmailUsingToken = async (req, res) => {
                 success: false,
                 message: "User not found"
             });
+        };
+
+           // already email verified
+           if (existingUser.email_verified) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Email is already verified. You can close this tab",
+
+            });
         }
+
+
 
         await updateEmail(user.userId, usr_email);
 
