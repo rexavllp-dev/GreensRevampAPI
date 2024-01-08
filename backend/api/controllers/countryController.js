@@ -48,4 +48,3 @@ export const getAllCountries = async (req,res) => {
     }
 }
 
-

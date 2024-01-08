@@ -139,9 +139,9 @@ export const registerUser = async (req, res) => {
         // password hash using bcrypt 
 
         const hashedPassword = await bcrypt.hash(usr_password, 12);
-       
 
-       const registrationMethod = "manual registration"
+
+        const registrationMethod = "manual registration"
 
         // creating   new user
         const newUser = await createUser({
@@ -160,7 +160,7 @@ export const registerUser = async (req, res) => {
             email_verified: false,
             mobile_verified: false,
             registration_method: registrationMethod,
-            usr_approval_id:4
+            usr_approval_id: 4
 
         });
 
@@ -387,7 +387,7 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
-     
+
         // Check if the user's company is verified
         const userCompany = existingUser.usr_company;
 
@@ -517,14 +517,26 @@ export const verifyEmail = async (req, res) => {
 // region resend email 
 export const resendEmail = async (req, res) => {
     const { token } = req.params;
+    console.log(token);
     try {
         const userInfo = await validateAuth(token);
         const user = await getUserById(userInfo.userId);
+        console.log(user);
         if (!user) {
             return res.status(404).json({
                 status: 404,
                 success: false,
                 message: "User not found"
+            });
+        };
+
+        // already email verified
+        if (user.email_verified) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Email is already verified. You can close this tab",
+
             });
         }
 
@@ -536,7 +548,7 @@ export const resendEmail = async (req, res) => {
             usr_company: user.usr_company,
         },
             process.env.EMAIL_SECRET,
-            { expiresIn: "15d" });
+            { expiresIn: "1d" });
 
         // Send email verification link
         await sendVerificationEmail(user.usr_email, user.usr_firstname, jwtToken);
@@ -547,6 +559,7 @@ export const resendEmail = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             status: 500,
             success: false,
