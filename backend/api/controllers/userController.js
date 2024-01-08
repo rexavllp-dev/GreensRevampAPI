@@ -811,14 +811,15 @@ export const deleteUser = async (req, res) => {
 
 
 export const updateEmailUsingToken = async (req, res) => {
+    
     const { token } = req.params;
     const { from } = req.query;
     const { usr_email } = req.body;
-    console.log(token);
+  
 
     try {
         const user = await validateAuth(token);
-
+        
         const existingUser = await getUserById(user.userId);
         if (!existingUser) {
             return res.status(401).json({
@@ -828,8 +829,8 @@ export const updateEmailUsingToken = async (req, res) => {
             });
         };
 
-           // already email verified
-           if (existingUser.email_verified) {
+        // already email verified
+        if (existingUser.email_verified) {
             return res.status(404).json({
                 status: 404,
                 success: false,
@@ -844,7 +845,7 @@ export const updateEmailUsingToken = async (req, res) => {
 
 
         await sendVerificationEmail(usr_email, existingUser.usr_firstname, token, from);
-        console.log(usr_email);
+   
 
         res.status(200).json({
             status: 200,
