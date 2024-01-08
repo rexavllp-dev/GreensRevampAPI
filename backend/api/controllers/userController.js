@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 
 import {
+    blockUser,
     checkUserExist,
     createUser,
     deleteAUser,
@@ -10,6 +11,7 @@ import {
     getUserByPhoneNumber,
     refreshTokenModel,
     updateEmail,
+    updateIncorrectAttempts,
     updateMobile,
     updateOtp,
     updateRegisterOtp,
@@ -207,6 +209,7 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginWithPassword = async (req, res) => {
+
     const { usr_email, usr_password } = req.body;
 
     try {
@@ -221,7 +224,18 @@ export const loginWithPassword = async (req, res) => {
                 message: "User not found!"
             });
 
-        }
+        };
+
+
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
+
 
         // Check if the user's company is verified
         const userCompany = existingUser.usr_company;
@@ -254,6 +268,22 @@ export const loginWithPassword = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(usr_password, existingUser?.usr_password);
 
         if (!isPasswordCorrect) {
+            const attempts = (existingUser.login_attempts || 0) + 1;
+
+            if (attempts > 3) {
+                // Block the user
+                await blockUser(existingUser.id);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
+                });
+            };
+
+            // Update the incorrect attempts counter in the database
+            await updateIncorrectAttempts(existingUser.id, attempts);
+
             return res.status(404).json({
                 status: 404,
                 success: false,
@@ -261,15 +291,14 @@ export const loginWithPassword = async (req, res) => {
             });
         };
 
+        // Reset the incorrect attempts counter upon successful login
+        await updateIncorrectAttempts(existingUser.id, 0);
+
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
             return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
         }
-
-
-
-
 
 
         //create token
@@ -811,15 +840,15 @@ export const deleteUser = async (req, res) => {
 
 
 export const updateEmailUsingToken = async (req, res) => {
-    
+
     const { token } = req.params;
     const { from } = req.query;
     const { usr_email } = req.body;
-  
+
 
     try {
         const user = await validateAuth(token);
-        
+
         const existingUser = await getUserById(user.userId);
         if (!existingUser) {
             return res.status(401).json({
@@ -845,7 +874,7 @@ export const updateEmailUsingToken = async (req, res) => {
 
 
         await sendVerificationEmail(usr_email, existingUser.usr_firstname, token, from);
-   
+
 
         res.status(200).json({
             status: 200,
