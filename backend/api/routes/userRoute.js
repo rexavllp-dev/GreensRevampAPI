@@ -26,8 +26,6 @@ import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailControl
 
 
 
-
-
 // user routes
 
 const router = express.Router();
@@ -89,3 +87,4 @@ router.get("/auth/facebook", passport.authenticate('facebook', { scope: ['profil
 router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), facebookAuth);
 
 export default router;
+

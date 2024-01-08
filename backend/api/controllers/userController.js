@@ -160,6 +160,7 @@ export const registerUser = async (req, res) => {
             email_verified: false,
             mobile_verified: false,
             registration_method: registrationMethod,
+            usr_approval_id:4
 
         });
 

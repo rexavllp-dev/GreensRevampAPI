@@ -11,6 +11,3 @@ const getErrorsInArray = (errors) => {
 
 
 export default getErrorsInArray;
-
-
-

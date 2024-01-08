@@ -15,5 +15,6 @@ router.put('/approve/:companyId', approveCompanyByAdmin);
 //  reject company verification  company
 router.put('/reject/:companyId', rejectCompanyByAdmin);
 
-
 export default router;
+
+

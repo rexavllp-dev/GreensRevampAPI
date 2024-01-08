@@ -223,7 +223,6 @@ export const registerCompany = async (req, res) => {
         }
 
 
-
         const newCompany = await createCompany({
             company_name,
             company_landline,
@@ -253,6 +252,7 @@ export const registerCompany = async (req, res) => {
             usr_company: newCompany[0].id,
             is_status: false,
             registration_method: registrationMethod,
+            usr_approval_id:1
         });
 
         const userId = newUser[0]?.id;
