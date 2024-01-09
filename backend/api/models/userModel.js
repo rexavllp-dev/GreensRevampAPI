@@ -86,9 +86,9 @@ export const updatePassword = async (id, hashedPassword) => {
 
 // find resetToken from database
 
-export const findByResetToken = async (reset_token) => {
+export const findByResetToken = async (email, reset_token) => {
     // console.log(resetToken)
-    const user = await db("users").select("*").where({ reset_token }).first();
+    const user = await db("users").select("*").where({email, reset_token }).first();
     return user;
 };
 

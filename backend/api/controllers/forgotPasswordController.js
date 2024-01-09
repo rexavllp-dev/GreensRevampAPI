@@ -9,6 +9,9 @@ import { sendPasswordResetEmail } from '../utils/emailer.js';
 // Generate a unique reset token
 const generateToken = () => crypto.randomBytes(20).toString('hex');
 
+// Function to check if a token is expired
+const isTokenExpired = (expiresAt) => new Date() > new Date(expiresAt);
+
 // forgot password
 export const forgotPassword = async (req, res) => {
     const { usr_email } = req.body;
@@ -32,6 +35,7 @@ export const forgotPassword = async (req, res) => {
 
         const token = generateToken();
         const expiresAt = new Date(Date.now() + 300000)
+
 
         await updateResetToken(usr_email, token, expiresAt);
         await sendPasswordResetEmail(usr_email, user.usr_firstname, token);
@@ -65,11 +69,11 @@ export const resetPassword = async  (req,res) => {
 
         const user = await findByResetToken(token);
         
-        if(!user) {
+        if(!user || isTokenExpired(user.expiresAt) ) {
             return res.status(400).json({
                 status: 400,
                 success: false,
-                message: "Invalid or expired token"
+                message: "Invalid or expired link"
             });
         }
 
