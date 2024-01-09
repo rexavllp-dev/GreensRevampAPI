@@ -308,7 +308,7 @@ export const loginWithPassword = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
-            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
+            return res.status(404).json({ status: 404, message: 'Email and mobile must be verified to login' });
         }
 
 
