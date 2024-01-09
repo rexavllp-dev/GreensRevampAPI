@@ -2,10 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "loader.cjs",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "node --experimental-modules app.js",
     "start": "nodemon app.js"
   },
   "keywords": [],
