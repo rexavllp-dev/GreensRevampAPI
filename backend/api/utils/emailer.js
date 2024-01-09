@@ -1,62 +1,67 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv'
+import { sendEmail } from '../helpers/sendEmail.js';
 
 
 dotenv.config();
 
+var smtpConfig = {
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // use SSL
+  auth: {
+    user: process.env.USER_GMAIL,
+    pass: process.env.APP_PASSWORD,
+  }
+};
 
 
 // verify email
 export const sendVerificationEmail = async (usr_email, usr_firstname, token, from) => {
-  console.log(usr_email);
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.USER_GMAIL,
-      pass: process.env.APP_PASSWORD,
-    },
-  });
-
   const verificationLink = `${process.env.BASE_URL}/auth/verify-email?token=${token}&orgin=${from}`;
-  const mailOptions = {
-    from: process.env.FROM_GMAIL,
-    to: usr_email,
-    subject: 'Email Verification',
+  const emailData = {
+    email: usr_email,
+    subject: `Email verification`,
     html: `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Email Verification</title>
-    </head>
-    <body>
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Email Verification</title>
+  </head>
+  <body>
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
 
-        <!-- Logo -->
-        <div style="text-align: center;">
-            <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
-        </div>
-    
-            <h2>Email Verification</h2>
-    
-            <p> Hello, <b> ${ usr_firstname } </b></p>
-    
-            <p>Thank you for signing up! Please click the link below to verify your email:</p>
-    
-            <p>
-                <a href=${verificationLink} target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a>
-            </p>
-    
-            <p>If you didn't sign up for our service, you can ignore this email.</p>
-    
-            <p>Best regards,<br> <b>Greens International </b> </p>
-    
-        </div>
-    </body>
-    </html>`,
+      <!-- Logo -->
+      <div style="text-align: center;">
+          <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+      </div>
+  
+          <h2>Email Verification</h2>
+  
+          <p> Hello, <b> ${usr_firstname} </b></p>
+  
+          <p>Thank you for signing up! Please click the link below to verify your email:</p>
+  
+          <p>
+              <a href=${verificationLink} target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: #fff; text-decoration: none; border-radius: 5px;">Verify Email</a>
+          </p>
+  
+          <p>If you didn't sign up for our service, you can ignore this email.</p>
+  
+          <p>Best regards,<br> <b>Greens International </b> </p>
+  
+      </div>
+  </body>
+  </html>`,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
+
 };
 
 
@@ -64,15 +69,8 @@ export const sendVerificationEmail = async (usr_email, usr_firstname, token, fro
 // send reset password to email
 export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) => {
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.USER_GMAIL,
-      pass: process.env.APP_PASSWORD,
-    },
-  });
   const resetPassLink = `${process.env.BASE_URL}/auth/reset?token=${token}`;
-  const mailOptions = {
+  const emailData = {
     from: process.env.FROM_GMAIL,
     to: usr_email,
     subject: 'Reset Password',
@@ -93,7 +91,7 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
     
             <h2> Password Reset</h2>
     
-            <p> Hello, <b> ${ usr_firstname } </b></p>
+            <p> Hello, <b> ${usr_firstname} </b></p>
     
             <p>We received a request to reset your password. If you didn't make this request, you can ignore this email.</p>
     
@@ -115,7 +113,14 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
 
 
   };
-  await transporter.sendMail(mailOptions);
+
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
+
+
 }
 
 
@@ -123,15 +128,7 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
 // send email for company verification 
 export const sendVerificationApproved = async (usr_email, usr_firstname) => {
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.USER_GMAIL,
-      pass: process.env.APP_PASSWORD,
-    },
-  });
-  // const resetPassLink = `${process.env.BASE_URL}/auth/reset?token=${token}`;
-  const mailOptions = {
+  const emailData = {
     from: process.env.FROM_GMAIL,
     to: usr_email,
     subject: 'Company Verification Approved',
@@ -139,26 +136,21 @@ export const sendVerificationApproved = async (usr_email, usr_firstname) => {
     <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
     <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
     <p>Thank you</p>
-  `, 
-
+  `,
   };
-  await transporter.sendMail(mailOptions);
-};
 
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
+};
 
 
 // send email for company verification 
 export const sendVerificationRejected = async (usr_email, usr_firstname) => {
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.USER_GMAIL,
-      pass: process.env.APP_PASSWORD,
-    },
-  });
- 
-  const mailOptions = {
+  const emailData = {
     from: process.env.FROM_GMAIL,
     to: usr_email,
     subject: 'Company Verification Rejected',
@@ -166,8 +158,12 @@ export const sendVerificationRejected = async (usr_email, usr_firstname) => {
     <p>Thank you for signing up!.Your company has been rejected,reason...</p>
     <a href="https://react.greens-intl.ae/auth/register/">Try again</a>
     <p>Thank you</p>
-  `, 
+  `,
 
   };
-  await transporter.sendMail(mailOptions);
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
 };

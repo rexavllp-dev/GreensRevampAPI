@@ -10,15 +10,20 @@ import passport from 'passport';
 import './api/utils/passport-config.js';
 import fileUpload from 'express-fileupload';
 import axios from 'axios';
+import createSocketServer from './api/utils/socketIo.js';
+import http from 'http';
+
 
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app); // Use the createSocketIO function
 
+const io = createSocketServer(server);
+app.set('socketio', io);
 
-
-const PORT =  5000;
+const PORT = 5000;
 const corsOptions = {
   credentials: true,
   origin: true,
@@ -51,11 +56,11 @@ app.use('/api/v1/country', countryRoute);
 app.use('/api/v1/admin', adminRoute);
 
 
-app.get('/', (req,res) => {
-    res.json("Greens_international Server is Online")
+app.get('/', (req, res) => {
+  res.json("Greens_international Server is Online")
 });
 
-app.get('/download/:url', async function(req, res) {
+app.get('/download/:url', async function (req, res) {
   let fileUrl = req.params.url;
   // const fileUrl = 'https://greensecombucket.s3.ap-south-1.amazonaws.com/images/image%20%2819%29.png';
 
@@ -80,7 +85,7 @@ app.get('/download/:url', async function(req, res) {
 });
 
 
- 
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)

@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 
 import {
     blockUser,
+    blockUserPermanently,
     checkUserExist,
     createUser,
     deleteAUser,
@@ -198,7 +199,7 @@ export const registerUser = async (req, res) => {
 
     } catch (error) {
 
-        // console.log(error);
+        console.log(error);
         res.status(500).json({
             status: 500,
             success: false,
@@ -269,8 +270,9 @@ export const loginWithPassword = async (req, res) => {
 
         if (!isPasswordCorrect) {
             const attempts = (existingUser.login_attempts || 0) + 1;
+            const failedCount = existingUser.failed_count 
 
-            if (attempts > 3) {
+            if ( attempts > 3 && failedCount === 0 ) {
                 // Block the user
                 await blockUser(existingUser.id);
 
@@ -278,6 +280,15 @@ export const loginWithPassword = async (req, res) => {
                     status: 403,
                     success: false,
                     message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
+                });
+            } else if (attempts > 3 && failedCount === 1 ) {
+                // Block the user permanently
+                await blockUserPermanently(existingUser.id);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked permanently due to repeated incorrect attempts. Contact admin for assistance.`
                 });
             };
 
@@ -960,3 +971,24 @@ export const updateUserDetails = async (req, res) => {
         });
     }
 };
+
+
+
+export const sendMessage = (req, res) => {
+    const io = req.app.get("socketio");
+  
+    // Example data
+    const data = {
+      email: "user@example.com",
+      message: "Hello, world!",
+    };
+  
+    // Emit the message to the specified email room
+    io.to(data.email).emit("receiveMessage", data);
+  
+    res.json({ success: true });
+  };
+ 
+
+
+
