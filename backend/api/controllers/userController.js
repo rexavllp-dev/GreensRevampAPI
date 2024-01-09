@@ -7,6 +7,7 @@ import {
     createUser,
     deleteAUser,
     getAllUsersData,
+    getCountryDialCode,
     getUserByEmail,
     getUserById,
     getUserByPhoneNumber,
@@ -488,8 +489,10 @@ export const loginWithOtp = async (req, res) => {
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
 
         await updateRegisterOtp(existingUser.id, otp, otpExpiry)
+        const country = await getCountryDialCode(userId)
+        const countryDialCode = country?.country_dial_code;
 
-        const sendOtp = await sendVerificationCode(existingUser.usr_mobile_number, otp);
+        const sendOtp = await sendVerificationCode(existingUser.usr_mobile_number, otp, countryDialCode);
         console.log("phone number", existingUser.usr_mobile_number);
         console.log("otp", otp);
         console.log("sendotps", sendOtp);
@@ -539,10 +542,11 @@ export const verifyEmail = async (req, res) => {
         // Set OTP expiry time (e.g., 5 minutes from now)
         if (email_verified) {
             const user = await updateRegisterOtp(userId, otp, otpExpiry)
-            console.log(user);
+            const country = await getCountryDialCode(userId)
+            const countryDialCode = country?.country_dial_code;
 
             // Send OTP via SMS
-            await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, user[0].otp_expiry);
+            await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, countryDialCode, user[0].otp_expiry);
             return res.status(200).json({
                 status: 200,
                 message: 'Email verification successful, Check your mobile for verification'
@@ -637,8 +641,10 @@ export const resendOtp = async (req, res) => {
         }
 
         await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+        const country = await getCountryDialCode(userInfo.id)
+        const countryDialCode = country?.country_dial_code;
 
-        await sendVerificationCode(userInfo.usr_mobile_number, otp, otpExpiry);
+        await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
 
         res.status(200).json({

@@ -3,7 +3,7 @@ import Joi from 'joi';
 import JoiDate from '@joi/date';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
-import { checkUserExist, createUser, deleteAUser, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
+import { checkUserExist, createUser, deleteAUser, getCountryDialCode, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import { sendVerificationEmail } from "../utils/emailer.js";
 import sendVerificationCode from "../utils/mobileOtp.js";
@@ -326,10 +326,12 @@ export const verifyEmail = async (req, res) => {
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
 
         if (email_verified) {
-            const user = await updateRegisterOtp(userId, otp, otpExpiry)
+            const user = await updateRegisterOtp(userId, otp, otpExpiry);
+            const country = await getCountryDialCode(userId)
+            const countryDialCode = country?.country_dial_code;
             console.log(user);
             // Send OTP via SMS
-            await sendVerificationCode(user.usr_mobile_number, user.otp, user.otp_expiry);
+            await sendVerificationCode(user.usr_mobile_number, user.otp, countryDialCode, user.otp_expiry);
 
 
 
@@ -393,9 +395,15 @@ export const resendEmail = async (req, res) => {
 // region resend resendOtp 
 
 export const resendOtp = async (req, res) => {
-    const { usr_mobile_number } = req.body;
+    const { token } = req.params;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
     try {
-        const user = await getUserByPhoneNumber(usr_mobile_number);
+        const user = await validateAuth(token);
+        console.log(user);
+
+        const userInfo = await getUserById(user.userId);
+
         if (!user) {
             return res.status(404).json({
                 status: 404,
@@ -403,7 +411,12 @@ export const resendOtp = async (req, res) => {
                 message: "User not found"
             });
         }
-        await sendVerificationCode(usr_mobile_number);
+
+        await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+        const country = await getCountryDialCode(userInfo.id);
+        const countryDialCode = country?.country_dial_code;
+
+        await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
 
         res.status(200).json({

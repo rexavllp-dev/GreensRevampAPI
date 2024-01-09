@@ -89,7 +89,7 @@ export const updatePassword = async (id, hashedPassword) => {
 
 export const findByResetToken = async (email, reset_token) => {
     // console.log(resetToken)
-    const user = await db("users").select("*").where({email, reset_token }).first();
+    const user = await db("users").select("*").where({ email, reset_token }).first();
     return user;
 };
 
@@ -146,9 +146,10 @@ export const updateUserVerificationStatus = async (userId, email_verified) => {
 
 export const getUserById = async (usr_id) => {
     // console.log("userId" , usr_id);
-    const user = await db('users').leftJoin('company', 'company.id', 'users.usr_company').select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
-        "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
-        "company.company_trade_license_expiry", "company.verification_status").where({ 'users.id': usr_id }).first();
+    const user = await db('users').leftJoin('company', 'company.id', 'users.usr_company')
+        .select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
+            "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
+            "company.company_trade_license_expiry", "company.verification_status").where({ 'users.id': usr_id }).first();
     return user;
 };
 
@@ -178,9 +179,22 @@ export const updateRegisterOtp = async (id, otp, otpExpiry) => {
     const user = await db('users').where({ id }).update({
         otp: otp,
         otp_expiry: otpExpiry
-    }).returning('*');
+    }).returning('*')
     return user;
 };
+
+
+export const getCountryDialCode = async (id) => {
+    const country = await db('users')
+        .leftJoin('countries', 'users.usr_mobile_country_code', 'countries.id',)
+        .select('users.*', 'countries.country_dial_code as country_dial_code')
+        .where({ "users.id" : id })
+        .first();
+    return country;
+};
+
+
+
 
 export const findUserById = async (id) => {
     const user = await db('users').where({ id }).first();
@@ -267,6 +281,6 @@ export const blockUser = async (userId) => {
 };
 
 export const blockUserPermanently = async (userId) => {
-   // Set blocked_until to null for permanent block
+    // Set blocked_until to null for permanent block
     await db("users").where({ id: userId }).update({ blocked_until: null, is_status: false, login_attempts: 0, failed_count: 0 });
 };
