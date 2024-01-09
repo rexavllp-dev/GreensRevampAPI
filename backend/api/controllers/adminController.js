@@ -180,14 +180,12 @@ export const isNotActiveByAdmin = async (req, res) => {
 
 
 
-
 // approve by admin  
 
 export const approveCompanyByAdmin = async (req, res) => {
     const { companyId } = req.params;
   
    
-
     try {
         const companyData = await fetchSingleCompany(companyId);
         // console.log(companyData);

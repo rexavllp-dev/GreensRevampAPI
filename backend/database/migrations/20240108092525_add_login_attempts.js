@@ -4,12 +4,7 @@
  */
 export const up = async (knex) => {
     await knex.schema.alterTable('users', (table) => {
-
-
-        table.string('registration_method');
-
-
-
+        table.integer('login_attempts').defaultTo(0);
     });
 };
 
@@ -17,12 +12,10 @@ export const up = async (knex) => {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
+
 export const down = async (knex) => {
     await knex.schema.alterTable('users', (table) => {
 
-        table.dropColumn('registration_method');
-
-
-
+        table.dropColumn('login_attempts');
     });
 };

@@ -1,4 +1,3 @@
-
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 import dotenv from 'dotenv';
 
