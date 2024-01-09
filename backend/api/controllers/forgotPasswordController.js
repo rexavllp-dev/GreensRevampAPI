@@ -29,7 +29,11 @@ export const forgotPassword = async (req, res) => {
         }
 
         if (!user.email_verified || !user.mobile_verified) {
-            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to reset the password' });
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'Email and mobile must be verified to reset the password'
+            });
         }
 
 
@@ -61,15 +65,15 @@ export const forgotPassword = async (req, res) => {
 
 // reset password 
 
-export const resetPassword = async  (req,res) => {
+export const resetPassword = async (req, res) => {
 
     const { token, usr_password } = req.body;
-        
+
     try {
 
         const user = await findByResetToken(token);
-        
-        if(!user || isTokenExpired(user.expiresAt) ) {
+
+        if (!user || isTokenExpired(user.expiresAt)) {
             return res.status(400).json({
                 status: 400,
                 success: false,
@@ -86,7 +90,7 @@ export const resetPassword = async  (req,res) => {
             success: true,
             message: "password reset successfully"
         });
-    } catch(error) {
+    } catch (error) {
         console.error(error);
         return res.status(500).json({
             status: 500,
@@ -94,7 +98,7 @@ export const resetPassword = async  (req,res) => {
             message: "Internal Server Error"
         });
     }
-  };
+};
 
 
 

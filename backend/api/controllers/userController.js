@@ -270,9 +270,9 @@ export const loginWithPassword = async (req, res) => {
 
         if (!isPasswordCorrect) {
             const attempts = (existingUser.login_attempts || 0) + 1;
-            const failedCount = existingUser.failed_count 
+            const failedCount = existingUser.failed_count
 
-            if ( attempts > 3 && failedCount === 0 ) {
+            if (attempts > 3 && failedCount === 0) {
                 // Block the user
                 await blockUser(existingUser.id);
 
@@ -281,7 +281,7 @@ export const loginWithPassword = async (req, res) => {
                     success: false,
                     message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
                 });
-            } else if (attempts > 3 && failedCount === 1 ) {
+            } else if (attempts > 3 && failedCount === 1) {
                 // Block the user permanently
                 await blockUserPermanently(existingUser.id);
 
@@ -308,7 +308,11 @@ export const loginWithPassword = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
-            return res.status(404).json({ status: 404, message: 'Email and mobile must be verified to login' });
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'Email and mobile must be verified to login'
+            });
         }
 
 
@@ -457,7 +461,7 @@ export const loginWithOtp = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
-            return res.status(404).json({ status: 404, error: 'Email and mobile must be verified to login' });
+            return res.status(404).json({ status: 404, success: false, message: 'Email and mobile must be verified to login' });
         }
 
         // token
@@ -976,19 +980,19 @@ export const updateUserDetails = async (req, res) => {
 
 export const sendMessage = (req, res) => {
     const io = req.app.get("socketio");
-  
+
     // Example data
     const data = {
-      email: "user@example.com",
-      message: "Hello, world!",
+        email: "user@example.com",
+        message: "Hello, world!",
     };
-  
+
     // Emit the message to the specified email room
     io.to(data.email).emit("receiveMessage", data);
-  
+
     res.json({ success: true });
-  };
- 
+};
+
 
 
 
