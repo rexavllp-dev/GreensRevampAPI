@@ -248,7 +248,7 @@ export const loginWithPassword = async (req, res) => {
                 return res.status(403).json({
                     status: 403,
                     success: false,
-                    message: 'Company is not verified. Please contact admin for assistance.',
+                    message: 'your account activation is under process we will update once your account is active.',
                 });
             }
 
@@ -442,7 +442,7 @@ export const loginWithOtp = async (req, res) => {
                 return res.status(403).json({
                     status: 403,
                     success: false,
-                    message: 'Company is not verified. Please contact admin for assistance.',
+                    message: 'your account activation is under process we will update once your account is active.',
                 });
             }
 
