@@ -11,6 +11,9 @@ import jwt from 'jsonwebtoken';
 import aws from 'aws-sdk';
 import sharp from "sharp";
 import maintenanceModeMessage from 'aws-sdk/lib/maintenance_mode_message.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+dayjs.extend(utc);
 
 // Suppress maintenance mode warning
 maintenanceModeMessage.suppress = true;
@@ -48,9 +51,11 @@ export const registerCompany = async (req, res) => {
         company_landline_country_code,
         company_trn_number,
         company_trade_license,
-        company_trade_license_expiry,
+        // company_trade_license_expiry
 
     } = req.body;
+
+    let company_trade_license_expiry = dayjs.utc(req.body.company_trade_license_expiry).utc(true).format();
 
     const files = req.files;
 
@@ -115,7 +120,7 @@ export const registerCompany = async (req, res) => {
             company_vat_certificate: Joi.string().label("Vat Certificate"),
             company_trn_number: Joi.number().required().label("Trn Number"),
             company_trade_license: Joi.string().label("Trade License"),
-            company_trade_license_expiry: JoiExtended.date().raw().format("DD/MM/YYYY").required().label("Trade License Expiry Date"),
+            // company_trade_license_expiry: JoiExtended.date().raw().format("DD/MM/YYYY").required().label("Trade License Expiry Date"),
 
         });
 
@@ -252,7 +257,7 @@ export const registerCompany = async (req, res) => {
             usr_company: newCompany[0].id,
             is_status: false,
             registration_method: registrationMethod,
-            usr_approval_id:1
+            usr_approval_id: 1
         });
 
         const userId = newUser[0]?.id;
