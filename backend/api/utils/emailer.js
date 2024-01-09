@@ -1,19 +1,8 @@
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv'
 import { sendEmail } from '../helpers/sendEmail.js';
 
 
 dotenv.config();
-
-var smtpConfig = {
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // use SSL
-  auth: {
-    user: process.env.USER_GMAIL,
-    pass: process.env.APP_PASSWORD,
-  }
-};
 
 
 // verify email
@@ -68,11 +57,12 @@ export const sendVerificationEmail = async (usr_email, usr_firstname, token, fro
 
 // send reset password to email
 export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) => {
+  console.log(usr_email);
 
   const resetPassLink = `${process.env.BASE_URL}/auth/reset?token=${token}`;
   const emailData = {
     from: process.env.FROM_GMAIL,
-    to: usr_email,
+    email: usr_email,
     subject: 'Reset Password',
     html: `<!DOCTYPE html>
     <html lang="en">
@@ -130,7 +120,7 @@ export const sendVerificationApproved = async (usr_email, usr_firstname) => {
 
   const emailData = {
     from: process.env.FROM_GMAIL,
-    to: usr_email,
+    email: usr_email,
     subject: 'Company Verification Approved',
     html: `<p> Dear ${usr_firstname} </p>
     <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
@@ -152,7 +142,7 @@ export const sendVerificationRejected = async (usr_email, usr_firstname) => {
 
   const emailData = {
     from: process.env.FROM_GMAIL,
-    to: usr_email,
+    email: usr_email,
     subject: 'Company Verification Rejected',
     html: `<p> Dear ${usr_firstname} </p>
     <p>Thank you for signing up!.Your company has been rejected,reason...</p>
