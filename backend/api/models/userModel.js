@@ -1,15 +1,16 @@
 import db from '../../config/dbConfig.js';
+import ms from 'ms';
 
 // Get all users
 export const getAllUsersData = async () => {
 
     const allUsers = await db("users")
         .leftJoin('company', 'users.usr_company', 'company.id')
-        .leftJoin('user_approval_status','users.usr_approval_id','user_approval_status.id')
+        .leftJoin('user_approval_status', 'users.usr_approval_id', 'user_approval_status.id')
         .orderBy('users.id', 'desc')
         .select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
             "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
-            "company.company_trade_license_expiry", "company.verification_status","user_approval_status.status_name");
+            "company.company_trade_license_expiry", "company.verification_status", "user_approval_status.status_name");
     return allUsers;
 
 };
@@ -252,3 +253,20 @@ export const createFacebookUser = async (facebookId, displayName, registrationMe
 export const updateUserRegistrationMethod = async (userId, registrationMethod) => {
     await db('users').where({ id: userId }).update({ registration_method: registrationMethod })
 }
+
+
+// Function to update incorrect attempts
+export const updateIncorrectAttempts = async (userId, attempts) => {
+    await db("users").where({ id: userId }).update({ login_attempts: attempts });
+};
+
+// Function to block user
+export const blockUser = async (userId) => {
+    const blockedUntil = new Date(Date.now() + ms('2m')); // Block for 2 minutes
+    await db("users").where({ id: userId }).update({ blocked_until: blockedUntil, login_attempts: 0, failed_count: 1 });
+};
+
+export const blockUserPermanently = async (userId) => {
+   // Set blocked_until to null for permanent block
+    await db("users").where({ id: userId }).update({ blocked_until: null, is_status: false, login_attempts: 0, failed_count: 0 });
+};
