@@ -288,7 +288,7 @@ export const loginWithPassword = async (req, res) => {
                 return res.status(403).json({
                     status: 403,
                     success: false,
-                    message: `User is blocked permanently due to repeated incorrect attempts. Contact admin for assistance.`
+                    message: `User is blocked temporary due to repeated incorrect attempts. Contact admin for assistance.`
                 });
             };
 
