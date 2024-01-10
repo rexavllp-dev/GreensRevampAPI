@@ -31,6 +31,7 @@ import sendVerificationCode from '../utils/mobileOtp.js';
 import validateAuth from '../middleware/validateAuth.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 import { iSCompanyStatusVerified } from '../models/companyModel.js';
+import Joi from 'joi';
 
 
 // gmail and facebook authentication 
