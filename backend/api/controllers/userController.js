@@ -4,6 +4,7 @@ import {
     blockUser,
     blockUserPermanently,
     checkUserExist,
+    checkUserExistWithMobile,
     createUser,
     deleteAUser,
     getAllUsersData,
@@ -309,6 +310,22 @@ export const loginWithPassword = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
+
+            if (!existingUser.email_verified) {
+                // jwt user token 
+                const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+
+                // Send email verification link
+                await sendVerificationEmail(usr_email, usr_firstname, token, 'individual');
+
+
+            }
+
+            if (!existingUser.mobile_verified) {
+                // Trigger mobile re-verification process (send a new verification code)
+                sendVerificationCode(existingUser.usr_mobile, existingUser.usr_firstname, existingUser.id);
+            }
+
             return res.status(404).json({
                 status: 404,
                 success: false,
@@ -462,6 +479,7 @@ export const loginWithOtp = async (req, res) => {
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
+
             return res.status(404).json({ status: 404, success: false, message: 'Email and mobile must be verified to login' });
         }
 
@@ -663,6 +681,7 @@ export const resendOtp = async (req, res) => {
     }
 };
 
+
 // #endregion
 
 export const verifyOtp = async (req, res) => {
@@ -781,8 +800,6 @@ export const verifyLoginOtp = async (req, res) => {
 
 }
 
-
-
 // region Login 
 
 
@@ -818,6 +835,7 @@ export const getSingleUser = async (req, res) => {
         });
     }
 };
+
 
 // middleware
 export const getUserInformation = async (req, res) => {
@@ -913,27 +931,56 @@ export const updateEmailUsingToken = async (req, res) => {
 export const updateMobileUsingToken = async (req, res) => {
     const { token } = req.params;
     const { usr_mobile_country_code, usr_mobile_number } = req.body;
+
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
     console.log(token);
 
-    try {
-        const user = await validateAuth(token);
 
-        const existingUser = await getUserById(user.userId);
-        if (!existingUser) {
-            return res.status(401).json({
-                status: 401,
+
+
+    try {
+
+
+        const user = await validateAuth(token);
+        const userInfo = await getUserById(user.userId);
+        const existingUser = await checkUserExistWithMobile(usr_mobile_number);
+        console.log(userInfo);
+
+
+        if (existingUser.length) {
+            return res.status(409).json({
+                status: 409,
+                success: false,
+                message: "User already exist",
+
+            });
+        }
+
+
+        if (!user) {
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: "User not found"
             });
         }
 
+        await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+
+        await updateRegisterOtp(userInfo.id, otp, otpExpiry);
 
 
-        await updateMobile(user.userId, usr_mobile_country_code, usr_mobile_number,);
+        const country = await getCountryDialCode(userInfo.id)
+        const countryDialCode = country?.country_dial_code;
+
+
+        await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Mobile number  updated successfully"
+            message: "Mobile number updated successfully, verify your otp"
         });
     } catch (error) {
         console.error(error);
@@ -948,7 +995,6 @@ export const updateUserDetails = async (req, res) => {
     const newData = req.body
 
     try {
-
         const existingUser = await getUserById(userId);
         if (!existingUser) {
             return res.status(404).json({
@@ -981,7 +1027,6 @@ export const updateUserDetails = async (req, res) => {
         });
     }
 };
-
 
 
 export const sendMessage = (req, res) => {
