@@ -141,11 +141,9 @@ export const sendVerificationApproved = async (usr_email, usr_firstname) => {
     
             <p> Hello, <b> ${usr_firstname} </b></p>
     
-            <p>You are blocked temporary due to repeated incorrect attempts.Please Contact admin for assistance.</p>
+            <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
     
-            <p> Click the link below to reset your password: </p>
-    
-            <a href="https://react.greens-intl.ae/auth/login/"> Login with another account</a>
+            <a href="https://react.greens-intl.ae/auth/login/">Click here to Login </a>
   
           
             <p>Best regards,<br> <b>Greens International </b> </p>
