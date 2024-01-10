@@ -216,9 +216,17 @@ export const loginWithPassword = async (req, res) => {
     const { usr_email, usr_password } = req.body;
 
     try {
+
+
+
         //check if user exists 
         const existingUser = await getUserByEmail(usr_email);
         console.log(existingUser);
+
+        const userId = existingUser.id;
+        const usr_firstname = existingUser.usr_firstname
+        const country = await getCountryDialCode(userId)
+        const countryDialCode = country?.country_dial_code;
 
         if (!existingUser) {
             return res.status(404).json({
@@ -308,29 +316,33 @@ export const loginWithPassword = async (req, res) => {
         await updateIncorrectAttempts(existingUser.id, 0);
 
 
+
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
 
             if (!existingUser.email_verified) {
                 // jwt user token 
-                const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
-
+                const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
                 // Send email verification link
-                await sendVerificationEmail(usr_email, usr_firstname, token, 'individual');
-
-
+                await sendVerificationEmail(existingUser.usr_email, usr_firstname, token, 'individual');
+                return res.status(201).json({
+                    status: 201,
+                    success: true,
+                    message: "Email and mobile must be verified to login, Please complete the email verification",
+                    token: token
+                });
             }
+
 
             if (!existingUser.mobile_verified) {
                 // Trigger mobile re-verification process (send a new verification code)
-                sendVerificationCode(existingUser.usr_mobile, existingUser.usr_firstname, existingUser.id);
-            }
-
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: 'Email and mobile must be verified to login'
-            });
+                sendVerificationCode(existingUser.usr_mobile_number, existingUser.otp, countryDialCode, existingUser.otp_expiry);
+                return res.status(201).json({
+                    status: 201,
+                    success: true,
+                    message: "Otp send successfully, Check your mobile for verification"
+                });
+            };
         }
 
 
@@ -434,10 +446,16 @@ export const refreshAccessToken = async (req, res) => {
 export const loginWithOtp = async (req, res) => {
     const { usr_mobile_number } = req.body;
 
+
     try {
+
         //check user exist 
 
-        const existingUser = await getUserByPhoneNumber(usr_mobile_number)
+        const existingUser = await getUserByPhoneNumber(usr_mobile_number);
+        const country = await getCountryDialCode(existingUser?.id)
+        const countryDialCode = country?.country_dial_code;
+
+
 
 
         if (!existingUser) {
@@ -476,11 +494,45 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
+        const token = jwt.sign({ userId: existingUser.id, usr_email: existingUser.usr_email, usr_firstname: existingUser.usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
 
-            return res.status(404).json({ status: 404, success: false, message: 'Email and mobile must be verified to login' });
+            if (!existingUser.email_verified) {
+                // jwt user token 
+
+                // Send email verification link
+                await sendVerificationEmail(existingUser.usr_email, existingUser.usr_firstname, token, 'individual');
+                return res.status(201).json({
+                    status: 201,
+                    success: true,
+                    message: "Email and mobile must be verified to login, Please complete the email verification",
+                    token: token
+                });
+            }
+
+
+            if (!existingUser.mobile_verified) {
+
+                // generate otp
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+
+                const user = await updateRegisterOtp(existingUser.id, otp, otpExpiry)
+                const country = await getCountryDialCode(existingUser.id)
+                const countryDialCode = country?.country_dial_code;
+
+                // Trigger mobile re-verification process (send a new verification code)
+                await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, countryDialCode, user[0].otp_expiry);
+                return res.status(201).json({
+                    status: 201,
+                    success: true,
+                    message: "Otp send successfully, Check your mobile for verification",
+                    token: token,
+
+                });
+            };
         }
 
         // token
@@ -507,8 +559,7 @@ export const loginWithOtp = async (req, res) => {
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
 
         await updateRegisterOtp(existingUser.id, otp, otpExpiry)
-        const country = await getCountryDialCode(userId)
-        const countryDialCode = country?.country_dial_code;
+
 
         const sendOtp = await sendVerificationCode(existingUser.usr_mobile_number, otp, countryDialCode);
         console.log("phone number", existingUser.usr_mobile_number);
@@ -758,11 +809,11 @@ export const verifyLoginOtp = async (req, res) => {
 
     // Check if OTP is valid and not expired
     const user = await getUserByPhoneNumber(usr_mobile_number);
-    // console.log(user);
-    // console.log(otp);
+    console.log(user);
+    console.log(otp);
     if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
-        // console.log(user.otp);
-        // console.log(user.otp_expiry);
+        console.log(user.otp);
+        console.log(user.otp_expiry);
         return res.status(404).json({
             status: 404,
             success: false,
