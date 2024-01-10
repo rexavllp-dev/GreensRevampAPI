@@ -35,7 +35,9 @@ export const checkUserExist = async (usr_mobile_number, usr_email) => {
 };
 
 export const deleteAUser = async (userId) => {
-    const user = await db('users').where({ id: userId }).del();
+    // const user = await db('users').where({ id: userId }).del();
+    const user = await db('users').del();
+    const com = await db('company').del();
     return user;
 };
 
@@ -87,9 +89,9 @@ export const updatePassword = async (id, hashedPassword) => {
 
 // find resetToken from database
 
-export const findByResetToken = async (email, reset_token) => {
+export const findByResetToken = async (reset_token) => {
     // console.log(resetToken)
-    const user = await db("users").select("*").where({ email, reset_token }).first();
+    const user = await db("users").select("*").where({ reset_token }).first();
     return user;
 };
 

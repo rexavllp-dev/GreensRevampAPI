@@ -9,20 +9,17 @@ dotenv.config();
 export const sendEmail = async ({ email, subject, html }) => {
     try {
         let transporter = nodemailer.createTransport({
-            host: "smtp-mail.outlook.com", // hostname
-            secureConnection: false, // TLS requires secureConnection to be false
-            port: 587, // port for secure SMTP
-        auth: {
-          user: "rexavtimetrack@outlook.com", // generated ethereal user
-          pass: "rexav2626", // generated ethereal password
-        },
-        tls: {
-          ciphers:'SSLv3'
-        }
+            host: "athena.indiandns.net",
+            port: 465,
+            secure: true,
+            auth: {
+                user: "mymail@greens-intl.ae",
+                pass: "8C2HwCOtsgz("
+            }
         });
 
         const mailOptions = {
-            from: 'rexavtimetrack@outlook.com',
+            from: 'mymail@greens-intl.ae',
             to: email,
             subject: subject,
             html: html,
