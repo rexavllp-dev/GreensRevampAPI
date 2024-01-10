@@ -143,7 +143,7 @@ export const registerCompany = async (req, res) => {
             company_landline,
             company_landline_country_code,
             company_trn_number,
-            company_trade_license_expiry,
+            // company_trade_license_expiry,
 
         };
 
