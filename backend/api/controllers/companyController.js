@@ -3,7 +3,7 @@ import Joi from 'joi';
 import JoiDate from '@joi/date';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
-import { checkUserExist, createUser, deleteAUser, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
+import { checkUserExist, createUser, deleteAUser, getCountryDialCode, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import { sendVerificationEmail } from "../utils/emailer.js";
 import sendVerificationCode from "../utils/mobileOtp.js";
@@ -11,6 +11,9 @@ import jwt from 'jsonwebtoken';
 import aws from 'aws-sdk';
 import sharp from "sharp";
 import maintenanceModeMessage from 'aws-sdk/lib/maintenance_mode_message.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+dayjs.extend(utc);
 
 // Suppress maintenance mode warning
 maintenanceModeMessage.suppress = true;
@@ -48,9 +51,11 @@ export const registerCompany = async (req, res) => {
         company_landline_country_code,
         company_trn_number,
         company_trade_license,
-        company_trade_license_expiry,
+        // company_trade_license_expiry
 
     } = req.body;
+
+    let company_trade_license_expiry = dayjs.utc(req.body.company_trade_license_expiry).utc(true).format();
 
     const files = req.files;
 
@@ -115,7 +120,7 @@ export const registerCompany = async (req, res) => {
             company_vat_certificate: Joi.string().label("Vat Certificate"),
             company_trn_number: Joi.number().required().label("Trn Number"),
             company_trade_license: Joi.string().label("Trade License"),
-            company_trade_license_expiry: JoiExtended.date().raw().format("DD/MM/YYYY").required().label("Trade License Expiry Date"),
+            // company_trade_license_expiry: JoiExtended.date().raw().format("DD/MM/YYYY").required().label("Trade License Expiry Date"),
 
         });
 
@@ -252,7 +257,7 @@ export const registerCompany = async (req, res) => {
             usr_company: newCompany[0].id,
             is_status: false,
             registration_method: registrationMethod,
-            usr_approval_id:1
+            usr_approval_id: 1
         });
 
         const userId = newUser[0]?.id;
@@ -321,10 +326,12 @@ export const verifyEmail = async (req, res) => {
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
 
         if (email_verified) {
-            const user = await updateRegisterOtp(userId, otp, otpExpiry)
+            const user = await updateRegisterOtp(userId, otp, otpExpiry);
+            const country = await getCountryDialCode(userId)
+            const countryDialCode = country?.country_dial_code;
             console.log(user);
             // Send OTP via SMS
-            await sendVerificationCode(user.usr_mobile_number, user.otp, user.otp_expiry);
+            await sendVerificationCode(user.usr_mobile_number, user.otp, countryDialCode, user.otp_expiry);
 
 
 
@@ -388,9 +395,15 @@ export const resendEmail = async (req, res) => {
 // region resend resendOtp 
 
 export const resendOtp = async (req, res) => {
-    const { usr_mobile_number } = req.body;
+    const { token } = req.params;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
     try {
-        const user = await getUserByPhoneNumber(usr_mobile_number);
+        const user = await validateAuth(token);
+        console.log(user);
+
+        const userInfo = await getUserById(user.userId);
+
         if (!user) {
             return res.status(404).json({
                 status: 404,
@@ -398,7 +411,12 @@ export const resendOtp = async (req, res) => {
                 message: "User not found"
             });
         }
-        await sendVerificationCode(usr_mobile_number);
+
+        await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+        const country = await getCountryDialCode(userInfo.id);
+        const countryDialCode = country?.country_dial_code;
+
+        await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
 
         res.status(200).json({

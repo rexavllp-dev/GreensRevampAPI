@@ -12,15 +12,15 @@ const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 const client = twilio(accountSid, authToken);
 
-const sendVerificationCode = async (usr_mobile_number, otp) => {
+const sendVerificationCode = async (usr_mobile_number, otp, countryDialCode) => {
 
     console.log(usr_mobile_number);
     console.log(otp);
     try {
         const message = await client.messages.create({
             body: `Your verification code is: ${otp}`,
-            from: twilioPhoneNumber,
-            to: usr_mobile_number
+            from:  twilioPhoneNumber,
+            to: countryDialCode + usr_mobile_number
 
         });
 

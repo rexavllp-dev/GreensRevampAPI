@@ -8,16 +8,18 @@ dotenv.config();
 
 export const sendEmail = async ({ email, subject, html }) => {
     try {
-        const transporter = nodemailer.createTransport({
-            service: 'outlook',
+        let transporter = nodemailer.createTransport({
+            host: "athena.indiandns.net",
+            port: 465,
+            secure: true,
             auth: {
-                user: 'rexavtimetrack@outlook.com',
-                pass: 'rexav2626',
-            },
+                user: "mymail@greens-intl.ae",
+                pass: "8C2HwCOtsgz("
+            }
         });
 
         const mailOptions = {
-            from: 'rexavtimetrack@outlook.com',
+            from: 'mymail@greens-intl.ae',
             to: email,
             subject: subject,
             html: html,

@@ -83,7 +83,7 @@ passport.use(
     {
       clientID: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      callbackURL: 'http://localhost:5000/api/v1/users/auth/facebook/callback',
+      callbackURL: 'https://api.greens-intl.ae/api/v1/users/auth/facebook/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
 
