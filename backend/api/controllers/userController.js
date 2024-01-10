@@ -251,7 +251,7 @@ export const loginWithPassword = async (req, res) => {
         // Check if the user's company is verified
         const userCompany = existingUser.usr_company;
         let userType;
-        if(!userCompany) {
+        if (!userCompany) {
             userType = "individual";
         } else {
             userType = "company"
@@ -333,10 +333,11 @@ export const loginWithPassword = async (req, res) => {
 
                 // Send email verification link
                 await sendVerificationEmail(existingUser.usr_email, usr_firstname, token, userType);
-                return res.status(201).json({
-                    status: 201,
-                    success: true,
+                return res.status(422).json({
+                    status: 422,
+                    success: false,
                     message: "Email and mobile must be verified to login, Please complete the email verification",
+                    from: userType,
                     token: token
                 });
             }
@@ -354,10 +355,11 @@ export const loginWithPassword = async (req, res) => {
 
                 // Trigger mobile re-verification process (send a new verification code)
                 await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, countryDialCode, user[0].otp_expiry);
-                return res.status(201).json({
-                    status: 201,
-                    success: true,
+                return res.status(422).json({
+                    status: 422,
+                    success: false,
                     message: "Otp send successfully, Check your mobile for verification",
+                    from: userType,
                     token: token,
 
                 });
@@ -490,7 +492,7 @@ export const loginWithOtp = async (req, res) => {
         // Check if the user's company is verified
         const userCompany = existingUser.usr_company;
         let userType;
-        if(!userCompany) {
+        if (!userCompany) {
             userType = "individual";
         } else {
             userType = "company"
@@ -529,17 +531,17 @@ export const loginWithOtp = async (req, res) => {
 
                 // Send email verification link
                 await sendVerificationEmail(existingUser.usr_email, existingUser.usr_firstname, token, userType);
-                return res.status(201).json({
-                    status: 201,
-                    success: true,
+                return res.status(422).json({
+                    status: 422,
+                    success: false,
                     message: "Email and mobile must be verified to login, Please complete the email verification",
+                    from: userType,
                     token: token
                 });
             }
 
 
             if (!existingUser.mobile_verified) {
-
                 // generate otp
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
                 const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
@@ -550,10 +552,11 @@ export const loginWithOtp = async (req, res) => {
 
                 // Trigger mobile re-verification process (send a new verification code)
                 await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, countryDialCode, user[0].otp_expiry);
-                return res.status(201).json({
-                    status: 201,
-                    success: true,
+                return res.status(422).json({
+                    status: 422,
+                    success: false,
                     message: "Otp send successfully, Check your mobile for verification",
+                    from: userType,
                     token: token,
 
                 });
@@ -784,7 +787,7 @@ export const verifyOtp = async (req, res) => {
             console.log(user.otp);
             console.log(user.otp_expiry);
             console.log(user.id);
-            
+
             return res.status(400).json({
                 status: 400,
                 success: false,
