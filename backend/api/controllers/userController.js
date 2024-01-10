@@ -759,7 +759,12 @@ export const verifyOtp = async (req, res) => {
             console.log(user.otp);
             console.log(user.otp_expiry);
             console.log(user.id);
-            return res.status(401).json({ error: 'Invalid OTP or OTP expired' });
+            
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Invalid OTP or OTP expired'
+            });
         }
 
         if (user && user.otp === otp) {
@@ -790,6 +795,7 @@ export const verifyOtp = async (req, res) => {
             // Perform additional user registration steps if needed
             res.status(200).json({
                 status: 200,
+                success: true,
                 message: 'OTP verified successfully',
             });
         }
