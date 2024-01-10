@@ -14,8 +14,7 @@ const client = twilio(accountSid, authToken);
 
 const sendVerificationCode = async (usr_mobile_number, otp, countryDialCode) => {
 
-    console.log(usr_mobile_number);
-    console.log(otp);
+   
     try {
         const message = await client.messages.create({
             body: `Your verification code is: ${otp}`,
