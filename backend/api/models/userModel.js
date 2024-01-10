@@ -34,6 +34,13 @@ export const checkUserExist = async (usr_mobile_number, usr_email) => {
     return user;
 };
 
+
+//  check user exist with mobile number
+export const checkUserExistWithMobile = async (usr_mobile_number) => {
+    const user = await db('users').select('id').where({ usr_mobile_number });
+    return user;
+};
+
 export const deleteAUser = async (userId) => {
     // const user = await db('users').where({ id: userId }).del();
     const user = await db('users').del();
