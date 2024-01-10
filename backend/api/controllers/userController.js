@@ -233,11 +233,7 @@ export const loginWithPassword = async (req, res) => {
 
         const userId = existingUser?.id;
         const usr_firstname = existingUser.usr_firstname
-        const country = await getCountryDialCode(userId)
-        const countryDialCode = country?.country_dial_code;
-
-
-
+    
 
         // Check if the user is blocked
         if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
@@ -866,8 +862,7 @@ export const verifyLoginOtp = async (req, res) => {
         };
         
         if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
-            console.log(user.otp);
-            console.log(user.otp_expiry);
+           
             return res.status(404).json({
                 status: 404,
                 success: false,
@@ -880,8 +875,8 @@ export const verifyLoginOtp = async (req, res) => {
             // Clear OTP after successful verification
             await updateOtp(existingUser.id);
 
-            const accessToken = generateAccessToken(user);
-            const refreshToken = generateRefreshToken(user);
+            const accessToken = generateAccessToken(existingUser.user);
+            const refreshToken = generateRefreshToken(existingUser.user);
 
             return res.status(200).json({
                 status: 200,
@@ -891,10 +886,10 @@ export const verifyLoginOtp = async (req, res) => {
                     accessToken,
                     refreshToken,
                     user: {
-                        id: user.id,
-                        usr_email: user.usr_email,
-                        usr_firstname: user.usr_firstname,
-                        usr_lastname: user.usr_lastname,
+                        id: existingUser.id,
+                        usr_email: existingUser.usr_email,
+                        usr_firstname: existingUser.usr_firstname,
+                        usr_lastname: existingUser.usr_lastname,
                     }
                 }
             });
