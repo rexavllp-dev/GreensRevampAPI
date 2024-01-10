@@ -38,7 +38,7 @@ export const forgotPassword = async (req, res) => {
 
 
         const token = generateToken();
-        const expiresAt = new Date(Date.now() + 300000)
+        const expiresAt = new Date(Date.now() + 86400000)
 
 
         await updateResetToken(usr_email, token, expiresAt);
