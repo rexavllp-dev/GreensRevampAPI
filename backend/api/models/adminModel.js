@@ -17,15 +17,24 @@ export const updateUserVerificationByAdmin = async (userId) => {
 };
 
 
-
+// update company status
 export const updateCompanyStatus = async (companyId, approvalId, verificationStatus) => {
-    return await db('company')
-        .leftJoin('users', 'users.usr_company', 'company.id')
-        .where({ "company.id": companyId })
+
+    const updateUserResult = await db('users')
+        .where({ "usr_company": companyId })
         .update({
-            "users.usr_approval_id": approvalId,
-            "company.verification_status": verificationStatus,
+            'usr_approval_id': approvalId,
         });
+
+    const updateCompanyResult = await db('company')
+        .where({ "id": companyId })
+        .update({
+            'verification_status': verificationStatus,
+        });
+
+    // You can check the results or handle them as needed
+
+    return { updateUserResult, updateCompanyResult };
 };
 
 

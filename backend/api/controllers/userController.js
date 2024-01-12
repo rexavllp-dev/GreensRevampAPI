@@ -255,6 +255,51 @@ export const loginWithPassword = async (req, res) => {
             userType = "company"
         }
 
+        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
+
+        // Check if both email and mobile are verified
+        if (!existingUser.email_verified || !existingUser.mobile_verified) {
+
+            if (!existingUser.email_verified) {
+                // jwt user token 
+
+                // Send email verification link
+                await sendVerificationEmail(existingUser.usr_email, usr_firstname, token, userType);
+                return res.status(422).json({
+                    status: 422,
+                    success: false,
+                    message: "Email and mobile must be verified to login, Please complete the email verification",
+                    from: userType,
+                    unverified: "email",
+                    token: token
+                });
+            }
+
+
+            if (!existingUser.mobile_verified) {
+
+                // generate otp
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+
+                const user = await updateRegisterOtp(existingUser.id, otp, otpExpiry)
+                const country = await getCountryDialCode(existingUser.id)
+                const countryDialCode = country?.country_dial_code;
+
+                // Trigger mobile re-verification process (send a new verification code)
+                await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, countryDialCode, user[0].otp_expiry);
+                return res.status(422).json({
+                    status: 422,
+                    success: false,
+                    message: "Otp send successfully, Check your mobile for verification",
+                    from: userType,
+                    unverified: "mobile",
+                    token: token,
+
+                });
+            };
+        };
+
 
         // Check if the user's company is verified
         const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
@@ -329,50 +374,7 @@ export const loginWithPassword = async (req, res) => {
         await updateIncorrectAttempts(existingUser.id, 0);
 
 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
 
-        // Check if both email and mobile are verified
-        if (!existingUser.email_verified || !existingUser.mobile_verified) {
-
-            if (!existingUser.email_verified) {
-                // jwt user token 
-
-                // Send email verification link
-                await sendVerificationEmail(existingUser.usr_email, usr_firstname, token, userType);
-                return res.status(422).json({
-                    status: 422,
-                    success: false,
-                    message: "Email and mobile must be verified to login, Please complete the email verification",
-                    from: userType,
-                    unverified: "email",
-                    token: token
-                });
-            }
-
-
-            if (!existingUser.mobile_verified) {
-
-                // generate otp
-                const otp = Math.floor(100000 + Math.random() * 900000).toString();
-                const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
-
-                const user = await updateRegisterOtp(existingUser.id, otp, otpExpiry)
-                const country = await getCountryDialCode(existingUser.id)
-                const countryDialCode = country?.country_dial_code;
-
-                // Trigger mobile re-verification process (send a new verification code)
-                await sendVerificationCode(user[0]?.usr_mobile_number, user[0].otp, countryDialCode, user[0].otp_expiry);
-                return res.status(422).json({
-                    status: 422,
-                    success: false,
-                    message: "Otp send successfully, Check your mobile for verification",
-                    from: userType,
-                    unverified: "mobile",
-                    token: token,
-
-                });
-            };
-        }
 
 
         //create token
@@ -481,11 +483,7 @@ export const loginWithOtp = async (req, res) => {
         //check user exist 
 
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
-        ;
-
-
-
-
+        
         if (!existingUser) {
 
             return res.status(404).json({
@@ -588,7 +586,6 @@ export const loginWithOtp = async (req, res) => {
 };
 
 
-
 // #region email verification 
 
 export const verifyEmail = async (req, res) => {
@@ -601,12 +598,13 @@ export const verifyEmail = async (req, res) => {
         const userId = decoded.userId;
         // console.log(decoded);
 
-        if (userId.email_verified) {
-            res.status(409).json({
-              status:409,
-              success:false,
-              message:"User already verified",
-              result:""
+        const existingUser = await getUserById(userId)
+
+        if (existingUser.email_verified) {
+            return res.status(409).json({
+                status: 409,
+                success: false,
+                message: "User already verified"
             });
         }
 

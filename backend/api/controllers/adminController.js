@@ -1,5 +1,5 @@
 import { joiOptions } from "../helpers/joiOptions.js";
-import { fetchSingleCompany, isActive, isNotActive, updateCompanyStatus, updateUserVerificationByAdmin } from "../models/adminModel.js";
+import { fetchSingleCompany, isActive, isNotActive,  updateCompanyStatus, updateUserVerificationByAdmin } from "../models/adminModel.js";
 import { checkUserExist, createUser } from "../models/userModel.js";
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
@@ -184,24 +184,24 @@ export const isNotActiveByAdmin = async (req, res) => {
 
 export const approveCompanyByAdmin = async (req, res) => {
     const { companyId } = req.params;
-  
-   
     try {
         const companyData = await fetchSingleCompany(companyId);
-      
         // console.log(companyData);
-        await updateCompanyStatus(companyId, 2, true);
+        const companyStatus = await updateCompanyStatus(companyId, 2, true);
         const userId = companyData?.id;
         // console.log(companyData.id);
         console.log( companyData.usr_email, companyData.usr_firstname );
-    
+        await isActive(userId);
+
         await sendVerificationApproved(companyData.usr_email, companyData.usr_firstname);
         
-
+ 
+        
         res.status(200).json({
             status: 200,
             success: true,
             message: "Company approved successfully",
+           
         });
 
     } catch (error) {
@@ -233,7 +233,7 @@ export const rejectCompanyByAdmin = async (req, res) => {
             status: 200,
             success: true,
             message: "Company rejected successfully",
-            result: companyStatus,
+            
         });
 
     } catch (error) {
