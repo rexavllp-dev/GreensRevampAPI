@@ -80,7 +80,7 @@ export const registerUser = async (req, res) => {
         usr_newsletter_accepted,
         email_verified,
         mobile_verified,
-        
+
 
 
 
@@ -189,7 +189,7 @@ export const registerUser = async (req, res) => {
             result: {
                 userToken: {
                     token,
-                    user: { 
+                    user: {
                         userId,
                         usr_email,
                         usr_firstname,
@@ -256,24 +256,24 @@ export const loginWithPassword = async (req, res) => {
         }
 
 
-    // Check if the user's company is verified
-    const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
 
-    if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-      if (existingUser.usr_approval_id === 1) {
-        return res.status(200).json({
-          status: 200,
-          success: true,
-          message: 'Please wait for company verification. Your account is pending for approval.'
-        });
-      } else if (existingUser.usr_approval_id === 3) {
-        return res.status(403).json({
-          status: 403,
-          success: false,
-          message: 'Your company is rejected. Contact admin for further assistance.'
-        });
-      }
-    }
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
+                return res.status(200).json({
+                    status: 200,
+                    success: true,
+                    message: 'Please wait for company verification. Your account is pending for approval.'
+                });
+            } else if (existingUser.usr_approval_id === 3) {
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: 'Your company is rejected. Contact admin for further assistance.'
+                });
+            }
+        }
 
         // Check if the user is blocked by the admin
         if (!existingUser.is_status) {
@@ -601,8 +601,19 @@ export const verifyEmail = async (req, res) => {
         const userId = decoded.userId;
         // console.log(decoded);
 
+        if (userId.email_verified) {
+            res.status(409).json({
+              status:409,
+              success:false,
+              message:"User already verified",
+              result:""
+            });
+        }
+
+
         // Update user verification status
         const email_verified = await updateUserVerificationStatus(userId, true);
+
         // generate otp
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
