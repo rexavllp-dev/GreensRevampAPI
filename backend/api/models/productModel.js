@@ -1,9 +1,12 @@
+import db from '../../config/dbConfig.js';
+
 // create product
 
-export const createProducts = async (productData) => {
+export const createAProduct = async (productData) => {
     const newUser = await db("products").insert(productData).returning('*');
     return newUser;
 };
+
 
 
 

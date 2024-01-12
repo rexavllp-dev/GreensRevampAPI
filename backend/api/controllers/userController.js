@@ -80,6 +80,7 @@ export const registerUser = async (req, res) => {
         usr_newsletter_accepted,
         email_verified,
         mobile_verified,
+        
 
 
 
@@ -188,7 +189,7 @@ export const registerUser = async (req, res) => {
             result: {
                 userToken: {
                     token,
-                    user: {
+                    user: { 
                         userId,
                         usr_email,
                         usr_firstname,
