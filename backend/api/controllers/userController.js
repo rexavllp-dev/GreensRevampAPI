@@ -83,6 +83,7 @@ export const registerUser = async (req, res) => {
 
 
 
+
     } = req.body;
 
 
@@ -176,7 +177,7 @@ export const registerUser = async (req, res) => {
 
 
         // jwt user token 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
 
         // Send email verification link
         await sendVerificationEmail(usr_email, usr_firstname, token, 'individual');
@@ -233,7 +234,7 @@ export const loginWithPassword = async (req, res) => {
 
         const userId = existingUser?.id;
         const usr_firstname = existingUser.usr_firstname
-    
+
 
         // Check if the user is blocked
         if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
@@ -254,18 +255,25 @@ export const loginWithPassword = async (req, res) => {
             userType = "company"
         }
 
-        if (!userCompany === null) {
-            const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
 
-            if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
+                return res.status(200).json({
+                    status: 200,
+                    success: true,
+                    message: 'Please wait for company verification. Your account is pending for approval.'
+                });
+            } else if (existingUser.usr_approval_id === 3) {
                 return res.status(403).json({
                     status: 403,
                     success: false,
-                    message: 'your account activation is under process we will update once your account is active.',
+                    message: 'Your company is rejected. Contact admin for further assistance.'
                 });
             }
-
-        };
+        }
 
         // Check if the user is blocked by the admin
         if (!existingUser.is_status) {
@@ -321,7 +329,7 @@ export const loginWithPassword = async (req, res) => {
         await updateIncorrectAttempts(existingUser.id, 0);
 
 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
@@ -336,7 +344,7 @@ export const loginWithPassword = async (req, res) => {
                     success: false,
                     message: "Email and mobile must be verified to login, Please complete the email verification",
                     from: userType,
-                    unverified:"email",
+                    unverified: "email",
                     token: token
                 });
             }
@@ -359,7 +367,7 @@ export const loginWithPassword = async (req, res) => {
                     success: false,
                     message: "Otp send successfully, Check your mobile for verification",
                     from: userType,
-                    unverified:"mobile",
+                    unverified: "mobile",
                     token: token,
 
                 });
@@ -523,7 +531,7 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
-    
+
 
         // token
         //create token
@@ -593,8 +601,19 @@ export const verifyEmail = async (req, res) => {
         const userId = decoded.userId;
         // console.log(decoded);
 
+        if (userId.email_verified) {
+            res.status(409).json({
+              status:409,
+              success:false,
+              message:"User already verified",
+              result:""
+            });
+        }
+
+
         // Update user verification status
         const email_verified = await updateUserVerificationStatus(userId, true);
+
         // generate otp
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
@@ -803,23 +822,23 @@ export const verifyLoginOtp = async (req, res) => {
     const { usr_mobile_number, otp } = req.body;
 
     try {
-        
+
         // Check if OTP is valid and not expired
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
 
 
-          // Check if the user's company is verified
-          const userCompany = existingUser.usr_company;
-          let userType;
-          if (!userCompany) {
-              userType = "individual";
-          } else {
-              userType = "company"
-          };
+        // Check if the user's company is verified
+        const userCompany = existingUser.usr_company;
+        let userType;
+        if (!userCompany) {
+            userType = "individual";
+        } else {
+            userType = "company"
+        };
 
-          const token = jwt.sign({ userId: existingUser.id, usr_email: existingUser.usr_email, usr_firstname: existingUser.usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
-          // Check if both email and mobile are verified
-          if (!existingUser.email_verified || !existingUser.mobile_verified) {
+        const token = jwt.sign({ userId: existingUser.id, usr_email: existingUser.usr_email, usr_firstname: existingUser.usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        // Check if both email and mobile are verified
+        if (!existingUser.email_verified || !existingUser.mobile_verified) {
 
             if (!existingUser.email_verified) {
                 // jwt user token 
@@ -831,7 +850,7 @@ export const verifyLoginOtp = async (req, res) => {
                     success: false,
                     message: "Email and mobile must be verified to login, Please complete the email verification",
                     from: userType,
-                    unverified:"email",
+                    unverified: "email",
                     token: token
                 });
             }
@@ -854,15 +873,15 @@ export const verifyLoginOtp = async (req, res) => {
                     success: false,
                     message: "Otp send successfully, Check your mobile for verification",
                     from: userType,
-                    unverified:"mobile",
+                    unverified: "mobile",
                     token: token,
 
                 });
             };
         };
-        
+
         if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
-           
+
             return res.status(404).json({
                 status: 404,
                 success: false,
@@ -871,7 +890,7 @@ export const verifyLoginOtp = async (req, res) => {
         }
 
         if (existingUser && existingUser.otp === otp) {
-            
+
             // Clear OTP after successful verification
             await updateOtp(existingUser.id);
 
@@ -894,7 +913,7 @@ export const verifyLoginOtp = async (req, res) => {
                 }
             });
         }
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'internal server error please try again' });
     }

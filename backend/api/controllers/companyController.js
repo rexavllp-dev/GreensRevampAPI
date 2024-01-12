@@ -96,7 +96,7 @@ export const registerCompany = async (req, res) => {
 
 
 
-        const JoiExtended = Joi.extend(JoiDate);
+        // const JoiExtended = Joi.extend(JoiDate);
         // Register company validation 
         const schema = Joi.object({
             usr_firstname: Joi.string().required().label("First Name"),
@@ -257,28 +257,28 @@ export const registerCompany = async (req, res) => {
             usr_company: newCompany[0].id,
             is_status: false,
             registration_method: registrationMethod,
-            usr_approval_id: 1
+            usr_approval_id: 1,
         });
 
         const userId = newUser[0]?.id;
         // jwt user token 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
 
         // Send email verification link
         await sendVerificationEmail(usr_email, usr_firstname, token, 'company');
 
 
 
-
+        console.log(newUser);
         res.status(201).json({
             status: 201,
             success: true,
             message: "Company registration successful. Check your email for verification ",
             result: {
-                company: newCompany,
                 userToken: {
                     token,
                     user: {
+                        
                         userId,
                         usr_email,
                         usr_firstname,
