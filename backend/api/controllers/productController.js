@@ -1,10 +1,12 @@
-import { createAProduct } from "../models/productModel";
+import { createAProduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
+import Joi from 'joi';
+import getErrorsInArray from '../helpers/getErrors.js';
 
 
 // create products
 
-export const registerUser = async (req, res) => {
+export const createProduct = async (req, res) => {
 
 
     const {
@@ -19,7 +21,7 @@ export const registerUser = async (req, res) => {
         prd_status,
         prd_sales_unit,
         prd_return_type,
-        prd_brand_name,
+        prd_brand_id,
         prd_price,
        
 
@@ -29,18 +31,18 @@ export const registerUser = async (req, res) => {
 try {
 
     const schema = Joi.object({
-        prd_name:joi.string().required().label("prd_name "),
+        prd_name: Joi.string().required().label("prd_name"),
         prd_description: Joi.string().required().label("prd_description"),
         prd_storage_type: Joi.string().required().label("prd_storage_type"),
-        prd_tax_class: Joi.number().required().label("prd_tax_class"),
+        prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
         prd_tags: Joi.string().required().label("prd_tags"),
-        prd_expiry_date: Joi.string().required().label("prd_expiry_date"),
-        prd_dashboard_status: Joi.string().label("prd_dashboard_status"),
+        prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
+        prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
         prd_status: Joi.boolean().required().label("prd_status "),
-        prd_sales_unit: Joi.boolean().required().label("prd_sales_unit"),
-        prd_return_type: Joi.boolean().required().label("prd_return_type"),
-        prd_brand_name: Joi.boolean().required().label(" prd_brand_name"),
-        prd_price: Joi.boolean().required().label(" prd_price"),
+        prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
+        prd_return_type: Joi.string().required().label("prd_return_type"),
+        prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
+        prd_price: Joi.number().required().label(" prd_price")
        
     });
 
@@ -59,7 +61,7 @@ try {
         prd_status,
         prd_sales_unit,
         prd_return_type,
-        prd_brand_name,
+        prd_brand_id,
         prd_price,
        
     };
@@ -87,7 +89,7 @@ try {
         prd_status,
         prd_sales_unit,
         prd_return_type,
-        prd_brand_name,
+        prd_brand_id,
         prd_price,
 
     })
@@ -103,8 +105,8 @@ try {
 
 
 }catch(error){
+    console.log(error)
     res.status(500).json({
-
         status: 500,
         success: false,
         error: error,

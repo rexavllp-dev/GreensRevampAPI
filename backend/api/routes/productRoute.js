@@ -1,6 +1,6 @@
 import express from 'express';
 import { createPrice } from '../controllers/priceController.js';
-import { createAProduct } from '../models/productModel.js';
+import { createProduct } from '../controllers/productController.js';
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ const router = express.Router();
 
 // create price route
 router.post('/create-price', createPrice);
-router.post('/create-product', createAProduct);
+router.post('/create-product', createProduct);
 
 
 export default router;

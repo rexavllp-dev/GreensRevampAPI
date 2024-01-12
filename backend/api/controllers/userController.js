@@ -322,7 +322,7 @@ export const loginWithPassword = async (req, res) => {
         await updateIncorrectAttempts(existingUser.id, 0);
 
 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
