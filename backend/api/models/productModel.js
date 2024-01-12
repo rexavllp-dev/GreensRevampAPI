@@ -8,6 +8,16 @@ export const createAProduct = async (productData) => {
 };
 
 
+// update model
+
+export const updateAproduct = async (productId, updatedData) => {
+    const updatedProduct = await db('products').where({ id: productId })
+        .update(updatedData)
+        .returning('*'); // Return the updated product
+}
+
+
+
 
 
 
@@ -18,6 +28,7 @@ export const createAProduct = async (productData) => {
 
 
 // create price
+
 export const createPrdPrice = async (priceData) => {
     const price = await db("products_price").insert(priceData).returning('*');
     return price;

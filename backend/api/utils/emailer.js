@@ -91,7 +91,7 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
                 <a href= ${resetPassLink} target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: #fff; text-decoration: none; border-radius: 6px;">Reset Password</a>
             </p>
   
-            <p>This link will expire in  <b>10 minutes </b> for security reasons.</p>
+            <p>This link will expire in  <b> 24 Hours  </b> for security reasons.</p>
     
             <p>If you didn't request a password reset, please disregard this email.</p>
     
