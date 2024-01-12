@@ -13,3 +13,6 @@ export async function seed(knex) {
     {id: 5, status_name: 'Inactive'}
   ]);
 }
+
+
+

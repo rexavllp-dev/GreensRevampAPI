@@ -7,7 +7,15 @@ dotenv.config();
 export const googleAuth = async (req, res) => {
     try {
 
-
+        // Check if the user has a company and is verified
+        if (!req.user.company || !req.user.isVerified) {
+  
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is not allowed to log in with Google due to missing company  unverified status",
+            });
+        }
      
         const accessToken = generateAccessToken(req.user)
         const refreshToken = generateRefreshToken(req.user)

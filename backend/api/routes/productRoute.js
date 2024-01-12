@@ -1,6 +1,6 @@
 import express from 'express';
-import { createPrice } from '../controllers/priceController.js';
 import { createProduct } from '../controllers/productController.js';
+import { createPrice, updatePrice } from '../controllers/priceController.js';
 
 const router = express.Router();
 
@@ -9,6 +9,10 @@ const router = express.Router();
 // create price route
 router.post('/create-price', createPrice);
 router.post('/create-product', createProduct);
+// update price
+router.put('/update-price', updatePrice);
+// get a price
+
 
 
 export default router;
