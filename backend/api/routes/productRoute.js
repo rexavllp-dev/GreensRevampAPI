@@ -1,5 +1,4 @@
 import express from 'express';
-import { createPrice } from '../controllers/priceController.js';
 import { createProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, updatePrice } from '../controllers/priceController.js';
 
