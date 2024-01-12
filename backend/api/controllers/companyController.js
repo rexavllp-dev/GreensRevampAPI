@@ -96,7 +96,7 @@ export const registerCompany = async (req, res) => {
 
 
 
-        const JoiExtended = Joi.extend(JoiDate);
+        // const JoiExtended = Joi.extend(JoiDate);
         // Register company validation 
         const schema = Joi.object({
             usr_firstname: Joi.string().required().label("First Name"),
@@ -257,7 +257,7 @@ export const registerCompany = async (req, res) => {
             usr_company: newCompany[0].id,
             is_status: false,
             registration_method: registrationMethod,
-            usr_approval_id: 1
+            usr_approval_id: 1,
         });
 
         const userId = newUser[0]?.id;
@@ -269,16 +269,16 @@ export const registerCompany = async (req, res) => {
 
 
 
-
+        console.log(newUser);
         res.status(201).json({
             status: 201,
             success: true,
             message: "Company registration successful. Check your email for verification ",
             result: {
-                company: newCompany,
                 userToken: {
                     token,
                     user: {
+                        
                         userId,
                         usr_email,
                         usr_firstname,
