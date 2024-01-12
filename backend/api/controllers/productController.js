@@ -1,4 +1,4 @@
-import { createAProduct, createProduct } from "../models/productModel";
+import { createAProduct } from "../models/productModel";
 import { joiOptions } from '../helpers/joiOptions.js';
 
 
@@ -96,9 +96,7 @@ try {
         status: 201,
         success: true,
         message: "product created successfully",
-        result: {
-           
-        }
+        
 
     });
 
@@ -110,7 +108,7 @@ try {
         status: 500,
         success: false,
         error: error,
-        message: "Failed Create Product! Please try again later."
+        message: "Failed to Create Product! Please try again later."
     });
 }
    

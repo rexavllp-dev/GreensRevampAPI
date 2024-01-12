@@ -55,7 +55,7 @@ app.use('/api/v1/users', userRoute);
 app.use('/api/v1/company', companyRoute);
 app.use('/api/v1/country', countryRoute);
 app.use('/api/v1/admin', adminRoute);
-app.use('/api/v1/product', productRoute);
+app.use('/api/v1/products', productRoute);
 
 
 app.get('/', (req, res) => {
