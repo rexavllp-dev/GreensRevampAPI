@@ -10,18 +10,18 @@ import passport from 'passport';
 import './api/utils/passport-config.js';
 import fileUpload from 'express-fileupload';
 import axios from 'axios';
-import createSocketServer from './api/utils/socketIo.js';
-import http from 'http';
+// import createSocketServer from './api/utils/socketIo.js';
+// import http from 'http';
 
 
 
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app); // Use the createSocketIO function
+// const server = http.createServer(app); // Use the createSocketIO function
 
-const io = createSocketServer(server);
-app.set('socketio', io);
+// const io = createSocketServer(server);
+// app.set('socketio', io);
 
 const PORT = 5000;
 const corsOptions = {
