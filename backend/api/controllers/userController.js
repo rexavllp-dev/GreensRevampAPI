@@ -325,9 +325,9 @@ export const loginWithPassword = async (req, res) => {
             return res.status(403).json({
                 status: 403,
                 success: false,
-                message: "User is blocked.Please contact admin for assistance."
+                message: "User is Suspended. Please contact admin for assistance."
             });
-        }
+        };
 
 
         // Check if password is correct
@@ -505,29 +505,39 @@ export const loginWithOtp = async (req, res) => {
         } else {
             userType = "company"
         }
+       
+        console.log(userCompany !== null);
 
-        if (!userCompany === null) {
-            const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+        
+            // Check if the user's company is verified
+            const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
 
             if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-                return res.status(403).json({
-                    status: 403,
-                    success: false,
-                    message: 'your account activation is under process we will update once your account is active.',
-                });
+                if (existingUser.usr_approval_id === 1) {
+                    return res.status(200).json({
+                        status: 200,
+                        success: true,
+                        message: 'Please wait for company verification. Your account is pending for approval.'
+                    });
+                } else if (existingUser.usr_approval_id === 3) {
+                    return res.status(403).json({
+                        status: 403,
+                        success: false,
+                        message: 'Your company is rejected. Contact admin for further assistance.'
+                    });
+                }
             }
+    
 
-        };
-
-
-        // Check if the user is blocked by the admin
+            // Check if the user is blocked by the admin
         if (!existingUser.is_status) {
             return res.status(403).json({
                 status: 403,
                 success: false,
-                message: "User is blocked.Please contact admin for assistance."
+                message: "User is suspend .Please contact admin for assistance."
             });
         }
+
 
 
 
@@ -826,7 +836,7 @@ export const verifyLoginOtp = async (req, res) => {
 
 
         // Check if the user's company is verified
-        const userCompany = existingUser.usr_company;
+        const userCompany = existingUser?.usr_company;
         let userType;
         if (!userCompany) {
             userType = "individual";
@@ -877,6 +887,13 @@ export const verifyLoginOtp = async (req, res) => {
                 });
             };
         };
+
+
+
+        
+
+
+
 
         if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
 

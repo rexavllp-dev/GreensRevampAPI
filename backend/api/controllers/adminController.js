@@ -187,7 +187,7 @@ export const approveCompanyByAdmin = async (req, res) => {
     try {
         const companyData = await fetchSingleCompany(companyId);
         // console.log(companyData);
-        const companyStatus = await updateCompanyStatus(companyId, 2, true);
+         await updateCompanyStatus({companyId, approvalId: 2, verificationStatus: true});
         const userId = companyData?.id;
         // console.log(companyData.id);
         console.log( companyData.usr_email, companyData.usr_firstname );
@@ -223,7 +223,7 @@ export const rejectCompanyByAdmin = async (req, res) => {
     try {
         const companyData = await fetchSingleCompany(companyId);
         // console.log(companyData);
-        const companyStatus = await updateCompanyStatus(companyId);
+         await updateCompanyStatus({ companyId, approvalId: 3, verificationStatus: false });
         const userId = companyData?.id;
         await isNotActive(userId)
 

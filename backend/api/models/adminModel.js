@@ -18,18 +18,20 @@ export const updateUserVerificationByAdmin = async (userId) => {
 
 
 // update company status
-export const updateCompanyStatus = async (companyId, approvalId, verificationStatus) => {
+export const updateCompanyStatus = async (companyData) => {
+  
+    console.log(companyData.approvalId);
 
     const updateUserResult = await db('users')
-        .where({ "usr_company": companyId })
+        .where({ "usr_company": companyData.companyId })
         .update({
-            'usr_approval_id': approvalId,
+            'usr_approval_id': companyData.approvalId,
         });
 
     const updateCompanyResult = await db('company')
-        .where({ "id": companyId })
+        .where({ "id": companyData.companyId })
         .update({
-            'verification_status': verificationStatus,
+            'verification_status': companyData.verificationStatus,
         });
 
     // You can check the results or handle them as needed
