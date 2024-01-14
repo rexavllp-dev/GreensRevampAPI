@@ -232,6 +232,16 @@ export const loginWithPassword = async (req, res) => {
 
         };
 
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is Suspended. Please contact admin for assistance."
+            });
+        };
+
+
         const userId = existingUser?.id;
         const usr_firstname = existingUser.usr_firstname
 
@@ -245,6 +255,49 @@ export const loginWithPassword = async (req, res) => {
             });
         };
 
+
+        // Check if password is correct
+
+        const isPasswordCorrect = await bcrypt.compare(usr_password, existingUser?.usr_password);
+
+        if (!isPasswordCorrect) {
+            const attempts = (existingUser.login_attempts || 0) + 1;
+            const failedCount = existingUser.failed_count
+
+            if (attempts > 3 && failedCount === 0) {
+                // Block the user
+                await blockUser(existingUser.id);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
+                });
+            } else if (attempts > 3 && failedCount === 1) {
+                // Block the user permanently
+                await blockUserPermanently(existingUser?.id);
+
+                await sendBlockVerification(existingUser.usr_email, usr_firstname)
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked temporary due to repeated incorrect attempts. Contact admin for assistance.`
+                });
+            };
+
+            // Update the incorrect attempts counter in the database
+            await updateIncorrectAttempts(existingUser.id, attempts);
+
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Invalid email or password!"
+            });
+        };
+
+        // Reset the incorrect attempts counter upon successful login
+        await updateIncorrectAttempts(existingUser.id, 0);
 
         // Check if the user's company is verified
         const userCompany = existingUser.usr_company;
@@ -319,63 +372,6 @@ export const loginWithPassword = async (req, res) => {
                 });
             }
         }
-
-        // Check if the user is blocked by the admin
-        if (!existingUser.is_status) {
-            return res.status(403).json({
-                status: 403,
-                success: false,
-                message: "User is Suspended. Please contact admin for assistance."
-            });
-        };
-
-
-        // Check if password is correct
-
-        const isPasswordCorrect = await bcrypt.compare(usr_password, existingUser?.usr_password);
-
-        if (!isPasswordCorrect) {
-            const attempts = (existingUser.login_attempts || 0) + 1;
-            const failedCount = existingUser.failed_count
-
-            if (attempts > 3 && failedCount === 0) {
-                // Block the user
-                await blockUser(existingUser.id);
-
-                return res.status(403).json({
-                    status: 403,
-                    success: false,
-                    message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
-                });
-            } else if (attempts > 3 && failedCount === 1) {
-                // Block the user permanently
-                await blockUserPermanently(existingUser?.id);
-
-                await sendBlockVerification(usr_email, usr_firstname)
-
-                return res.status(403).json({
-                    status: 403,
-                    success: false,
-                    message: `User is blocked temporary due to repeated incorrect attempts. Contact admin for assistance.`
-                });
-            };
-
-            // Update the incorrect attempts counter in the database
-            await updateIncorrectAttempts(existingUser.id, attempts);
-
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: "Invalid email or password!"
-            });
-        };
-
-        // Reset the incorrect attempts counter upon successful login
-        await updateIncorrectAttempts(existingUser.id, 0);
-
-
-
-
 
         //create token
 
@@ -483,7 +479,7 @@ export const loginWithOtp = async (req, res) => {
         //check user exist 
 
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
-        
+
         if (!existingUser) {
 
             return res.status(404).json({
@@ -505,31 +501,31 @@ export const loginWithOtp = async (req, res) => {
         } else {
             userType = "company"
         }
-       
+
         console.log(userCompany !== null);
 
-        
-            // Check if the user's company is verified
-            const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
 
-            if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-                if (existingUser.usr_approval_id === 1) {
-                    return res.status(200).json({
-                        status: 200,
-                        success: true,
-                        message: 'Please wait for company verification. Your account is pending for approval.'
-                    });
-                } else if (existingUser.usr_approval_id === 3) {
-                    return res.status(403).json({
-                        status: 403,
-                        success: false,
-                        message: 'Your company is rejected. Contact admin for further assistance.'
-                    });
-                }
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
+                return res.status(200).json({
+                    status: 200,
+                    success: true,
+                    message: 'Please wait for company verification. Your account is pending for approval.'
+                });
+            } else if (existingUser.usr_approval_id === 3) {
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: 'Your company is rejected. Contact admin for further assistance.'
+                });
             }
-    
+        }
 
-            // Check if the user is blocked by the admin
+
+        // Check if the user is blocked by the admin
         if (!existingUser.is_status) {
             return res.status(403).json({
                 status: 403,
@@ -758,51 +754,102 @@ export const verifyOtp = async (req, res) => {
 
     try {
         const userInfo = await validateAuth(token);
+
         // OTP valid for 5 minutes
         // Check if OTP is valid and not expired
-        const user = await getUserById(userInfo.userId);
-        if (!user) {
+        const existingUser = await getUserById(userInfo.userId);
+        if (!existingUser) {
             return res.status(401).json({
                 status: 401,
                 success: false,
-                message: "User not found"
+                message: "User not found, please login again"
             });
-        }
+        };
+
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is Suspended. Please contact admin for assistance."
+            });
+        };
+
+        const userId = existingUser?.id;
+        const usr_firstname = existingUser.usr_firstname
+
+
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
+
 
         // console.log(user.otp_expiry);
 
-        if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
-            console.log("otp", otp);
-            console.log(user.otp);
-            console.log(user.otp_expiry);
-            console.log(user.id);
+        if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
+
+            const attempts = (existingUser.login_attempts || 0) + 1;
+            const failedCount = existingUser.failed_count
+
+            if (attempts > 3 && failedCount === 0) {
+                // Block the user
+                await blockUser(existingUser.id);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
+                });
+            } else if (attempts > 3 && failedCount === 1) {
+                // Block the user permanently
+                await blockUserPermanently(existingUser?.id);
+
+                await sendBlockVerification(existingUser.usr_email, usr_firstname)
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked temporary due to repeated incorrect attempts. Contact admin for assistance.`
+                });
+            };
+
+            // Update the incorrect attempts counter in the database
+            await updateIncorrectAttempts(existingUser.id, attempts);
 
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: 'Invalid OTP or OTP expired'
             });
-        }
+        };
 
-        if (user && user.otp === otp) {
+        // Reset the incorrect attempts counter upon successful login
+        await updateIncorrectAttempts(existingUser.id, 0);
+
+        if (existingUser && existingUser.otp === otp) {
             // Clear OTP after successful verification and update
-            await updateOtp(user.id, true);
+            await updateOtp(existingUser.id, true);
 
         }
 
         if (from === 'individual') {
-            const accessToken = generateAccessToken(user);
-            const refreshToken = generateRefreshToken(user);
+            const accessToken = generateAccessToken(existingUser);
+            const refreshToken = generateRefreshToken(existingUser);
             return res.status(200).json({
                 status: 200,
                 success: true,
                 message: "OTP verified successfully",
                 result: {
                     user: {
-                        id: user.id,
-                        usr_email: user.usr_email,
-                        usr_firstname: user.usr_firstname,
-                        usr_lastname: user.usr_lastname,
+                        id: existingUser.id,
+                        usr_email: existingUser.usr_email,
+                        usr_firstname: existingUser.usr_firstname,
+                        usr_lastname: existingUser.usr_lastname,
                     },
                     accessToken,
                     refreshToken
@@ -833,6 +880,68 @@ export const verifyLoginOtp = async (req, res) => {
 
         // Check if OTP is valid and not expired
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
+
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
+
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is Suspended. Please contact admin for assistance."
+            });
+        };
+
+
+
+
+
+        if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
+
+            const attempts = (existingUser.login_attempts || 0) + 1;
+            const failedCount = existingUser.failed_count;
+
+            if (attempts > 3 && failedCount === 0) {
+                // Block the user
+                await blockUser(existingUser.id);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
+                });
+            } else if (attempts > 3 && failedCount === 1) {
+                // Block the user permanently
+                await blockUserPermanently(existingUser?.id);
+
+                await sendBlockVerification(existingUser.usr_email, existingUser.usr_firstname);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked temporary due to repeated incorrect attempts. Contact admin for assistance.`
+                });
+            };
+
+            // Update the incorrect attempts counter in the database
+            await updateIncorrectAttempts(existingUser.id, attempts);
+
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'Invalid OTP or OTP expired'
+            });
+        };
+
+        // Reset the incorrect attempts counter upon successful login
+        await updateIncorrectAttempts(existingUser.id, 0);
 
 
         // Check if the user's company is verified
@@ -889,21 +998,6 @@ export const verifyLoginOtp = async (req, res) => {
         };
 
 
-
-        
-
-
-
-
-        if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
-
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: 'Invalid OTP or OTP expired'
-            });
-        }
-
         if (existingUser && existingUser.otp === otp) {
 
             // Clear OTP after successful verification
@@ -930,7 +1024,7 @@ export const verifyLoginOtp = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: 'internal server error please try again' });
+        return res.status(500).json({ message: 'Something went wrong, please try again' });
     }
 
 }

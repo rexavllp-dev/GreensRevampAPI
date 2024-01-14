@@ -1,3 +1,5 @@
+import { iSCompanyStatusVerified } from "../models/companyModel.js";
+import { getUserById } from "../models/userModel.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 import dotenv from 'dotenv';
 
@@ -7,20 +9,46 @@ dotenv.config();
 export const googleAuth = async (req, res) => {
     try {
 
-        // Check if the user has a company and is verified
-        if (!req.user.company || !req.user.isVerified) {
-  
-            return res.status(403).json({
-                status: 403,
-                success: false,
-                message: "User is not allowed to log in with Google due to missing company  unverified status",
-            });
-        }
-     
-        const accessToken = generateAccessToken(req.user)
-        const refreshToken = generateRefreshToken(req.user)
+        const userId = req.user.id;
 
-        console.log(req.user)
+        const existingUser = await getUserById(userId);
+
+        const userCompany = existingUser.usr_company;
+
+           // Check if the user's company is verified
+           const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+
+           if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+               if (existingUser.usr_approval_id === 1) {
+                   return res.status(200).json({
+                       status: 200,
+                       success: true,
+                       message: 'Please wait for company verification. Your account is pending for approval.'
+                   });
+               } else if (existingUser.usr_approval_id === 3) {
+                   return res.status(403).json({
+                       status: 403,
+                       success: false,
+                       message: 'Your company is rejected. Contact admin for further assistance.'
+                   });
+               }
+           }
+   
+
+           // Check if the user is blocked by the admin
+       if (!existingUser.is_status) {
+           return res.status(403).json({
+               status: 403,
+               success: false,
+               message: "User is suspend .Please contact admin for assistance."
+           });
+       }
+
+     
+        const accessToken = generateAccessToken(existingUser);
+        const refreshToken = generateRefreshToken(existingUser);
+
+        console.log(existingUser)
 
         // res.status(201).json({
         //   status:201,
@@ -38,8 +66,45 @@ export const googleAuth = async (req, res) => {
 export const facebookAuth = async (req, res) => {
     try {
 
-        const accessToken = generateAccessToken(req.user)
-        const refreshToken = generateRefreshToken(req.user)
+
+        const userId = req.user.id;
+
+        const existingUser = await getUserById(userId);
+
+        const userCompany = existingUser.usr_company;
+
+           // Check if the user's company is verified
+           const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+
+           if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+               if (existingUser.usr_approval_id === 1) {
+                   return res.status(200).json({
+                       status: 200,
+                       success: true,
+                       message: 'Please wait for company verification. Your account is pending for approval.'
+                   });
+               } else if (existingUser.usr_approval_id === 3) {
+                   return res.status(403).json({
+                       status: 403,
+                       success: false,
+                       message: 'Your company is rejected. Contact admin for further assistance.'
+                   });
+               }
+           }
+   
+
+           // Check if the user is blocked by the admin
+       if (!existingUser.is_status) {
+           return res.status(403).json({
+               status: 403,
+               success: false,
+               message: "User is suspend .Please contact admin for assistance."
+           });
+       }
+
+
+        const accessToken = generateAccessToken(existingUser);
+        const refreshToken = generateRefreshToken(existingUser);
 
 
         res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}`);
