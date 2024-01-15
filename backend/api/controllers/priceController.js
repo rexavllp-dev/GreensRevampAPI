@@ -95,7 +95,7 @@ export const getAllPrice = async (req, res) => {
 }
 
 
-// delete price
+// delete prices
 
 export const deletePrice = async (req, res) => {
   const { priceId } = req.params;
