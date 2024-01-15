@@ -16,6 +16,26 @@ export const updateAproduct = async (productId, updatedData) => {
         .returning('*'); // Return the updated product
 }
 
+// get a product
+
+export const getProductById = async (productId) => {
+    const product = await db('products')
+            .select('*')
+            .where({ id: productId })
+            .first();
+
+            return product;
+}
+
+// get all products
+
+export const getAllProducts = async () => {
+
+    const products = await db('products').select('*');
+    return products;
+
+}
+
 
 
 

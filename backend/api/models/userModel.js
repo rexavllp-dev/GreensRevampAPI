@@ -162,6 +162,7 @@ export const getUserById = async (usr_id) => {
     return user;
 };
 
+
 export const getUserByPhoneNumber = async (usr_mobile_number) => {
     const user = await db('users').select("*").where({ usr_mobile_number }).first();
     return user;

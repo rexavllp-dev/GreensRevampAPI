@@ -1,4 +1,4 @@
-import { createAProduct, updateAproduct } from "../models/productModel.js";
+import { createAProduct, getAllProducts, getProductById, updateAproduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -171,3 +171,64 @@ export const updateProduct = async (req, res) => {
         });
     }
 };
+
+
+// get all products
+
+export const getAllProduct = async (req, res) => {
+    try {
+        
+        const products = await getAllProducts();
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Products fetched successfully',
+            data: products,
+        });
+
+    }catch(error){
+        console.log(error)
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: "Failed to fetch Product! Please try again later."
+        });
+    }
+}
+
+// get a product
+
+export const getSingleProduct = async (req, res) => {
+    try {
+        const productId = req.params.productId; 
+       
+        // Assuming you have a route parameter for the product ID
+        const product = await getProductById(productId);
+        console.log(product);
+        if (!product) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'Product not found',
+            });
+        }
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Product single fetched successfully',
+            data: product,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: 'Failed to fetch single product. Please try again later.',
+        });
+    }
+}
