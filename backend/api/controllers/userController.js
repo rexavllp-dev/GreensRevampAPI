@@ -26,7 +26,7 @@ import {
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 import jwt from 'jsonwebtoken';
-import { sendBlockVerification, sendVerificationEmail } from '../utils/emailer.js';
+import { sendBlockVerification, sendUserRegistrationEmail, sendVerificationEmail } from '../utils/emailer.js';
 import sendVerificationCode from '../utils/mobileOtp.js';
 import validateAuth from '../middleware/validateAuth.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
@@ -374,7 +374,7 @@ export const loginWithPassword = async (req, res) => {
                     message: 'Your company is rejected. Contact admin for further assistance.'
                 });
             }
-        }
+        };
 
         //create token
 
@@ -479,8 +479,7 @@ export const loginWithOtp = async (req, res) => {
 
     try {
 
-        //check user exist 
-
+        //check user exist with mobile number
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
 
         if (!existingUser) {
@@ -841,6 +840,8 @@ export const verifyOtp = async (req, res) => {
         if (from === 'individual') {
             const accessToken = generateAccessToken(existingUser);
             const refreshToken = generateRefreshToken(existingUser);
+
+            await sendUserRegistrationEmail(existingUser.usr_email, existingUser.usr_firstname);
             return res.status(200).json({
                 status: 200,
                 success: true,
@@ -857,6 +858,7 @@ export const verifyOtp = async (req, res) => {
                 }
             });
         } else {
+            await sendUserRegistrationEmail(existingUser.usr_email, existingUser.usr_firstname);
             // Perform additional user registration steps if needed
             res.status(200).json({
                 status: 200,
