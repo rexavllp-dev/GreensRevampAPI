@@ -15,35 +15,35 @@ export const googleAuth = async (req, res) => {
 
         const userCompany = existingUser.usr_company;
 
-           // Check if the user's company is verified
-           const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
 
-           if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-               if (existingUser.usr_approval_id === 1) {
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
                 const pendingMessage = "Please wait for company verification. Your account is pending for approval.";
-                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(suspendedMessage)}`);
+                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(pendingMessage)}`);
                 encodeURIComponent(pendingMessage);
 
 
-               } else if (existingUser.usr_approval_id === 3) {
+            } else if (existingUser.usr_approval_id === 3) {
 
                 const rejectMessage = "Your company is rejected. Contact admin for further assistance.";
-                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(suspendedMessage)}`);
+                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(rejectMessage)}`);
                 encodeURIComponent(rejectMessage);
-               }
-           }
-   
+            }
+        }
 
-           // Check if the user is blocked by the admin
-       if (!existingUser.is_status) {
-           return res.status(403).json({
-               status: 403,
-               success: false,
-               message: "User is suspend .Please contact admin for assistance."
-           });
-       }
 
-     
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is suspend .Please contact admin for assistance."
+            });
+        }
+
+
         const accessToken = generateAccessToken(existingUser);
         const refreshToken = generateRefreshToken(existingUser);
 
@@ -72,34 +72,32 @@ export const facebookAuth = async (req, res) => {
 
         const userCompany = existingUser.usr_company;
 
-           // Check if the user's company is verified
-           const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
 
-           if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-               if (existingUser.usr_approval_id === 1) {
-                   return res.status(200).json({
-                       status: 200,
-                       success: true,
-                       message: 'Please wait for company verification. Your account is pending for approval.'
-                   });
-               } else if (existingUser.usr_approval_id === 3) {
-                   return res.status(403).json({
-                       status: 403,
-                       success: false,
-                       message: 'Your company is rejected. Contact admin for further assistance.'
-                   });
-               }
-           }
-   
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
+                const pendingMessage = "Please wait for company verification. Your account is pending for approval.";
+                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(pendingMessage)}`);
+                encodeURIComponent(pendingMessage);
 
-           // Check if the user is blocked by the admin
-       if (!existingUser.is_status) {
-           return res.status(403).json({
-               status: 403,
-               success: false,
-               message: "User is suspend .Please contact admin for assistance."
-           });
-       }
+
+            } else if (existingUser.usr_approval_id === 3) {
+
+                const rejectMessage = "Your company is rejected. Contact admin for further assistance.";
+                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(rejectMessage)}`);
+                encodeURIComponent(rejectMessage);
+            }
+        }
+
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "User is suspend .Please contact admin for assistance."
+            });
+        }
 
 
         const accessToken = generateAccessToken(existingUser);
