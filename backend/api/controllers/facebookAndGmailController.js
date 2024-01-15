@@ -20,17 +20,16 @@ export const googleAuth = async (req, res) => {
 
            if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
                if (existingUser.usr_approval_id === 1) {
-                   return res.status(200).json({
-                       status: 200,
-                       success: true,
-                       message: 'Please wait for company verification. Your account is pending for approval.'
-                   });
+                const pendingMessage = "Please wait for company verification. Your account is pending for approval.";
+                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(suspendedMessage)}`);
+                encodeURIComponent(suspendedMessage);
+
+
                } else if (existingUser.usr_approval_id === 3) {
-                   return res.status(403).json({
-                       status: 403,
-                       success: false,
-                       message: 'Your company is rejected. Contact admin for further assistance.'
-                   });
+
+                const rejectMessage = "Your company is rejected. Contact admin for further assistance.";
+                res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(suspendedMessage)}`);
+                encodeURIComponent(suspendedMessage);
                }
            }
    

@@ -5,7 +5,7 @@
 export const up = async (knex) => {
     await knex.schema.createTable('product_gallery', (table) => {
       table.increments('id').primary();
-      table.integer('product_id').references('id').inTable('products');
+      table.integer('product_id').unsigned().references('id').inTable('products');
       table.string('url');
       table.boolean('is_baseimage').defaultTo(false);
       table.timestamp('created_at').defaultTo(knex.fn.now());

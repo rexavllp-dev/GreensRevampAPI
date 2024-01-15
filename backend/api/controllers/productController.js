@@ -273,15 +273,14 @@ export const deleteProduct = async (req, res) => {
 // add product images
 export const addProductImages = async (req, res) => {
     const productId = req.params.productId;
-    console.log(productId);
     const files = req.files;
     const isBaseImage = req.body.isBaseImage;
-
+  
     try {
         let productImages = [];
 
-        for (const field in files) {
-            const file = files[field];
+        for (let i=0; i<files.files.length; i++) {
+            const file = files.files[i];
 
             const resizedBuffer = await sharp(file.data)
                 .resize({ width: 300, height: 300 })
@@ -297,13 +296,14 @@ export const addProductImages = async (req, res) => {
             const s3Data = await s3.upload(uploadParams).promise();
 
             const imageDetails = {
-                product_id: parseInt(productId),
+                product_id: productId,
                 url: s3Data.Location,
                 is_baseimage: isBaseImage,
             };
 
             productImages.push(imageDetails);
         }
+        console.log(productImages);
 
         // Save product images to the database
         await createProductGallery(productImages);

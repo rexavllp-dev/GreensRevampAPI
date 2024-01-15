@@ -49,7 +49,7 @@ export const deleteAProduct = async (productId) => {
 // ____________________________________________________________________________________________________________________________________________________________________________
 // upload images
 export const createProductGallery = async (data) => {
-    console.log(data);
+    console.log("data",data);
     const images = db('product_gallery').insert(data).returning('*');
     return images;
 };

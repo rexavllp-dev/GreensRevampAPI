@@ -523,9 +523,9 @@ export const loginWithOtp = async (req, res) => {
 
         if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
             if (existingUser.usr_approval_id === 1) {
-                return res.status(200).json({
-                    status: 200,
-                    success: true,
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
                     message: 'Please wait for company verification. Your account is pending for approval.'
                 });
             } else if (existingUser.usr_approval_id === 3) {
