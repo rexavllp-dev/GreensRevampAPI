@@ -362,8 +362,8 @@ export const loginWithPassword = async (req, res) => {
 
         if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
             if (existingUser.usr_approval_id === 1) {
-                return res.status(200).json({
-                    status: 200,
+                return res.status(422).json({
+                    status: 422,
                     success: true,
                     message: 'Please wait for company verification. Your account is pending for approval.'
                 });
@@ -461,7 +461,7 @@ export const refreshAccessToken = async (req, res) => {
         const newRefreshToken = generateRefreshToken(user);
         await refreshTokenModel.updateResetToken(decoded.userId, newRefreshToken);
 
-        return res.status(200).json({ status: 200, accessToken: newAccessToken, refresh_token: newAccessToken, message: 'Token regenerated successfully' })
+        return res.status(201).json({ status: 200, accessToken: newAccessToken, refresh_token: newAccessToken, message: 'Token regenerated successfully' })
     } catch (error) {
         console.log(error);
 
@@ -523,8 +523,8 @@ export const loginWithOtp = async (req, res) => {
 
         if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
             if (existingUser.usr_approval_id === 1) {
-                return res.status(200).json({
-                    status: 200,
+                return res.status(422).json({
+                    status: 422,
                     success: true,
                     message: 'Please wait for company verification. Your account is pending for approval.'
                 });
@@ -683,8 +683,8 @@ export const resendEmail = async (req, res) => {
 
         // Send email verification link
         await sendVerificationEmail(user.usr_email, user.usr_firstname, jwtToken);
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "Email verification link send successfully"
         });
@@ -841,8 +841,8 @@ export const verifyOtp = async (req, res) => {
         if (from === 'individual') {
             const accessToken = generateAccessToken(existingUser);
             const refreshToken = generateRefreshToken(existingUser);
-            return res.status(200).json({
-                status: 200,
+            return res.status(201).json({
+                status: 201,
                 success: true,
                 message: "OTP verified successfully",
                 result: {
@@ -858,8 +858,8 @@ export const verifyOtp = async (req, res) => {
             });
         } else {
             // Perform additional user registration steps if needed
-            res.status(200).json({
-                status: 200,
+            res.status(201).json({
+                status: 201,
                 success: true,
                 message: 'OTP verified successfully',
             });
@@ -1046,8 +1046,8 @@ export const getSingleUser = async (req, res) => {
                 message: "User not found"
             });
         }
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "User successfully found",
             result: user,
@@ -1143,8 +1143,8 @@ export const updateEmailUsingToken = async (req, res) => {
         await sendVerificationEmail(usr_email, existingUser.usr_firstname, token, from);
 
 
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "Email updated successfully"
         });
@@ -1205,8 +1205,8 @@ export const updateMobileUsingToken = async (req, res) => {
 
 
         await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "Mobile number updated successfully, verify your otp"
         });
@@ -1239,8 +1239,8 @@ export const updateUserDetails = async (req, res) => {
         }
 
         const updatedUser = await updateUser(userId, newData);
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "User updated successfully",
             result: newData,

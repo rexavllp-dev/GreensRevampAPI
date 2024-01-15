@@ -3,6 +3,17 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
 import sharp from "sharp";
+import aws from 'aws-sdk';
+
+
+const awsConfig = ({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+    bucketName: process.env.S3_BUCKET_NAME
+});
+
+const s3 = new aws.S3(awsConfig)
 
 
 // create products
@@ -262,6 +273,7 @@ export const deleteProduct = async (req, res) => {
 // add product images
 export const addProductImages = async (req, res) => {
     const productId = req.params.productId;
+    console.log(productId);
     const files = req.files;
     const isBaseImage = req.body.isBaseImage;
 
@@ -285,7 +297,7 @@ export const addProductImages = async (req, res) => {
             const s3Data = await s3.upload(uploadParams).promise();
 
             const imageDetails = {
-                product_id: productId,
+                product_id: parseInt(productId),
                 url: s3Data.Location,
                 is_baseimage: isBaseImage,
             };
