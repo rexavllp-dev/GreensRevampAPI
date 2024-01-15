@@ -1,7 +1,8 @@
-import { createAProduct, deleteAproduct, getAllProducts, getProductById, updateAproduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, getAllProducts, getProductById, updateAProduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
+import sharp from "sharp";
 
 
 // create products
@@ -140,7 +141,7 @@ export const updateProduct = async (req, res) => {
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
 
         // Call the model function to update the product
-        const updatedProduct = await updateAproduct(productId, {
+        const updatedProduct = await updateAProduct(productId, {
             prd_name,
             prd_description,
             prd_storage_type,
@@ -239,7 +240,7 @@ export const getSingleProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
     try {
         const productId = req.params.productId;
-        const deletedProduct = await deleteAproduct(productId);
+        const deletedProduct = await deleteAProduct(productId);
         res.status(200).json({
             status: 200,
             success: true,
@@ -255,4 +256,59 @@ export const deleteProduct = async (req, res) => {
             message: 'Failed to delete product. Please try again later.',
         });
     }
-}
+};
+
+
+// add product images
+export const addProductImages = async (req, res) => {
+    const productId = req.params.productId;
+    const files = req.files;
+    const isBaseImage = req.body.isBaseImage;
+
+    try {
+        let productImages = [];
+
+        for (const field in files) {
+            const file = files[field];
+
+            const resizedBuffer = await sharp(file.data)
+                .resize({ width: 300, height: 300 })
+                .toBuffer();
+
+            const uploadParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `images/${file.name}`,
+                Body: resizedBuffer,
+                ContentType: file.mimetype,
+            };
+
+            const s3Data = await s3.upload(uploadParams).promise();
+
+            const imageDetails = {
+                product_id: productId,
+                url: s3Data.Location,
+                is_baseimage: isBaseImage,
+            };
+
+            productImages.push(imageDetails);
+        }
+
+        // Save product images to the database
+        await createProductGallery(productImages);
+
+        res.status(201).json({
+            status: 201,
+            success: true,
+            message: "Product images added successfully.",
+            result: productImages,
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to add product images! Please try again later.",
+        });
+    }
+};

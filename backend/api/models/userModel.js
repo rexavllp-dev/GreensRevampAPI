@@ -287,10 +287,11 @@ export const updateIncorrectAttempts = async (userId, attempts) => {
 // Function to block user
 export const blockUser = async (userId) => {
     const blockedUntil = new Date(Date.now() + ms('2m')); // Block for 2 minutes
-    await db("users").where({ id: userId }).update({ blocked_until: blockedUntil, login_attempts: 0, failed_count: 1 });
+    return await db("users").where({ id: userId }).update({ blocked_until: blockedUntil, login_attempts: 0, failed_count: 1 });
+    
 };
 
 export const blockUserPermanently = async (userId) => {
     // Set blocked_until to null for permanent block
-    await db("users").where({ id: userId }).update({ blocked_until: null, is_status: false, login_attempts: 0, failed_count: 0 });
+    return await db("users").where({ id: userId }).update({ blocked_until: null, attempt_blocked: true, login_attempts: 0, failed_count: 0 });
 };

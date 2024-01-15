@@ -232,15 +232,18 @@ export const loginWithPassword = async (req, res) => {
 
         };
 
-        // Check if the user is blocked by the admin
-        if (!existingUser.is_status) {
+
+           // Check if the user is blocked by the admin
+           if (existingUser.attempt_blocked) {
             return res.status(403).json({
                 status: 403,
                 success: false,
-                message: "User is Suspended. Please contact admin for assistance."
+                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
             });
         };
 
+
+     
 
         const userId = existingUser?.id;
         const usr_firstname = existingUser.usr_firstname
@@ -489,6 +492,16 @@ export const loginWithOtp = async (req, res) => {
             });
         }
 
+
+          // Check attempt  if the user is blocked by the admin
+          if (existingUser.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
+            });
+        }
+
         const country = await getCountryDialCode(existingUser?.id)
         const countryDialCode = country?.country_dial_code
 
@@ -523,18 +536,6 @@ export const loginWithOtp = async (req, res) => {
                 });
             }
         }
-
-
-        // Check if the user is blocked by the admin
-        if (!existingUser.is_status) {
-            return res.status(403).json({
-                status: 403,
-                success: false,
-                message: "User is suspend .Please contact admin for assistance."
-            });
-        }
-
-
 
 
         // token
@@ -767,11 +768,11 @@ export const verifyOtp = async (req, res) => {
         };
 
         // Check if the user is blocked by the admin
-        if (!existingUser.is_status) {
+        if (existingUser.attempt_blocked) {
             return res.status(403).json({
                 status: 403,
                 success: false,
-                message: "User is Suspended. Please contact admin for assistance."
+                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
             });
         };
 
@@ -891,15 +892,13 @@ export const verifyLoginOtp = async (req, res) => {
         };
 
         // Check if the user is blocked by the admin
-        if (!existingUser.is_status) {
+        if (existingUser.attempt_blocked) {
             return res.status(403).json({
                 status: 403,
                 success: false,
-                message: "User is Suspended. Please contact admin for assistance."
+                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
             });
         };
-
-
 
 
 

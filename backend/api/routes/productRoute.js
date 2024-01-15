@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getAllProduct, getSingleProduct, updateProduct } from '../controllers/productController.js';
+import { addProductImages, createProduct, deleteProduct, getAllProduct, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 
 
@@ -41,6 +41,9 @@ router.get('/get-price/:priceId', getPrice)
 
 // delete a price
 router.delete('/delete-price/:priceId',deletePrice);
+
+// upload images
+router.post('/:productId/images', addProductImages);
 
 
 export default router;
