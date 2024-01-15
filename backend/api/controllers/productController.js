@@ -1,4 +1,4 @@
-import { createAProduct, getAllProducts, getProductById, updateAproduct } from "../models/productModel.js";
+import { createAProduct, deleteAproduct, getAllProducts, getProductById, updateAproduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -118,7 +118,7 @@ try {
 }
 
 
-// upadate product 
+// update product 
 
 export const updateProduct = async (req, res) => {
     try {
@@ -207,7 +207,7 @@ export const getSingleProduct = async (req, res) => {
        
         // Assuming you have a route parameter for the product ID
         const product = await getProductById(productId);
-        console.log(product);
+        // console.log(product);
         if (!product) {
             return res.status(404).json({
                 status: 404,
@@ -229,6 +229,30 @@ export const getSingleProduct = async (req, res) => {
             success: false,
             error: error,
             message: 'Failed to fetch single product. Please try again later.',
+        });
+    }
+}
+
+
+// delete a product
+
+export const deleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const deletedProduct = await deleteAproduct(productId);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Product deleted successfully',
+            data: deletedProduct,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: 'Failed to delete product. Please try again later.',
         });
     }
 }
