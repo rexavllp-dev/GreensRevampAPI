@@ -218,9 +218,9 @@ export const sendBlockVerification = async (usr_email, usr_firstname) => {
     
             <p>You are blocked temporary due to repeated incorrect attempts.Please Contact admin for assistance.</p>
     
-            <p> Click the link below to reset your password: </p>
+        
     
-            <a href="https://react.greens-intl.ae/auth/login/"> Login with another account</a>
+            <a href="https://react.greens-intl.ae/auth/login/"> Login</a>
   
           
             <p>Best regards,<br> <b>Greens International </b> </p>
