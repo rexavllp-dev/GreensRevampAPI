@@ -35,98 +35,98 @@ export const createProduct = async (req, res) => {
         prd_return_type,
         prd_brand_id,
         prd_price,
-       
+
 
 
     } = req.body;
 
-try {
+    try {
 
-    const schema = Joi.object({
-        prd_name: Joi.string().required().label("prd_name"),
-        prd_description: Joi.string().required().label("prd_description"),
-        prd_storage_type: Joi.string().required().label("prd_storage_type"),
-        prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
-        prd_tags: Joi.string().required().label("prd_tags"),
-        prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
-        prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
-        prd_status: Joi.boolean().required().label("prd_status "),
-        prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
-        prd_return_type: Joi.string().required().label("prd_return_type"),
-        prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
-        prd_price: Joi.number().required().label(" prd_price")
-       
-    });
+        const schema = Joi.object({
+            prd_name: Joi.string().required().label("prd_name"),
+            prd_description: Joi.string().required().label("prd_description"),
+            prd_storage_type: Joi.string().required().label("prd_storage_type"),
+            prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
+            prd_tags: Joi.string().required().label("prd_tags"),
+            prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
+            prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
+            prd_status: Joi.boolean().required().label("prd_status "),
+            prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
+            prd_return_type: Joi.string().required().label("prd_return_type"),
+            prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
+            prd_price: Joi.number().required().label(" prd_price")
+
+        });
 
 
-     // product validation data
+        // product validation data
 
-     const validate_data = {
-     
-        prd_name,
-        prd_description,
-        prd_storage_type,
-        prd_tax_class,
-        prd_tags,
-        prd_expiry_date,
-        prd_dashboard_status,
-        prd_status,
-        prd_sales_unit,
-        prd_return_type,
-        prd_brand_id,
-        prd_price,
-       
-    };
+        const validate_data = {
 
-    const { error } = schema.validate(validate_data, joiOptions);
-    if (error) {
-        return res.status(500).json({
+            prd_name,
+            prd_description,
+            prd_storage_type,
+            prd_tax_class,
+            prd_tags,
+            prd_expiry_date,
+            prd_dashboard_status,
+            prd_status,
+            prd_sales_unit,
+            prd_return_type,
+            prd_brand_id,
+            prd_price,
+
+        };
+
+        const { error } = schema.validate(validate_data, joiOptions);
+        if (error) {
+            return res.status(500).json({
+                status: 500,
+                success: false,
+                message: "Validation Error",
+                error: getErrorsInArray(error?.details),
+            });
+        };
+
+
+        // create a product
+        const newProduct = await createAProduct({
+
+            prd_name,
+            prd_description,
+            prd_storage_type,
+            prd_tax_class,
+            prd_tags,
+            prd_expiry_date,
+            prd_dashboard_status,
+            prd_status,
+            prd_sales_unit,
+            prd_return_type,
+            prd_brand_id,
+            prd_price,
+
+        })
+
+        res.status(201).json({
+            status: 201,
+            success: true,
+            message: "product created successfully",
+
+
+        });
+
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
             status: 500,
             success: false,
-            message: "Validation Error",
-            error: getErrorsInArray(error?.details),
+            error: error,
+            message: "Failed to Create Product! Please try again later."
         });
-    };
+    }
 
-
-    // create a product
-    const newProduct = await createAProduct({
-
-        prd_name,
-        prd_description,
-        prd_storage_type,
-        prd_tax_class,
-        prd_tags,
-        prd_expiry_date,
-        prd_dashboard_status,
-        prd_status,
-        prd_sales_unit,
-        prd_return_type,
-        prd_brand_id,
-        prd_price,
-
-    })
-
-    res.status(201).json({
-        status: 201,
-        success: true,
-        message: "product created successfully",
-        
-
-    });
-
-
-
-}catch(error){
-    console.log(error)
-    res.status(500).json({
-        status: 500,
-        success: false,
-        error: error,
-        message: "Failed to Create Product! Please try again later."
-    });
-}
-   
 }
 
 
@@ -189,7 +189,7 @@ export const updateProduct = async (req, res) => {
 
 export const getAllProduct = async (req, res) => {
     try {
-        
+
         const products = await getAllProducts();
 
 
@@ -200,7 +200,7 @@ export const getAllProduct = async (req, res) => {
             data: products,
         });
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
         res.status(500).json({
             status: 500,
@@ -215,8 +215,8 @@ export const getAllProduct = async (req, res) => {
 
 export const getSingleProduct = async (req, res) => {
     try {
-        const productId = req.params.productId; 
-       
+        const productId = req.params.productId;
+
         // Assuming you have a route parameter for the product ID
         const product = await getProductById(productId);
         // console.log(product);
@@ -275,11 +275,11 @@ export const addProductImages = async (req, res) => {
     const productId = req.params.productId;
     const files = req.files;
     const isBaseImage = req.body.isBaseImage;
-  
+
     try {
         let productImages = [];
 
-        for (let i=0; i<files.files.length; i++) {
+        for (let i = 0; i < files.files.length; i++) {
             const file = files.files[i];
 
             const resizedBuffer = await sharp(file.data)
@@ -324,3 +324,42 @@ export const addProductImages = async (req, res) => {
         });
     }
 };
+
+export const productFilter = async (req, res) => {
+    const { category, subcategory, brand } = req.body;
+    try {
+        const products = await filterProducts(category, subcategory, brand);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Products fetched successfully',
+            data: products,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: 'Failed to fetch products. Please try again later.',
+        });
+    }
+};
+
+
+// export const productSorting = async (req, res) => {
+//     const { sortBy, sortOrder } = req.body;
+//     try {
+//         const products = await sortProducts(sortBy, sortOrder);
+//         res.status(200).json({
+//             status: 200,    
+//             success: true,
+//             message: 'Products fetched successfully',
+//             result: products,
+//         });
+//     }
+
+// }
+
+
+
