@@ -30,7 +30,7 @@ router.get('/get-products', getAllProduct)
 router.post('/create-price', createPrice);
 
 // update price
-router.put('/update-price', updatePrice);
+router.put('/update-price/:priceId', updatePrice);
 
 // get all price
 router.get('/getall-price', getAllPrice)

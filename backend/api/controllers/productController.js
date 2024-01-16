@@ -1,4 +1,4 @@
-import { createAProduct, deleteAproduct, getAllProducts, getProductById, updateAproduct } from "../models/productModel.js";
+import { createAProduct, deleteAProduct, getAllProducts, getProductById, updateAproduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -22,6 +22,7 @@ export const createProduct = async (req, res) => {
         prd_sales_unit,
         prd_return_type,
         prd_brand_id,
+        sku_code,
         prd_price,
        
 
@@ -42,7 +43,8 @@ try {
         prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
         prd_return_type: Joi.string().required().label("prd_return_type"),
         prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
-        prd_price: Joi.number().required().label(" prd_price")
+        prd_price: Joi.number().required().label(" prd_price"),
+        sku_code: Joi.string().required().label(" sku_code")
        
     });
 
@@ -132,6 +134,7 @@ export const updateProduct = async (req, res) => {
             prd_dashboard_status,
             prd_status,
             prd_sales_unit,
+            sku_code,
             prd_return_type,
             prd_brand_id,
             prd_price,
@@ -152,6 +155,7 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
+            sku_code,
             prd_price,
         });
 
@@ -239,7 +243,7 @@ export const getSingleProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
     try {
         const productId = req.params.productId;
-        const deletedProduct = await deleteAproduct(productId);
+        const deletedProduct = await deleteAProduct(productId);
         res.status(200).json({
             status: 200,
             success: true,
@@ -256,3 +260,25 @@ export const deleteProduct = async (req, res) => {
         });
     }
 }
+
+// get price
+export const getPrice = async (req, res) => {
+    try {
+        const price = await getProductPrice(req.params.priceId);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Get the price successfully',
+            data: price,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: 'Failed to get price. Please try again later.',
+        });
+    }
+}
+

@@ -38,7 +38,7 @@ export const getAllProducts = async () => {
 
 // delete product
 
-export const deleteAproduct = async (productId) => {
+export const deleteAProduct = async (productId) => {
     const deletedProduct = await db('products').where({ id: productId }).del();
     return deletedProduct;
 }
