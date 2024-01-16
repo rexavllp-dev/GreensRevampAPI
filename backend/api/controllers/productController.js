@@ -358,6 +358,7 @@ export const getProductsWithSorting = async (req, res) => {
             result: products
         });
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             status: 500,
             success: false,

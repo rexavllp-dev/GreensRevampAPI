@@ -1,3 +1,4 @@
+import { query } from 'express';
 import db from '../../config/dbConfig.js';
 
 // create product
@@ -49,7 +50,7 @@ export const deleteAProduct = async (productId) => {
 // ____________________________________________________________________________________________________________________________________________________________________________
 // upload images
 export const createProductGallery = async (data) => {
-    console.log("data",data);
+    console.log("data", data);
     const images = db('product_gallery').insert(data).returning('*');
     return images;
 };
@@ -62,22 +63,22 @@ export const getProductGalleryByProductId = async (productId) => {
 
 
 export const getSortedProducts = async (sortOption) => {
-    const sortProducts = await db('products').select('*');
+    let query = await db('products').select('*');
     switch (sortOption) {
         case 'priceLowToHigh':
-            sortProducts = sortProducts.orderBy('prd_price', 'asc');
+            query = query.orderBy('prd_price', 'asc');
             break;
         case 'priceHighToLow':
-            sortProducts = sortProducts.orderBy('prd_price', 'desc');
+            query = query.orderBy('prd_price', 'desc');
             break;
         case 'alphabeticalAZ':
-            sortProducts = sortProducts.orderBy('prd_name', 'asc');
+            query = query.orderBy('prd_name', 'asc');
             break;
         case 'alphabeticalZA':
-            sortProducts = sortProducts.orderBy('prd_name', 'desc');
+            query = query.orderBy('prd_name', 'desc');
             break;
         default:
-            break;     
+            break;
     };
 
     return sortProducts;

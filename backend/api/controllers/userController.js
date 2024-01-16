@@ -735,7 +735,7 @@ export const resendOtp = async (req, res) => {
 
          // Check if enough time has passed since the last resend attempt
          const currentTime = new Date();
-         const lastResendTime = existingUser.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
+         const lastResendTime = userInfo.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
          const timeDifference = currentTime - lastResendTime;
          const resendCooldown = 60 * 1000; // 1 minute cooldown
  
