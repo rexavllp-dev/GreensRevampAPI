@@ -60,6 +60,30 @@ export const getProductGalleryByProductId = async (productId) => {
     return images;
 };
 
+
+export const getSortedProducts = async (sortOption) => {
+    const sortProducts = await db('products').select('*');
+    switch (sortOption) {
+        case 'priceLowToHigh':
+            sortProducts = sortProducts.orderBy('prd_price', 'asc');
+            break;
+        case 'priceHighToLow':
+            sortProducts = sortProducts.orderBy('prd_price', 'desc');
+            break;
+        case 'alphabeticalAZ':
+            sortProducts = sortProducts.orderBy('prd_name', 'asc');
+            break;
+        case 'alphabeticalZA':
+            sortProducts = sortProducts.orderBy('prd_name', 'desc');
+            break;
+        default:
+            break;     
+    };
+
+    return sortProducts;
+
+}
+
 // ____________________________________________________________________________________________________________________________________________________________________________
 
 

@@ -15,6 +15,7 @@ import {
     refreshTokenModel,
     updateEmail,
     updateIncorrectAttempts,
+    updateLastResendTime,
     updateMobile,
     updateOtp,
     updateRegisterOtp,
@@ -233,8 +234,8 @@ export const loginWithPassword = async (req, res) => {
         };
 
 
-           // Check if the user is blocked by the admin
-           if (existingUser.attempt_blocked) {
+        // Check if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
             return res.status(403).json({
                 status: 403,
                 success: false,
@@ -243,7 +244,7 @@ export const loginWithPassword = async (req, res) => {
         };
 
 
-     
+
 
         const userId = existingUser?.id;
         const usr_firstname = existingUser.usr_firstname
@@ -492,8 +493,8 @@ export const loginWithOtp = async (req, res) => {
         }
 
 
-          // Check attempt  if the user is blocked by the admin
-          if (existingUser.attempt_blocked) {
+        // Check attempt  if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
             return res.status(403).json({
                 status: 403,
                 success: false,
@@ -722,11 +723,108 @@ export const resendOtp = async (req, res) => {
             });
         }
 
+        // Check if the user is blocked by the admin
+        if (user.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple incorrect attempts. Contact admin for assistance"
+            });
+        };
+
+
+         // Check if enough time has passed since the last resend attempt
+         const currentTime = new Date();
+         const lastResendTime = existingUser.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
+         const timeDifference = currentTime - lastResendTime;
+         const resendCooldown = 60 * 1000; // 1 minute cooldown
+ 
+         if (timeDifference < resendCooldown) {
+             return res.status(429).json({
+                 status: 429,
+                 success: false,
+                 message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
+             });
+         };
+ 
+         await updateLastResendTime(userInfo.id, currentTime);
+
+
+
         await updateRegisterOtp(userInfo.id, otp, otpExpiry);
         const country = await getCountryDialCode(userInfo.id)
         const countryDialCode = country?.country_dial_code;
 
         await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Otp send successfully"
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to send otp"
+        });
+    }
+};
+
+
+export const resendLoginOtp = async (req, res) => {
+    const { usr_mobile_number } = req.body;
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+    try {
+
+
+        const existingUser = await getUserByPhoneNumber(usr_mobile_number);
+
+        if (!existingUser) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "User not found"
+            });
+        };
+
+        // Check if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple attempts. Contact admin for assistance"
+            });
+        };
+
+
+        // Check if enough time has passed since the last resend attempt
+        const currentTime = new Date();
+        const lastResendTime = existingUser.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
+        const timeDifference = currentTime - lastResendTime;
+        const resendCooldown = 60 * 1000; // 1 minute cooldown
+
+        if (timeDifference < resendCooldown) {
+            return res.status(429).json({
+                status: 429,
+                success: false,
+                message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
+            });
+        };
+
+        await updateLastResendTime(existingUser.id, currentTime);
+
+
+        await updateRegisterOtp(existingUser.id, otp, otpExpiry);
+        const country = await getCountryDialCode(existingUser.id)
+        const countryDialCode = country?.country_dial_code;
+
+        await sendVerificationCode(existingUser.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
 
         res.status(200).json({
@@ -771,7 +869,7 @@ export const verifyOtp = async (req, res) => {
             return res.status(403).json({
                 status: 403,
                 success: false,
-                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
+                message: "Your account has been temporarily suspended due to multiple incorrect attempts. Contact admin for assistance"
             });
         };
 

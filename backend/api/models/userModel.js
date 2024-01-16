@@ -295,3 +295,11 @@ export const blockUserPermanently = async (userId) => {
     // Set blocked_until to null for permanent block
     return await db("users").where({ id: userId }).update({ blocked_until: null, attempt_blocked: true, login_attempts: 0, failed_count: 0 });
 };
+
+
+// login resend otp cooldown
+
+export const updateLastResendTime = async (userId, currentTime) => {
+    const updatedUser = await db("users").where({ id: userId }).update({ last_resend_time: currentTime });
+    return updatedUser;
+};
