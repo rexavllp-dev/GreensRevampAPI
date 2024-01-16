@@ -1,4 +1,4 @@
-import { createAProduct, createProductGallery, deleteAProduct, getAllProducts, getProductById, updateAProduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, getAllProducts, getProductById, getSortedProducts, updateAProduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -347,19 +347,23 @@ export const productFilter = async (req, res) => {
 };
 
 
-// export const productSorting = async (req, res) => {
-//     const { sortBy, sortOrder } = req.body;
-//     try {
-//         const products = await sortProducts(sortBy, sortOrder);
-//         res.status(200).json({
-//             status: 200,    
-//             success: true,
-//             message: 'Products fetched successfully',
-//             result: products,
-//         });
-//     }
-
-// }
-
+export const getProductsWithSorting = async (req, res) => {
+    const { sortBy } = req.body;
+    try {
+        const products = await getSortedProducts(sortBy);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Product sorted successfully",
+            result: products
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to sort products"
+        });
+    }
+};
 
 
