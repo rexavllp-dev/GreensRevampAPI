@@ -723,8 +723,17 @@ export const resendOtp = async (req, res) => {
             });
         }
 
+           // Check if the user is blocked
+           if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
+
         // Check if the user is blocked by the admin
-        if (user.attempt_blocked) {
+        if (userInfo.attempt_blocked) {
             return res.status(403).json({
                 status: 403,
                 success: false,
@@ -737,7 +746,7 @@ export const resendOtp = async (req, res) => {
          const currentTime = new Date();
          const lastResendTime = userInfo.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
          const timeDifference = currentTime - lastResendTime;
-         const resendCooldown = 60 * 1000; // 1 minute cooldown
+         const resendCooldown = 60 * 1000; // 1 minute cool down
  
          if (timeDifference < resendCooldown) {
              return res.status(429).json({
@@ -792,6 +801,15 @@ export const resendLoginOtp = async (req, res) => {
                 message: "User not found"
             });
         };
+
+            // Check if the user is blocked
+            if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+                });
+            };
 
         // Check if the user is blocked by the admin
         if (existingUser.attempt_blocked) {

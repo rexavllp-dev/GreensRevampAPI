@@ -63,7 +63,7 @@ export const getProductGalleryByProductId = async (productId) => {
 
 
 export const getSortedProducts = async (sortOption) => {
-    let query = await db('products').select('*');
+    let query = await db('products').orderBy('id', 'desc').select('*');
     switch (sortOption) {
         case 'priceLowToHigh':
             query = query.orderBy('prd_price', 'asc');
