@@ -1,7 +1,19 @@
-import { createAProduct, deleteAProduct, getAllProducts, getProductById, updateAproduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, getAllProducts, getProductById, getSortedProducts, updateAProduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
+import sharp from "sharp";
+import aws from 'aws-sdk';
+
+
+const awsConfig = ({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+    bucketName: process.env.S3_BUCKET_NAME
+});
+
+const s3 = new aws.S3(awsConfig)
 
 
 // create products
@@ -24,12 +36,12 @@ export const createProduct = async (req, res) => {
         prd_brand_id,
         sku_code,
         prd_price,
-       
+
 
 
     } = req.body;
 
-try {
+    try {
 
     const schema = Joi.object({
         prd_name: Joi.string().required().label("prd_name"),
@@ -49,74 +61,74 @@ try {
     });
 
 
-     // product validation data
+        // product validation data
 
-     const validate_data = {
-     
-        prd_name,
-        prd_description,
-        prd_storage_type,
-        prd_tax_class,
-        prd_tags,
-        prd_expiry_date,
-        prd_dashboard_status,
-        prd_status,
-        prd_sales_unit,
-        prd_return_type,
-        prd_brand_id,
-        prd_price,
-       
-    };
+        const validate_data = {
 
-    const { error } = schema.validate(validate_data, joiOptions);
-    if (error) {
-        return res.status(500).json({
+            prd_name,
+            prd_description,
+            prd_storage_type,
+            prd_tax_class,
+            prd_tags,
+            prd_expiry_date,
+            prd_dashboard_status,
+            prd_status,
+            prd_sales_unit,
+            prd_return_type,
+            prd_brand_id,
+            prd_price,
+
+        };
+
+        const { error } = schema.validate(validate_data, joiOptions);
+        if (error) {
+            return res.status(500).json({
+                status: 500,
+                success: false,
+                message: "Validation Error",
+                error: getErrorsInArray(error?.details),
+            });
+        };
+
+
+        // create a product
+        const newProduct = await createAProduct({
+
+            prd_name,
+            prd_description,
+            prd_storage_type,
+            prd_tax_class,
+            prd_tags,
+            prd_expiry_date,
+            prd_dashboard_status,
+            prd_status,
+            prd_sales_unit,
+            prd_return_type,
+            prd_brand_id,
+            prd_price,
+
+        })
+
+        res.status(201).json({
+            status: 201,
+            success: true,
+            message: "product created successfully",
+
+
+        });
+
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
             status: 500,
             success: false,
-            message: "Validation Error",
-            error: getErrorsInArray(error?.details),
+            error: error,
+            message: "Failed to Create Product! Please try again later."
         });
-    };
+    }
 
-
-    // create a product
-    const newProduct = await createAProduct({
-
-        prd_name,
-        prd_description,
-        prd_storage_type,
-        prd_tax_class,
-        prd_tags,
-        prd_expiry_date,
-        prd_dashboard_status,
-        prd_status,
-        prd_sales_unit,
-        prd_return_type,
-        prd_brand_id,
-        prd_price,
-
-    })
-
-    res.status(201).json({
-        status: 201,
-        success: true,
-        message: "product created successfully",
-        
-
-    });
-
-
-
-}catch(error){
-    console.log(error)
-    res.status(500).json({
-        status: 500,
-        success: false,
-        error: error,
-        message: "Failed to Create Product! Please try again later."
-    });
-}
-   
 }
 
 
@@ -143,7 +155,7 @@ export const updateProduct = async (req, res) => {
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
 
         // Call the model function to update the product
-        const updatedProduct = await updateAproduct(productId, {
+        const updatedProduct = await updateAProduct(productId, {
             prd_name,
             prd_description,
             prd_storage_type,
@@ -181,7 +193,7 @@ export const updateProduct = async (req, res) => {
 
 export const getAllProduct = async (req, res) => {
     try {
-        
+
         const products = await getAllProducts();
 
 
@@ -192,7 +204,7 @@ export const getAllProduct = async (req, res) => {
             data: products,
         });
 
-    }catch(error){
+    } catch (error) {
         console.log(error)
         res.status(500).json({
             status: 500,
@@ -207,8 +219,8 @@ export const getAllProduct = async (req, res) => {
 
 export const getSingleProduct = async (req, res) => {
     try {
-        const productId = req.params.productId; 
-       
+        const productId = req.params.productId;
+
         // Assuming you have a route parameter for the product ID
         const product = await getProductById(productId);
         // console.log(product);
@@ -256,7 +268,7 @@ export const deleteProduct = async (req, res) => {
             status: 500,
             success: false,
             error: error,
-            message: 'Failed to delete product. Please try again later.',
+            message: 'Failed to price product. Please try again later.',
         });
     }
 }
@@ -270,6 +282,81 @@ export const getPrice = async (req, res) => {
             success: true,
             message: 'Get the price successfully',
             data: price,
+})
+}catch(error){
+    res.status(500).json({
+        status: 500,
+        success: false,
+        error: error,
+        message: 'Failed to get price. Please try again later.',
+    });
+};
+}
+
+// add product images
+export const addProductImages = async (req, res) => {
+    const productId = req.params.productId;
+    const files = req.files;
+    const isBaseImage = req.body.isBaseImage;
+
+    try {
+        let productImages = [];
+
+        for (let i = 0; i < files.files.length; i++) {
+            const file = files.files[i];
+
+            const resizedBuffer = await sharp(file.data)
+                .resize({ width: 300, height: 300 })
+                .toBuffer();
+
+            const uploadParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `images/${file.name}`,
+                Body: resizedBuffer,
+                ContentType: file.mimetype,
+            };
+
+            const s3Data = await s3.upload(uploadParams).promise();
+
+            const imageDetails = {
+                product_id: productId,
+                url: s3Data.Location,
+                is_baseimage: isBaseImage,
+            };
+
+            productImages.push(imageDetails);
+        }
+        console.log(productImages);
+
+        // Save product images to the database
+        await createProductGallery(productImages);
+
+        res.status(201).json({
+            status: 201,
+            success: true,
+            message: "Product images added successfully.",
+            result: productImages,
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to add product images! Please try again later.",
+        });
+    }
+};
+
+export const productFilter = async (req, res) => {
+    const { category, subcategory, brand } = req.body;
+    try {
+        const products = await filterProducts(category, subcategory, brand);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Products fetched successfully',
+            data: products,
         });
     } catch (error) {
         console.error(error);
@@ -281,4 +368,27 @@ export const getPrice = async (req, res) => {
         });
     }
 }
+     
+
+
+export const getProductsWithSorting = async (req, res) => {
+    const { sortBy } = req.body;
+    try {
+        const products = await getSortedProducts(sortBy);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Product sorted successfully",
+            result: products
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to sort products"
+        });
+    }
+};
+
 

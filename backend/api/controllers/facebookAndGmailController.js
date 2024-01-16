@@ -15,40 +15,34 @@ export const googleAuth = async (req, res) => {
 
         const userCompany = existingUser.usr_company;
 
-           // Check if the user's company is verified
-           const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
 
-           if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-               if (existingUser.usr_approval_id === 1) {
-                   return res.status(200).json({
-                       status: 200,
-                       success: true,
-                       message: 'Please wait for company verification. Your account is pending for approval.'
-                   });
-               } else if (existingUser.usr_approval_id === 3) {
-                   return res.status(403).json({
-                       status: 403,
-                       success: false,
-                       message: 'Your company is rejected. Contact admin for further assistance.'
-                   });
-               }
-           }
-   
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
+                const pendingMessage = "Please wait for company verification. Your account is pending for approval.";
+                return res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(pendingMessage)}`);
 
-           // Check if the user is blocked by the admin
-       if (!existingUser.is_status) {
-           return res.status(403).json({
-               status: 403,
-               success: false,
-               message: "User is suspend .Please contact admin for assistance."
-           });
-       }
 
-     
+            } else if (existingUser.usr_approval_id === 3) {
+
+                const rejectMessage = "Your company is rejected. Contact admin for further assistance.";
+                return res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(rejectMessage)}`);
+            }
+        }
+
+
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
+
+            const pendingMessage = "User is suspend .Please contact admin for assistance.";
+            return res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(pendingMessage)}`);
+        }
+
+
         const accessToken = generateAccessToken(existingUser);
         const refreshToken = generateRefreshToken(existingUser);
 
-        console.log(existingUser)
 
         // res.status(201).json({
         //   status:201,
@@ -56,7 +50,7 @@ export const googleAuth = async (req, res) => {
         //   message:"success",
         //   result:{ accessToken, refreshToken }
         // });
-        res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}`);
+        return res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}`);
     } catch (error) {
         console.log(error);
     }
@@ -73,41 +67,34 @@ export const facebookAuth = async (req, res) => {
 
         const userCompany = existingUser.usr_company;
 
-           // Check if the user's company is verified
-           const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
 
-           if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-               if (existingUser.usr_approval_id === 1) {
-                   return res.status(200).json({
-                       status: 200,
-                       success: true,
-                       message: 'Please wait for company verification. Your account is pending for approval.'
-                   });
-               } else if (existingUser.usr_approval_id === 3) {
-                   return res.status(403).json({
-                       status: 403,
-                       success: false,
-                       message: 'Your company is rejected. Contact admin for further assistance.'
-                   });
-               }
-           }
-   
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
+                const pendingMessage = "Please wait for company verification. Your account is pending for approval.";
+                return res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(pendingMessage)}`);
 
-           // Check if the user is blocked by the admin
-       if (!existingUser.is_status) {
-           return res.status(403).json({
-               status: 403,
-               success: false,
-               message: "User is suspend .Please contact admin for assistance."
-           });
-       }
+
+            } else if (existingUser.usr_approval_id === 3) {
+
+                const rejectMessage = "Your company is rejected. Contact admin for further assistance.";
+                return res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(rejectMessage)}`);
+            }
+        }
+
+        // Check if the user is blocked by the admin
+        if (!existingUser.is_status) {
+            const pendingMessage = "User is suspend .Please contact admin for assistance.";
+            return res.redirect(`${process.env.BASE_URL}/auth/fail?message=${encodeURIComponent(pendingMessage)}`);
+        }
 
 
         const accessToken = generateAccessToken(existingUser);
         const refreshToken = generateRefreshToken(existingUser);
 
 
-        res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}`);
+        return res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}`);
         // res.status(201).json({
         //   status:201,
         //   success:true,

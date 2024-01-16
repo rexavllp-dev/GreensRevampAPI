@@ -1,3 +1,4 @@
+import { query } from 'express';
 import db from '../../config/dbConfig.js';
 
 // create product
@@ -8,23 +9,24 @@ export const createAProduct = async (productData) => {
 };
 
 
-// update model
+// update product
 
-export const updateAproduct = async (productId, updatedData) => {
+export const updateAProduct = async (productId, updatedData) => {
     const updatedProduct = await db('products').where({ id: productId })
         .update(updatedData)
         .returning('*'); // Return the updated product
+    return updatedProduct;
 }
 
 // get a product
 
 export const getProductById = async (productId) => {
     const product = await db('products')
-            .select('*')
-            .where({ id: productId })
-            .first();
+        .select('*')
+        .where({ id: productId })
+        .first();
 
-            return product;
+    return product;
 }
 
 // get all products
@@ -45,14 +47,44 @@ export const deleteAProduct = async (productId) => {
 
 
 
-
-
-
-
-
-
-
 // ____________________________________________________________________________________________________________________________________________________________________________
+// upload images
+export const createProductGallery = async (data) => {
+    console.log("data", data);
+    const images = db('product_gallery').insert(data).returning('*');
+    return images;
+};
+
+// get image 
+export const getProductGalleryByProductId = async (productId) => {
+    const images = db('product_gallery').where({ product_id: productId }).select('*');
+    return images;
+};
+
+
+export const getSortedProducts = async (sortOption) => {
+    let query = await db('products').orderBy('id', 'desc').select('*');
+    switch (sortOption) {
+        case 'priceLowToHigh':
+            query = query.orderBy('prd_price', 'asc');
+            break;
+        case 'priceHighToLow':
+            query = query.orderBy('prd_price', 'desc');
+            break;
+        case 'alphabeticalAZ':
+            query = query.orderBy('prd_name', 'asc');
+            break;
+        case 'alphabeticalZA':
+            query = query.orderBy('prd_name', 'desc');
+            break;
+        default:
+            break;
+    };
+
+    return sortProducts;
+
+}
+
 // ____________________________________________________________________________________________________________________________________________________________________________
 
 

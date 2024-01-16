@@ -374,8 +374,8 @@ export const resendEmail = async (req, res) => {
 
         // Send email verification link
         await sendVerificationEmail(usr_email, user.usr_firstname, token);
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "Email verification link send successfully"
         });
@@ -419,8 +419,8 @@ export const resendOtp = async (req, res) => {
         await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
 
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "Otp send successfully"
         });
@@ -457,7 +457,7 @@ export const verifyOtp = async (req, res) => {
 
     // Perform additional user registration steps if needed
 
-    res.status(200).json({ message: 'OTP verified successfully' });
+    res.status(201).json({ message: 'OTP verified successfully' });
 };
 
 
@@ -476,8 +476,8 @@ export const getSingleUser = async (req, res) => {
                 message: "User not found"
             });
         }
-        res.status(200).json({
-            status: 200,
+        res.status(201).json({
+            status: 201,
             success: true,
             message: "User successfully found",
             result: user,
@@ -502,7 +502,7 @@ export const deleteUser = async (req, res) => {
     const userId = req.params.id;
     try {
         const deleteSingleUser = await deleteAUser(userId);
-        return res.status(200).json({ success: true, message: 'User deleted successfully', result: deleteSingleUser });
+        return res.status(201).json({ success: true, message: 'User deleted successfully', result: deleteSingleUser });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Internal Server Error' });

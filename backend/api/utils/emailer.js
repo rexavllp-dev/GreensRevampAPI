@@ -54,6 +54,55 @@ export const sendVerificationEmail = async (usr_email, usr_firstname, token, fro
 };
 
 
+// user registration successful
+export const sendUserRegistrationEmail = async (usr_email, usr_firstname) => {
+  
+  const emailData = {
+    email: usr_email,
+    subject: `Registration Complete`,
+    html: `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Registration Complete</title>
+  </head>
+  <body>
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+
+      <!-- Logo -->
+      <div style="text-align: center;">
+          <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+      </div>
+  
+          <h2>Registration Complete</h2>
+  
+          <p> Hello, <b> ${usr_firstname} </b></p>
+  
+          <p>Congratulations! You have successfully completed your registration.</p>
+  
+          <p>
+          <a href="https://react.greens-intl.ae/auth/login/">Click here to Login </a> 
+          </p>
+
+  
+          <p>Best regards,<br> <b>Greens International </b> </p>
+  
+      </div>
+  </body>
+  </html>`,
+  };
+
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
+
+};
+
+
+
 
 // send reset password to email
 export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) => {
@@ -218,9 +267,9 @@ export const sendBlockVerification = async (usr_email, usr_firstname) => {
     
             <p>You are blocked temporary due to repeated incorrect attempts.Please Contact admin for assistance.</p>
     
-            <p> Click the link below to reset your password: </p>
+        
     
-            <a href="https://react.greens-intl.ae/auth/login/"> Login with another account</a>
+            <a href="https://react.greens-intl.ae/auth/login/"> Login</a>
   
           
             <p>Best regards,<br> <b>Greens International </b> </p>
