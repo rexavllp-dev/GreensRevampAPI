@@ -77,6 +77,7 @@ export const createProduct = async (req, res) => {
             prd_return_type,
             prd_brand_id,
             prd_price,
+            sku_code
 
         };
 
