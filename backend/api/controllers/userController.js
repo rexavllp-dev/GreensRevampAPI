@@ -749,8 +749,8 @@ export const resendOtp = async (req, res) => {
          const resendCooldown = 60 * 1000; // 1 minute cool down
  
          if (timeDifference < resendCooldown) {
-             return res.status(429).json({
-                 status: 429,
+             return res.status(404).json({
+                 status: 404,
                  success: false,
                  message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
              });
@@ -828,8 +828,8 @@ export const resendLoginOtp = async (req, res) => {
         const resendCooldown = 60 * 1000; // 1 minute cooldown
 
         if (timeDifference < resendCooldown) {
-            return res.status(429).json({
-                status: 429,
+            return res.status(404).json({
+                status: 404,
                 success: false,
                 message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
             });
