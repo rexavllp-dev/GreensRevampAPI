@@ -157,7 +157,7 @@ export const getUserById = async (usr_id) => {
     // console.log("userId" , usr_id);
     const user = await db('users')
         .leftJoin('company', 'company.id', 'users.usr_company')
-        .leftJoin('countries', 'countries.id', 'users.usr_country')
+        .leftJoin('countries', 'countries.id', 'users.usr_mobile_country_code')
         .select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
             "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
             "company.company_trade_license_expiry", "company.verification_status", "countries.country_name", "countries.country_code", "countries.dial_code")
