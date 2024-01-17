@@ -41,6 +41,17 @@ export const checkUserExistWithMobile = async (usr_mobile_number) => {
     return user;
 };
 
+// user already exist with country code
+export const checkUserExistWithMobileAndCountryCode = async (usr_mobile_country_code, usr_mobile_number) => {
+    const existingUser = await db('users')
+        .where({
+            'usr_mobile_country_code': usr_mobile_country_code,
+            'usr_mobile_number': usr_mobile_number
+        })
+        .select('*');
+    return existingUser;
+};
+
 export const deleteAUser = async (userId) => {
     // const user = await db('users').where({ id: userId }).del();
     const user = await db('users').del();

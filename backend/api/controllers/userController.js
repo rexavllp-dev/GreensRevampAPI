@@ -5,6 +5,7 @@ import {
     blockUserPermanently,
     checkUserExist,
     checkUserExistWithMobile,
+    checkUserExistWithMobileAndCountryCode,
     createUser,
     deleteAUser,
     getAllUsersData,
@@ -723,8 +724,8 @@ export const resendOtp = async (req, res) => {
             });
         }
 
-           // Check if the user is blocked
-           if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
             return res.status(403).json({
                 status: 403,
                 success: false,
@@ -742,21 +743,21 @@ export const resendOtp = async (req, res) => {
         };
 
 
-         // Check if enough time has passed since the last resend attempt
-         const currentTime = new Date();
-         const lastResendTime = userInfo.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
-         const timeDifference = currentTime - lastResendTime;
-         const resendCooldown = 60 * 1000; // 1 minute cool down
- 
-         if (timeDifference < resendCooldown) {
-             return res.status(404).json({
-                 status: 404,
-                 success: false,
-                 message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
-             });
-         };
- 
-         await updateLastResendTime(userInfo.id, currentTime);
+        // Check if enough time has passed since the last resend attempt
+        const currentTime = new Date();
+        const lastResendTime = userInfo.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
+        const timeDifference = currentTime - lastResendTime;
+        const resendCooldown = 60 * 1000; // 1 minute cool down
+
+        if (timeDifference < resendCooldown) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
+            });
+        };
+
+        await updateLastResendTime(userInfo.id, currentTime);
 
 
 
@@ -802,14 +803,14 @@ export const resendLoginOtp = async (req, res) => {
             });
         };
 
-            // Check if the user is blocked
-            if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
-                return res.status(403).json({
-                    status: 403,
-                    success: false,
-                    message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
-                });
-            };
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
 
         // Check if the user is blocked by the admin
         if (existingUser.attempt_blocked) {
@@ -1090,7 +1091,7 @@ export const verifyLoginOtp = async (req, res) => {
             }
 
 
-            if (!existingUser.mobile_verified) { 
+            if (!existingUser.mobile_verified) {
 
                 // generate otp
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -1284,14 +1285,10 @@ export const updateMobileUsingToken = async (req, res) => {
     console.log(token);
 
 
-
-
     try {
-
-
         const user = await validateAuth(token);
         const userInfo = await getUserById(user.userId);
-        const existingUser = await checkUserExistWithMobile(usr_mobile_number);
+        const existingUser = await checkUserExistWithMobileAndCountryCode(usr_mobile_country_code, usr_mobile_number);
         console.log(userInfo);
 
 
@@ -1299,7 +1296,7 @@ export const updateMobileUsingToken = async (req, res) => {
             return res.status(409).json({
                 status: 409,
                 success: false,
-                message: "User already exist",
+                message: "User already exists with the mobile number and country code",
 
             });
         }
@@ -1313,26 +1310,64 @@ export const updateMobileUsingToken = async (req, res) => {
             });
         }
 
-        await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+         // Check if the user is changing the country code
+         if (userInfo.usr_mobile_country_code !== usr_mobile_country_code) {
+            // Update the mobile number and country code
+            await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
 
-        await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+            // Update the OTP and send a new verification code
+            await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+            const country = await getCountryDialCode(userInfo.id)
+            const countryDialCode = country?.country_dial_code;
 
+            await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
-        const country = await getCountryDialCode(userInfo.id)
-        const countryDialCode = country?.country_dial_code;
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                message: "Mobile number and country code updated successfully, verify your OTP",
+            });
+        } else {
+            // User is not changing the country code, only update the mobile number
+            await updateMobile(userInfo.id, null, usr_mobile_number);
 
-
-        await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Mobile number updated successfully, verify your otp"
-        });
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                message: "Mobile number updated successfully, verify your OTP",
+            });
+        }
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to update mobile' });
     }
-}
+};
+
+//         // Only update the country code if it has changed
+//         if (userInfo.usr_mobile_country_code !== usr_mobile_country_code) {
+//             await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+//         }
+
+//         // await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+
+//         await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+
+
+//         const country = await getCountryDialCode(userInfo.id)
+//         const countryDialCode = country?.country_dial_code;
+
+
+//         await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
+//         res.status(200).json({
+//             status: 200,
+//             success: true,
+//             message: "Mobile number updated successfully, verify your otp"
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ success: false, message: 'Failed to update mobile' });
+//     }
+// }
 
 
 // update using details 
