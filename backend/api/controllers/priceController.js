@@ -20,7 +20,9 @@ export const createPrice = async (req, res) => {
       message: "Failed something went wrong",
     });
   }
-};
+}; 
+
+                                        
 
 
 // update price 

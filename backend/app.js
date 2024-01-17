@@ -11,6 +11,7 @@ import passport from 'passport';
 import './api/utils/passport-config.js';
 import fileUpload from 'express-fileupload';
 import axios from 'axios';
+import morgan from 'morgan';
 // import createSocketServer from './api/utils/socketIo.js';
 // import http from 'http';
 
@@ -30,6 +31,8 @@ const corsOptions = {
   origin: true,
 };
 
+app.use(morgan('combined'))
+
 // set up session
 app.use(
   session({
@@ -48,6 +51,7 @@ app.use(passport.session());
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use('/public', express.static('public'));
 

@@ -40,13 +40,16 @@ router.get('/getall-price', getAllPrice)
 router.get('/get-price/:priceId', getPrice)
 
 // delete a price
-router.delete('/delete-price/:priceId',deletePrice);
+router.delete('/delete-price/:priceId', deletePrice);
 
 // upload images
-router.post('/:productId/images', addProductImages);
+router.post('/images/:productId', addProductImages);
 
 // sort products
 router.get('/sort-products', getProductsWithSorting);
+
+// filter products
+
 
 
 export default router;

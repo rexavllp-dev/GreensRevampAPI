@@ -1090,7 +1090,7 @@ export const verifyLoginOtp = async (req, res) => {
             }
 
 
-            if (!existingUser.mobile_verified) {
+            if (!existingUser.mobile_verified) { 
 
                 // generate otp
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
