@@ -41,6 +41,17 @@ export const checkUserExistWithMobile = async (usr_mobile_number) => {
     return user;
 };
 
+// user already exist with country code
+export const checkUserExistWithMobileAndCountryCode = async (usr_mobile_country_code, usr_mobile_number) => {
+    const existingUser = await db('users')
+        .where({
+            'usr_mobile_country_code': usr_mobile_country_code,
+            'usr_mobile_number': usr_mobile_number
+        })
+        .select('*');
+    return existingUser;
+};
+
 export const deleteAUser = async (userId) => {
     // const user = await db('users').where({ id: userId }).del();
     const user = await db('users').del();
@@ -160,7 +171,7 @@ export const getUserById = async (usr_id) => {
         .leftJoin('countries', 'countries.id', 'users.usr_mobile_country_code')
         .select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
             "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
-            "company.company_trade_license_expiry", "company.verification_status", "countries.country_name", "countries.country_code", "countries.dial_code")
+            "company.company_trade_license_expiry", "company.verification_status", "countries.country_name", "countries.country_code", "countries.country_dial_code")
         .where({ 'users.id': usr_id }).first();
     return user;
 };
