@@ -15,9 +15,7 @@ const awsConfig = ({
 
 const s3 = new aws.S3(awsConfig)
 
-
 // create products
-
 export const createProduct = async (req, res) => {
 
 
@@ -111,11 +109,8 @@ export const createProduct = async (req, res) => {
             status: 201,
             success: true,
             message: "product created successfully",
-
-
+            data: newProduct
         });
-
-
 
     } catch (error) {
         console.log(error)
@@ -127,7 +122,7 @@ export const createProduct = async (req, res) => {
         });
     }
 
-}
+};
 
 
 // update product 

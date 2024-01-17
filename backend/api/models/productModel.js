@@ -1,4 +1,3 @@
-import { query } from 'express';
 import db from '../../config/dbConfig.js';
 
 // create product
