@@ -11,8 +11,8 @@ export const createPrdPrice = async (priceData) => {
 
 
 // update price
-export const updatePrdPrice = async (priceId, priceData) => {
-    const price = await db("products_price").where({ id:priceId }).update(priceData).returning();
+export const updatePrdPrice = async (productId,priceData) => {
+    const price = await db("products_price").where({ product_id: productId }).update(priceData).returning();
     return price;
 };
 
@@ -42,17 +42,19 @@ export const deletePrdPrice = async (priceId) => {
 
 // 
 
-export const getPriceById = async (priceId) => {
+export const getProductPriceById = async (productId) => {
     const product = await db('products_price')
             .select('*')
-            .where({ id: priceId })
+            .where({ product_id: productId })
             .first();
 
             return product;
 }
 
 
-export const updatePriceHistory = async ( priceData) => {
-    const PriceHistory = await db('price_history').insert(priceData).returning('*');
+export const updatePriceHistory = async (priceData) => {
+    // console.log(priceData)
+    const PriceHistory = db('price_history').insert(priceData).returning('*');
+    return PriceHistory;
 }
 
