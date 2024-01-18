@@ -15,9 +15,7 @@ const awsConfig = ({
 
 const s3 = new aws.S3(awsConfig)
 
-
 // create products
-
 export const createProduct = async (req, res) => {
 
 
@@ -58,6 +56,7 @@ export const createProduct = async (req, res) => {
         sku_code: Joi.string().required().label(" sku_code")
        
     });
+      
 
 
         // product validation data
@@ -75,7 +74,8 @@ export const createProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            sku_code
+            sku_code,
+            prd_price,
 
         };
 
@@ -112,11 +112,8 @@ export const createProduct = async (req, res) => {
             status: 201,
             success: true,
             message: "product created successfully",
-
-
+            data: newProduct
         });
-
-
 
     } catch (error) {
         console.log(error)
@@ -128,7 +125,7 @@ export const createProduct = async (req, res) => {
         });
     }
 
-}
+};
 
 
 // update product 
@@ -145,7 +142,6 @@ export const updateProduct = async (req, res) => {
             prd_dashboard_status,
             prd_status,
             prd_sales_unit,
-            sku_code,
             prd_return_type,
             prd_brand_id,
             prd_price,
@@ -166,7 +162,6 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            sku_code,
             prd_price,
         });
 
@@ -193,7 +188,30 @@ export const updateProduct = async (req, res) => {
 export const getAllProduct = async (req, res) => {
     try {
 
-        const products = await getAllProducts();
+        let page = null;
+        let per_page = null;
+        let search_query = null;
+        if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
+            search_query = req.query.search_query;
+        }
+        if (req.query.page !== null && req.query.page !== undefined && req.query.page !== 'undefined') {
+            page = req.query.page;
+        }
+        if (req.query.per_page !== null && req.query.per_page !== undefined && req.query.per_page !== 'undefined') {
+            per_page = req.query.per_page;
+        }
+        console.log(search_query);                                                                                                     
+
+        const filtersParam = req.query.filters;
+
+        let filters = [];
+
+        // Attempt to parse the filters parameter
+        if (filtersParam) {
+            filters = JSON.parse(filtersParam);
+        }
+       
+        const products = await getAllProducts(page, per_page, search_query, filters);
 
 
         res.status(200).json({
@@ -267,30 +285,11 @@ export const deleteProduct = async (req, res) => {
             status: 500,
             success: false,
             error: error,
-            message: 'Failed to price product. Please try again later.',
+            message: 'Failed to delete product. Please try again later.',
         });
     }
-}
-
-// get price
-export const getPrice = async (req, res) => {
-    try {
-        const price = await getProductPrice(req.params.priceId);
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Get the price successfully',
-            data: price,
-})
-}catch(error){
-    res.status(500).json({
-        status: 500,
-        success: false,
-        error: error,
-        message: 'Failed to get price. Please try again later.',
-    });
 };
-}
+
 
 // add product images
 export const addProductImages = async (req, res) => {
@@ -347,29 +346,8 @@ export const addProductImages = async (req, res) => {
     }
 };
 
-export const productFilter = async (req, res) => {
-    const { category, subcategory, brand } = req.body;
-    try {
-        const products = await filterProducts(category, subcategory, brand);
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Products fetched successfully',
-            data: products,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            status: 500,
-            success: false,
-            error: error,
-            message: 'Failed to get price. Please try again later.',
-        });
-    }
-}
-     
 
-
+// product sorting
 export const getProductsWithSorting = async (req, res) => {
     const { sortBy } = req.body;
     try {
@@ -389,5 +367,5 @@ export const getProductsWithSorting = async (req, res) => {
         });
     }
 };
-
+      
 

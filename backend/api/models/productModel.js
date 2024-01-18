@@ -1,4 +1,3 @@
-import { query } from 'express';
 import db from '../../config/dbConfig.js';
 
 // create product
@@ -31,11 +30,37 @@ export const getProductById = async (productId) => {
 
 // get all products
 
-export const getAllProducts = async () => {
+export const getAllProducts = async (page, per_page, search, filters) => {
+    let query =  db('products')
+        .join('brands', 'products.prd_brand_id', 'brands.id')
+        .join('product_category', 'products.id', 'product_category.product_id')
+        .join('categories', 'product_category.category_id', 'categories.id')
+        .select(
+            'products.*',
+            'brands.*',
+            'categories.*'
+        );
 
-    const products = await db('products').select('*');
-    return products;
+    if (search) {
+console.log(search)
+        query.where("products.prd_name", "ilike", `%${search}%`);
+    }
 
+    // Apply complex filters
+   
+    filters.forEach(filter => {
+        if (filter.operator === '>') {
+            query.where(filter.column, '>', filter.value);
+        }
+        if (filter.operator === '<') {
+            query.where(filter.column, '<', filter.value);
+        }
+        if (filter.operator === '=') {
+            query.where(filter.column, '=', filter.value);
+        }
+    });
+
+    return query;
 }
 
 // delete product
@@ -49,6 +74,7 @@ export const deleteAProduct = async (productId) => {
 
 // ____________________________________________________________________________________________________________________________________________________________________________
 // upload images
+
 export const createProductGallery = async (data) => {
     console.log("data", data);
     const images = db('product_gallery').insert(data).returning('*');
@@ -62,35 +88,35 @@ export const getProductGalleryByProductId = async (productId) => {
 };
 
 
-export const getSortedProducts = async (sortOption) => {
-    let query = await db('products').orderBy('id', 'desc').select('*');
-    switch (sortOption) {
+export const getSortedProducts = async (sortBy) => {
+    let query;
+
+    switch (sortBy) {
         case 'priceLowToHigh':
-            query = query.orderBy('prd_price', 'asc');
+            query = db.select().from('products').orderBy('prd_price', 'asc');
             break;
         case 'priceHighToLow':
-            query = query.orderBy('prd_price', 'desc');
+            query = db.select().from('products').orderBy('prd_price', 'desc');
             break;
         case 'alphabeticalAZ':
-            query = query.orderBy('prd_name', 'asc');
+            query = db.select().from('products').orderBy('prd_name', 'asc');
             break;
         case 'alphabeticalZA':
-            query = query.orderBy('prd_name', 'desc');
+            query = db.select().from('products').orderBy('prd_name', 'desc');
             break;
         default:
+            query = db.select().from('products');
             break;
     };
 
-    return sortProducts;
+    const products = await query;
+    return products;
 
 }
 
 // ____________________________________________________________________________________________________________________________________________________________________________
 
 
-
-
-
-
-
+                                                 
+    
 
