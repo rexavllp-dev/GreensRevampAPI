@@ -37,3 +37,28 @@ export const deleteACategory = async (categoryId) => {
     const deleteCategory = db('categories').where({ id: categoryId }).del();
     return deleteCategory;
 };
+
+
+export const getCategoriesTree = async () => {
+    console.log('Before query');
+    const categories = await db('categories').select('id', 'cat_parent_id', 'cat_name').orderBy('id');
+    // console.log(categories);
+    const categoryMap = {};
+    const rootCategories = [];
+
+    categories.forEach((category) => {
+        // console.log(category);
+        category.children = [];
+        categoryMap[category.id] = category;
+        const parent = categoryMap[category.cat_parent_id];
+        if (parent) {
+            // console.log(parent);
+            parent.children.push(category);
+        } else {
+            rootCategories.push(category);
+            // console.log(category);
+        }
+    });
+
+    return rootCategories;
+}
