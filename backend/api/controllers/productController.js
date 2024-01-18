@@ -73,10 +73,7 @@ export const createProduct = async (req, res) => {
             prd_status,
             prd_sales_unit,
             prd_return_type,
-            prd_brand_id,
-            sku_code,
-            prd_price,
-
+            prd_brand_id
         };
 
         const { error } = schema.validate(validate_data, joiOptions);
