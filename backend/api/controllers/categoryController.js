@@ -2,7 +2,7 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
-import { createACategory, deleteACategory, getCategories, getCategoriesByParentId, getCategoryById, updateACategory } from '../models/categoryModel.js';
+import { createACategory, deleteACategory, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById,  updateACategory } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
 
@@ -153,12 +153,13 @@ export const uploadCategoryImages = async (req, res) => {
 // update Category
 export const updateCategory = async (req, res) => {
     try {
-        const { cat_name, cat_description } = req.body;
+        const { cat_name, cat_description, category_status } = req.body;
         const categoryId = req.params.categoryId;
 
         const updateCategory = await updateACategory(categoryId, {
             cat_name,
             cat_description,
+            category_status
         });
 
         res.status(200).json({
@@ -291,6 +292,28 @@ export const deleteCategory = async (req,res) => {
             success: false,
             error: error,
             message: 'Failed to delete Category. Please try again later.',
+        });
+    }
+};
+
+
+export const getCategoriesByTree = async (req, res) => {
+    try {
+        const categoryTree = await getCategoriesTree();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Categories fetched successfully',
+            data: categoryTree,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: 'Failed to fetch categories. Please try again later',
+            error: error,
         });
     }
 }

@@ -1,10 +1,9 @@
 import db from '../../config/dbConfig.js';
 
 // create product
-
 export const createAProduct = async (productData) => {
-    const newUser = await db("products").insert(productData).returning('*');
-    return newUser;
+    const newProduct = await db("products").insert(productData).returning('*');
+    return newProduct;
 };
 
 
@@ -76,7 +75,6 @@ export const deleteAProduct = async (productId) => {
 // upload images
 
 export const createProductGallery = async (data) => {
-    console.log("data", data);
     const images = db('product_gallery').insert(data).returning('*');
     return images;
 };

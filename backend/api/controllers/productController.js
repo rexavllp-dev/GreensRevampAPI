@@ -290,14 +290,19 @@ export const deleteProduct = async (req, res) => {
 // add product images
 export const addProductImages = async (req, res) => {
     const productId = req.params.productId;
-    const files = req.files;
+    let files = req.files.files;
+   
+    if(!files?.length) {
+        files = [files]
+    }
     const isBaseImage = req.body.isBaseImage;
 
     try {
         let productImages = [];
 
-        for (let i = 0; i < files.files.length; i++) {
-            const file = files.files[i];
+        for (let i = 0; i < files?.length; i++) {
+            const file = files[i];
+            
 
             const resizedBuffer = await sharp(file.data)
                 .resize({ width: 300, height: 300 })
