@@ -50,7 +50,6 @@ export const createProduct = async (req, res) => {
         prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
         prd_return_type: Joi.string().required().label("prd_return_type"),
         prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
-        sku_code: Joi.string().required().label(" sku_code")
        
     });
       
