@@ -1,8 +1,8 @@
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
-import { createABrand, deleteABrand, getBrandById, getBrands, updateABrand } from '../models/brandModel.js';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
+import { createACategory, deleteACategory, getCategories, getCategoriesByParentId, getCategoryById, updateACategory } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
 
@@ -16,15 +16,21 @@ const awsConfig = ({
 
 const s3 = new aws.S3(awsConfig)
 
-export const createBrand = async (req, res) => {
-    const { brd_name, brand_status } = req.body;
+
+// create category
+export const createCategory = async (req, res) => {
+    const {  cat_parent_id, cat_name, cat_description } = req.body;
     try {
         const schema = Joi.object({
-            brd_name: Joi.string().required().label("brd_name"),
+            cat_parent_id: Joi.number().required().label("cat_parent_id"),
+            cat_name: Joi.string().required().label("cat_name"),
+            cat_description: Joi.string().required().label("cat_description"),
         });
 
         const validate_data = {
-            brd_name,
+            cat_parent_id,
+            cat_name,
+            cat_description
         };
 
         const { error } = schema.validate(validate_data, joiOptions);
@@ -37,31 +43,32 @@ export const createBrand = async (req, res) => {
             });
         };
 
-        const newBrand = await createABrand({
-            brd_name,
-            brand_status,
+        const newCategory = await createACategory({
+            cat_parent_id,
+            cat_name,
+            cat_description,
         });
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Brand created successfully",
-            data: newBrand
+            message: "Category created successfully",
+            data: newCategory
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to create brand",
+            message: "Failed to create category",
             error: error,
         });
     }
 };
 
 
-// upload brand logo and brand banner
-export const uploadBrandImages = async (req, res) => {
+// upload Category logo and Category banner
+export const uploadCategoryImages = async (req, res) => {
     try {
         const files = req.files;
 
@@ -74,8 +81,8 @@ export const uploadBrandImages = async (req, res) => {
             });
         }
 
-        let brd_logo;
-        let brd_banner;
+        let cat_logo;
+        let cat_banner;
 
         for (const field in files) {
             const file = files[field];
@@ -97,10 +104,10 @@ export const uploadBrandImages = async (req, res) => {
 
                 const s3Data = await s3.upload(uploadParams).promise();
 
-                if (field === "brd_logo") {
-                    brd_logo = s3Data.Location;
+                if (field === "cat_logo") {
+                    cat_logo = s3Data.Location;
                 } else {
-                    brd_banner = s3Data.Location;
+                    cat_banner = s3Data.Location;
                 }
             } else {
                 // If it's not a PDF or JPEG, upload the original file without resizing
@@ -113,23 +120,23 @@ export const uploadBrandImages = async (req, res) => {
 
                 const s3Data = await s3.upload(uploadParams).promise();
 
-                if (field === "brd_logo") {
-                    brd_logo = s3Data.Location;
+                if (field === "cat_logo") {
+                    cat_logo = s3Data.Location;
                 } else {
-                    brd_banner = s3Data.Location;
+                    cat_banner = s3Data.Location;
                 }
             }
         }
 
-        // Now, you can use brd_logo and brd_banner in your database operations or save them as needed.
+        // Now, you can use cat_logo and cat_banner in your database operations or save them as needed.
 
         res.status(201).json({
             status: 201,
             success: true,
-            message: "Brand images uploaded successfully",
+            message: "Category images uploaded successfully",
             result: {
-                brd_logo,
-                brd_banner,
+                cat_logo,
+                cat_banner,
             }
         });
 
@@ -138,27 +145,27 @@ export const uploadBrandImages = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to upload brand images. Please try again later."
+            message: "Failed to upload Category images. Please try again later."
         });
     }
 };
 
-// update brands
-export const updateBrand = async (req, res) => {
+// update Category
+export const updateCategory = async (req, res) => {
     try {
-        const { brd_name, brand_status } = req.body;
-        const brandId = req.params.brandId;
+        const { cat_name, cat_description } = req.body;
+        const categoryId = req.params.categoryId;
 
-        const updateBrand = await updateABrand(brandId, {
-            brd_name,
-            brand_status,
+        const updateCategory = await updateACategory(categoryId, {
+            cat_name,
+            cat_description,
         });
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Update brand successfully",
-            result: updateBrand
+            message: "Update Category successfully",
+            result: updateCategory
         });
 
     } catch (error) {
@@ -173,24 +180,54 @@ export const updateBrand = async (req, res) => {
     }
 };
 
-
-export const getSingleBrand = async (req, res) => {
-    const brandId = req.params.brandId;
+// get categories by parentId
+export const getCategoriesWithParentId = async (req, res) => {
     try {
-        const brand = await getBrandById(brandId);
-        if (!brand) {
+        const parentId = req.params.parentId;
+        const categories = await getCategoriesByParentId(parentId);
+        if (!categories) {
             return res.status(404).json({
                 status: 404,
                 success: false,
-                message: "Brand not found",
+                message: "Category not found",
+            });
+        };
+
+        res.status(200).json({
+          status:200,
+          success:true,
+          message:"Category fetched successfully",
+          result: categories
+        });
+    } catch (error) {
+        res.status(500).json({
+          status:500,
+          success:false,
+          message:"Failed to fetch category",
+          error: error
+        });
+    }
+
+}
+
+
+export const getSingleCategory = async (req, res) => {
+    const CategoryId = req.params.categoryId;
+    try {
+        const category = await getCategoryById(CategoryId);
+        if (!category) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Category not found",
             });
         };
         
         res.status(200).json({
           status:200,
           success:true,
-          message:"Brand fetched successfully",
-          result: brand
+          message:"Category fetched successfully",
+          result: category
         });
     } catch (error) {
         console.error(error);
@@ -198,22 +235,22 @@ export const getSingleBrand = async (req, res) => {
             status: 500,
             success: false,
             error: error,
-            message: 'Failed to fetch brand. Please try again later.',
+            message: 'Failed to fetch category. Please try again later.',
         });
     }
 };
 
 
 
-export const getAllBrands = async (req, res) => {
+export const getAllCategories = async (req, res) => {
     try {
-        const brands = await getBrands();
+        const categories = await getCategories();
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: 'Brands fetched successfully',
-            data: brands,
+            message: 'Categories fetched successfully',
+            data: categories,
         });
 
     } catch (error) {
@@ -221,31 +258,31 @@ export const getAllBrands = async (req, res) => {
         res.status(500).json({
             status: 200,
             success: true,
-            message: 'Failed to fetch brands. Please try again later',
+            message: 'Failed to fetch categories. Please try again later',
             error: error,
         });
     }
 };
 
 
-export const deleteBrand = async (req,res) => {
+export const deleteCategory = async (req,res) => {
     try {
-        const brandId = req.params.brandId;
-        const deletedBrand = await deleteABrand(brandId);
+        const categoryId = req.params.categoryId;
+        const deletedCategory = await deleteACategory(categoryId);
 
-        if (!deletedBrand) {
+        if (!deletedCategory) {
             return res.status(404).json({
                 status: 404,
                 success: false,
-                message: "Brand not found",
+                message: "Category not found",
             });
         };
 
         res.status(200).json({
           status:200,
           success:true,
-          message:"Brand deleted successfully",
-          result: deletedBrand
+          message:"Category deleted successfully",
+          result: deletedCategory
         });
     } catch (error) {
         console.error(error);
@@ -253,7 +290,7 @@ export const deleteBrand = async (req,res) => {
             status: 500,
             success: false,
             error: error,
-            message: 'Failed to delete brand. Please try again later.',
+            message: 'Failed to delete Category. Please try again later.',
         });
     }
 }
