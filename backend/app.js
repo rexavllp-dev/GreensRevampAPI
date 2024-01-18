@@ -6,6 +6,8 @@ import companyRoute from './api/routes/companyRoute.js';
 import countryRoute from './api/routes/countryRoute.js';
 import adminRoute from './api/routes/adminRoute.js';
 import productRoute from './api/routes/productRoute.js';
+import brandRoute from './api/routes/brandRoute.js';
+import categoryRoutes from './api/routes/categoryRoute.js';
 import session from 'express-session';
 import passport from 'passport';
 import './api/utils/passport-config.js';
@@ -60,6 +62,8 @@ app.use('/api/v1/company', companyRoute);
 app.use('/api/v1/country', countryRoute);
 app.use('/api/v1/admin', adminRoute);
 app.use('/api/v1/products', productRoute);
+app.use('/api/v1/brands', brandRoute);
+app.use('/api/v1/categories', categoryRoutes);
 
 
 app.get('/', (req, res) => {

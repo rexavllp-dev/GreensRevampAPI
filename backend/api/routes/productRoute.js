@@ -10,7 +10,7 @@ const router = express.Router();
 // create a product
 router.post('/create-product', createProduct);
 
-// upadte a product
+// update a product
 router.put('/update-product/:productId', updateProduct)
 
 // get a product

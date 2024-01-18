@@ -18,7 +18,6 @@ const s3 = new aws.S3(awsConfig)
 // create products
 export const createProduct = async (req, res) => {
 
-
     const {
 
         prd_name,
@@ -34,8 +33,6 @@ export const createProduct = async (req, res) => {
         prd_brand_id,
         sku_code,
         
-
-
 
     } = req.body;
 
@@ -133,6 +130,7 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const {
+
             prd_name,
             prd_description,
             prd_storage_type,
@@ -145,6 +143,7 @@ export const updateProduct = async (req, res) => {
             prd_return_type,
             prd_brand_id,
             prd_price,
+
         } = req.body;
 
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
@@ -238,7 +237,7 @@ export const getSingleProduct = async (req, res) => {
     try {
         const productId = req.params.productId;
 
-        // Assuming you have a route parameter for the product ID
+      
         const product = await getProductById(productId);
         // console.log(product);
         if (!product) {
@@ -261,7 +260,7 @@ export const getSingleProduct = async (req, res) => {
             status: 500,
             success: false,
             error: error,
-            message: 'Failed to fetch single product. Please try again later.',
+            message: 'Failed to fetch product. Please try again later.',
         });
     }
 }

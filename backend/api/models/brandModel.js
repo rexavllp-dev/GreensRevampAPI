@@ -5,4 +5,31 @@ import db from '../../config/dbConfig.js';
 export const createABrand = async (brandData) => {
     const brand = await db('brands').insert(brandData).returning('*');
     return brand;
-}
+};
+
+// update a brand
+export const updateABrand = async (brandId, updatedData) => {
+    const updatedBrand = await db('brands').where({ id: brandId })
+        .update(updatedData)
+        .returning('*'); // Return the updated product
+    return updatedBrand;
+};
+
+// get single brand
+export const getBrandById = async (brandId) => {
+    const brand = await db('brands').select('*').where({ id: brandId }).first();
+    return brand;
+};
+
+// get all brands
+export const getBrands = async () => {
+    const brands = await db('brands').select('*');
+    return brands;
+};
+
+// delete brands
+export const deleteABrand = async (brandId) => {
+    const deleteBrand = db('brands').where({ id: brandId }).del();
+    return deleteBrand;
+};
+

@@ -169,9 +169,11 @@ export const getUserById = async (usr_id) => {
     const user = await db('users')
         .leftJoin('company', 'company.id', 'users.usr_company')
         .leftJoin('countries', 'countries.id', 'users.usr_mobile_country_code')
+        .leftJoin('user_approval_status', 'user_approval_status.id', 'users.usr_approval_id')
         .select("users.*", "company.company_name", "company.company_landline_country_code", "company.company_landline",
             "company.company_vat_certificate", "company.company_trn_number", "company.company_trade_license",
-            "company.company_trade_license_expiry", "company.verification_status", "countries.country_name", "countries.country_code", "countries.country_dial_code")
+            "company.company_trade_license_expiry", "company.verification_status", "countries.country_name",
+             "countries.country_code", "countries.country_dial_code", "user_approval_status.status_name")
         .where({ 'users.id': usr_id }).first();
     return user;
 };
