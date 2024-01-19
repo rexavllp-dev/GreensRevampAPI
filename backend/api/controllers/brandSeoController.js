@@ -1,4 +1,5 @@
-import { createSeo, deleteASeo, getSeo, getSeoById, updateASeo } from "../models/seoModel.js";
+import { createSeo, deleteASeo, getSeo, getSeoById, updateASeo } from "../models/brandSeoModel.js";
+
 
 
 
@@ -29,10 +30,19 @@ export const addSeo = async (req, res) => {
 // update seo
 export const updateSeo = async (req, res) => {
     const  updatedData  = req.body;
-    const  seoId  = req.params.seoId;
+    const seoId  = req.params.seoId;
+    console.log(updatedData);
 
     try {
         const updatedSeo = await updateASeo(seoId, updatedData);
+
+        if(!updatedSeo) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Seo not found"
+            });
+        }
 
         res.status(200).json({
             status: 200,

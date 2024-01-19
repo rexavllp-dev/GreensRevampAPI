@@ -1,7 +1,7 @@
 import express from 'express';
 import { addProductImages, createProduct, deleteProduct, getAllProduct, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
-import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/seoController.js';
+import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 
 
 const router = express.Router();

@@ -256,4 +256,4 @@ export const deleteBrand = async (req,res) => {
             message: 'Failed to delete brand. Please try again later.',
         });
     }
-}
+};
