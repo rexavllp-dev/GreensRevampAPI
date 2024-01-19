@@ -19,18 +19,18 @@ export const updateAProduct = async (productId, updatedData) => {
 // get a product
 
 export const getProductById = async (productId) => {
-    const product = await db('products')
-        .select('*')
-        .where({ id: productId })
-        .first();
+    const products = await db('products')
+        .select('products.*', 'product_gallery.url', 'product_gallery.is_baseimage') // Return the updated product
+        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+        .where('products.id', productId);
 
-    return product;
-}
+    return products;
+};
 
 // get all products
 
 export const getAllProducts = async (page, per_page, search, filters) => {
-    let query =  db('products')
+    let query = db('products')
         .join('brands', 'products.prd_brand_id', 'brands.id')
         .join('product_category', 'products.id', 'product_category.product_id')
         .join('categories', 'product_category.category_id', 'categories.id')
@@ -41,13 +41,15 @@ export const getAllProducts = async (page, per_page, search, filters) => {
         );
 
     if (search) {
-console.log(search)
+        console.log(search)
         query.where("products.prd_name", "ilike", `%${search}%`);
     }
 
     // Apply complex filters
-   
+
     filters.forEach(filter => {
+        console.log("filters",filters);
+        console.log("filter",filter);
         if (filter.operator === '>') {
             query.where(filter.column, '>', filter.value);
         }
@@ -115,6 +117,6 @@ export const getSortedProducts = async (sortBy) => {
 // ____________________________________________________________________________________________________________________________________________________________________________
 
 
-                                                 
-    
+
+
 

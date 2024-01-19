@@ -190,7 +190,9 @@ export const registerCompany = async (req, res) => {
             if (file.mimetype === 'image/pdf' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
                 // Resize only if it's a PDF, JPEG, PNG 
                 const resizedBuffer = await sharp(file.data)
-                    .resize({ width: 300, height: 300 }) // Adjust the dimensions as needed
+                    .jpeg({ quality: 10, progressive: true })
+                    .png({ quality: 10, progressive: true })
+                    
                     .toBuffer();
 
                 // Upload resized image to S3

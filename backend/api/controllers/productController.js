@@ -204,10 +204,10 @@ export const getAllProduct = async (req, res) => {
         // Attempt to parse the filters parameter
         if (filtersParam) {
             filters = JSON.parse(filtersParam);
-        }
+        };
        
         const products = await getAllProducts(page, per_page, search_query, filters);
-
+        console.log("products",products);
 
         res.status(200).json({
             status: 200,
@@ -225,7 +225,7 @@ export const getAllProduct = async (req, res) => {
             message: "Failed to fetch Product! Please try again later."
         });
     }
-}
+};
 
 // get a product
 
@@ -234,21 +234,33 @@ export const getSingleProduct = async (req, res) => {
         const productId = req.params.productId;
 
       
-        const product = await getProductById(productId);
-        // console.log(product);
-        if (!product) {
+        const products = await getProductById(productId);
+        console.log(products);
+        if (!products  || products.length === 0) {
             return res.status(404).json({
                 status: 404,
                 success: false,
                 message: 'Product not found',
             });
-        }
+        };
+
+
+        const productUrls = products.map(product => ({
+            id: product.id,
+            product_id: product.id,
+            url: product.url,
+            is_baseimage: product.is_baseimage,
+        }));
+       
 
         res.status(200).json({
             status: 200,
             success: true,
             message: 'Product single fetched successfully',
-            data: product,
+            data: {
+                product : products,
+                productUrls: productUrls
+            }
         });
     } catch (error) {
         console.error(error);
@@ -259,7 +271,7 @@ export const getSingleProduct = async (req, res) => {
             message: 'Failed to fetch product. Please try again later.',
         });
     }
-}
+};
 
 
 // delete a product
