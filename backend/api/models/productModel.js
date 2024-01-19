@@ -17,7 +17,6 @@ export const updateAProduct = async (productId, updatedData) => {
 }
 
 // get a product
-
 export const getProductById = async (productId) => {
     const products = await db('products')
         .select('products.*', 'product_gallery.url', 'product_gallery.is_baseimage') // Return the updated product
@@ -32,8 +31,8 @@ export const getProductById = async (productId) => {
 export const getAllProducts = async (page, per_page, search, filters) => {
     let query = db('products')
         .join('brands', 'products.prd_brand_id', 'brands.id')
-        .join('product_category', 'products.id', 'product_category.product_id')
-        .join('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
         .select(
             'products.*',
             'brands.*',
@@ -62,7 +61,7 @@ export const getAllProducts = async (page, per_page, search, filters) => {
     });
 
     return query;
-}
+};
 
 // delete product
 
