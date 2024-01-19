@@ -75,8 +75,13 @@ export const uploadBrandImages = async (req, res) => {
             });
         };
 
-        if (!brandId) {
-            res.status(404).json({
+        // Get the brand
+        const brand = await getBrandById(brandId);
+      
+
+        // Check if the brand is not found
+        if (!brand) {
+            return res.status(404).json({
                 status: 404,
                 success: false,
                 message: "Brand not found",

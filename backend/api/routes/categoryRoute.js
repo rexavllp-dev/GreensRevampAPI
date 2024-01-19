@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/create-category', createCategory);
 
 // upload Category logo and Category banner
-router.post('/upload-category-images', uploadCategoryImages);
+router.post('/upload-category-images/:categoryId', uploadCategoryImages);
 
 // update a product
 router.put('/update-category/:categoryId', updateCategory);

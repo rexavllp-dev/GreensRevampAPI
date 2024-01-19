@@ -82,13 +82,18 @@ export const uploadCategoryImages = async (req, res) => {
             });
         };
 
-        if(!categoryId) {
-            res.status(404).json({
-              status:404,
-              success:false,
-              message:"Brand not found",
+        const categories = await getCategoryById(categoryId);
+      
+
+        // Check if the brand is not found
+        if (!categories) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Categories not found",
             });
         }
+
 
         let cat_logo;
         let cat_banner;
