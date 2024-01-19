@@ -53,7 +53,7 @@ router.get('/sort-products', getProductsWithSorting);
 // seo routes
 
 // create seo
-router.post('/createSeo', addSeo);
+router.post('/create-seo', addSeo);
 
 // update a product
 router.put('/update-seo/:seoId', updateSeo);

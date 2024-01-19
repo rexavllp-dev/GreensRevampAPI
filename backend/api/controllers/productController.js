@@ -288,15 +288,15 @@ export const deleteProduct = async (req, res) => {
 
 // add product images
 export const addProductImages = async (req, res) => {
-    const productId = req.params.productId;
-    let files = req.files.files;
-   
-    if(!files?.length) {
-        files = [files]
-    }
-    const isBaseImage = req.body.isBaseImage;
-
+    
     try {
+        const productId = req.params.productId;
+        let files = req.files?.files;
+       
+        if(!files?.length) {
+            files = [files]
+        }
+        const isBaseImage = req.body?.isBaseImage;
         let productImages = [];
 
         for (let i = 0; i < files?.length; i++) {
@@ -341,6 +341,7 @@ export const addProductImages = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
+            error: error,
             message: "Failed to add product images! Please try again later.",
         });
     }
