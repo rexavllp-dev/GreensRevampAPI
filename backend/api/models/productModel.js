@@ -19,8 +19,12 @@ export const updateAProduct = async (productId, updatedData) => {
 // get a product
 export const getProductById = async (productId) => {
     const products = await db('products')
-        .select('products.*', 'product_gallery.url', 'product_gallery.is_baseimage') // Return the updated product
+        .select('products.*',
+            'product_gallery.*',
+            'products_price.*',
+        )
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
         .where('products.id', productId);
 
     return products;
@@ -33,10 +37,15 @@ export const getAllProducts = async (page, per_page, search, filters) => {
         .join('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .select(
             'products.*',
             'brands.*',
-            'categories.*'
+            'categories.*',
+            "products_price.*",
+            "product_gallery.*"
+
         );
 
     if (search) {
@@ -47,8 +56,8 @@ export const getAllProducts = async (page, per_page, search, filters) => {
     // Apply complex filters
 
     filters.forEach(filter => {
-        console.log("filters",filters);
-        console.log("filter",filter);
+        console.log("filters", filters);
+        console.log("filter", filter);
         if (filter.operator === '>') {
             query.where(filter.column, '>', filter.value);
         }
