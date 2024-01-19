@@ -63,6 +63,7 @@ export const createBrand = async (req, res) => {
 // upload brand logo and brand banner
 export const uploadBrandImages = async (req, res) => {
     try {
+        const brandId = req.params.brandId;
         const files = req.files;
 
         // Check if there are files
@@ -71,6 +72,14 @@ export const uploadBrandImages = async (req, res) => {
                 status: 400,
                 success: false,
                 message: "No image provided",
+            });
+        };
+
+        if (!brandId) {
+            res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Brand not found",
             });
         }
 
@@ -121,7 +130,11 @@ export const uploadBrandImages = async (req, res) => {
             }
         }
 
-        // Now, you can use brd_logo and brd_banner in your database operations or save them as needed.
+        await updateABrand(brandId, {
+            brd_logo,
+            brd_banner,
+        })
+
 
         res.status(201).json({
             status: 201,
@@ -131,6 +144,7 @@ export const uploadBrandImages = async (req, res) => {
                 brd_logo,
                 brd_banner,
             }
+
         });
 
     } catch (error) {
@@ -185,12 +199,12 @@ export const getSingleBrand = async (req, res) => {
                 message: "Brand not found",
             });
         };
-        
+
         res.status(200).json({
-          status:200,
-          success:true,
-          message:"Brand fetched successfully",
-          result: brand
+            status: 200,
+            success: true,
+            message: "Brand fetched successfully",
+            result: brand
         });
     } catch (error) {
         console.error(error);
@@ -228,7 +242,7 @@ export const getAllBrands = async (req, res) => {
 };
 
 
-export const deleteBrand = async (req,res) => {
+export const deleteBrand = async (req, res) => {
     try {
         const brandId = req.params.brandId;
         const deletedBrand = await deleteABrand(brandId);
@@ -242,10 +256,10 @@ export const deleteBrand = async (req,res) => {
         };
 
         res.status(200).json({
-          status:200,
-          success:true,
-          message:"Brand deleted successfully",
-          result: deletedBrand
+            status: 200,
+            success: true,
+            message: "Brand deleted successfully",
+            result: deletedBrand
         });
     } catch (error) {
         console.error(error);

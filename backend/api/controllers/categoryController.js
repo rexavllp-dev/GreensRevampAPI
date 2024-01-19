@@ -69,6 +69,7 @@ export const createCategory = async (req, res) => {
 
 // upload Category logo and Category banner
 export const uploadCategoryImages = async (req, res) => {
+    const categoryId = req.params.categoryId;
     try {
         const files = req.files;
 
@@ -78,6 +79,14 @@ export const uploadCategoryImages = async (req, res) => {
                 status: 400,
                 success: false,
                 message: "No image provided",
+            });
+        };
+
+        if(!categoryId) {
+            res.status(404).json({
+              status:404,
+              success:false,
+              message:"Brand not found",
             });
         }
 
@@ -126,9 +135,14 @@ export const uploadCategoryImages = async (req, res) => {
                     cat_banner = s3Data.Location;
                 }
             }
-        }
+        };
 
-        // Now, you can use cat_logo and cat_banner in your database operations or save them as needed.
+         await updateACategory(categoryId, {
+            cat_logo,
+            cat_banner,
+        })
+
+        
 
         res.status(201).json({
             status: 201,

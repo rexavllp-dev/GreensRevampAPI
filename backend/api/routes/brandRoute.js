@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/create-brand', createBrand);
 
 // upload brand logo and brand banner
-router.post('/upload-brand-images', uploadBrandImages);
+router.post('/upload-brand-images/:brandId', uploadBrandImages);
 
 // update a product
 router.put('/update-brand/:brandId', updateBrand);
