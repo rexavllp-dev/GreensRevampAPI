@@ -47,8 +47,8 @@ export const getAllProducts = async (page, per_page, search, filters) => {
             'categories.*',
             "products_price.*",
             "product_gallery.*"
-
-        );
+            )
+            .distinct('products.id');
 
     if (search) {
         console.log(search)
