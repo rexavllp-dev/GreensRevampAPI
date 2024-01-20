@@ -9,7 +9,7 @@ export const createNewOption = async (req, res) => {
     res.status(200).json({
       status: 200,
       success: true,
-      message: "     Option created successfully",
+      message: "Option created successfully",
       result: newOption
     });
   } catch (error) {
