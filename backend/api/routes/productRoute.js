@@ -9,6 +9,7 @@ import { addProductReview, approveReviewByAdmin, getAllReviews } from '../contro
 import { getPublicProducts } from '../models/publicProductModel.js';
 import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductCrotroller.js';
 import { createNewOption, deleteOption, getAllOptions, getSingleOption } from '../controllers/optionController.js';
+import { addProductOptionValues, deleteOptionLabel, getOptionsByProductId, updateAOptionLabel,  } from '../controllers/productOptionController.js';
 
 
 const router = express.Router();
@@ -134,5 +135,19 @@ router.get('/get-all-options', getAllOptions);
 // delete option
 router.delete('/delete-option/:optionId', deleteOption);
 
+
+// product option route
+
+// create product option
+router.post('/create-product-option', addProductOptionValues);
+
+// get Options By ProductId
+router.get('/get-options', getOptionsByProductId);
+
+// update product option
+router.put('/update-product-option/:product_optionId', updateAOptionLabel);
+
+// delete product option
+router.delete('/delete-product-option/:product_optionId', deleteOptionLabel);
 
 export default router;
