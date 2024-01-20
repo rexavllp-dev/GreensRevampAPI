@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProductImages, createProduct, deleteProduct, getAllProduct, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
+import { addProductImages, createProduct, deleteProduct, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
@@ -8,6 +8,7 @@ import { createRelatedProduct } from '../controllers/relatedProductController.js
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getPublicProducts } from '../models/publicProductModel.js';
 import { getAllProductPublic } from '../controllers/publicProductCrotroller.js';
+import { createNewOption, deleteOption, getAllOptions, getSingleOption } from '../controllers/optionController.js';
 
 
 const router = express.Router();
@@ -33,6 +34,8 @@ router.get('/get-products', getAllProduct)
 // products public routes 
 
 router.get('/public/getall-products',getAllProductPublic); 
+// get product by category
+router.get('/get-products-category/:categoryId', getProductsOfCategory);
 
 // __________________________________________________________________________________________________________________________________________________________________________
 // __________________________________________________________________________________________________________________________________________________________________________
@@ -82,14 +85,13 @@ router.delete('/delete-seo/:seoId', deleteSeo);
 
 // inventory routes
 
+// create inventory
 router.post('/create-inventory', createProductInventory);
-
 // update inventory 
-
 router.put('/update-inventory/:productId', updateProductInventory);
 
-// product badege route
 
+// product badge route
 router.post('/create-badge', createProductBadge);
 
 // related products
@@ -108,6 +110,19 @@ router.put('/approve-review', approveReviewByAdmin);
 // get all reviews 
 router.get('/get-reviews', getAllReviews);
 
+// option route
+
+// create option
+router.post('/create-option', createNewOption);
+
+// get option
+router.get('/get-option/:optionId', getSingleOption);
+
+// get all options
+router.get('/get-all-options', getAllOptions);
+
+// delete option
+router.delete('/delete-option/:optionId', deleteOption);
 
 
 export default router;

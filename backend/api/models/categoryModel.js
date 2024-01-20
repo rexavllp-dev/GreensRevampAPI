@@ -30,7 +30,7 @@ export const getCategories = async () => {
 export const getCategoriesByParentId = async (parentId) => {
     const categories = await db('categories').select('*').where({ cat_parent_id: parentId });
     return categories;
-}
+};
 
 // delete categories
 export const deleteACategory = async (categoryId) => {

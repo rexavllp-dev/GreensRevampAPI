@@ -6,3 +6,19 @@ export const createOption = async (optionData) => {
     return option;
 };
 
+export const  getOptionById = async (optionId) => {
+    const option = await db('options').select('*').where({ id: optionId }).first();
+    return option;
+};
+
+
+export const getOptions = async () => {
+    const options = await db('options').select('*');
+    return options;
+};
+
+
+export const deleteAOption = async (optionId) => {
+    const deleteOption = db('options').where({ id: optionId }).del();
+    return deleteOption;
+};

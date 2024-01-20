@@ -1,4 +1,4 @@
-import { createAProduct, createProductGallery, deleteAProduct, getAllProducts, getProductById, getSortedProducts, updateAProduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, updateAProduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -250,12 +250,12 @@ export const getSingleProduct = async (req, res) => {
         };
 
 
-        const productUrls = products.map(product => ({
-            id: product.id,
-            product_id: product.id,
-            url: product.url,
-            is_baseimage: product.is_baseimage,
-        }));
+        // const productUrls = products.map(product => ({
+        //     id: product.id,
+        //     product_id: product.id,
+        //     url: product.url,
+        //     is_baseimage: product.is_baseimage,
+        // }));
        
 
         res.status(200).json({
@@ -264,7 +264,7 @@ export const getSingleProduct = async (req, res) => {
             message: 'Product single fetched successfully',
             data: {
                 product : products,
-                productUrls: productUrls
+                // productUrls: productUrls
             }
         });
     } catch (error) {
@@ -385,5 +385,55 @@ export const getProductsWithSorting = async (req, res) => {
         });
     }
 };
-      
+    
+
+
+export const getProductsOfCategory = async (req, res) => {
+
+    const categoryId = req.params.categoryId;
+    try {
+
+        let page = null;
+        let per_page = null;
+        let search_query = null;
+        if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
+            search_query = req.query.search_query;
+        }
+        if (req.query.page !== null && req.query.page !== undefined && req.query.page !== 'undefined') {
+            page = req.query.page;
+        }
+        if (req.query.per_page !== null && req.query.per_page !== undefined && req.query.per_page !== 'undefined') {
+            per_page = req.query.per_page;
+        }
+        console.log(search_query);                                                                                                     
+
+        const filtersParam = req.query.filters;
+
+        let filters = [];
+
+        // Attempt to parse the filters parameter
+        if (filtersParam) {
+            filters = JSON.parse(filtersParam);
+        };
+       
+        const products = await getProductsByCategory(page, per_page, search_query, filters, categoryId);
+        console.log("products",products);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Products fetched successfully',
+            data: products,
+        });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: "Failed to fetch Product! Please try again later."
+        });
+    }
+};
 
