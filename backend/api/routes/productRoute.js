@@ -7,7 +7,7 @@ import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getPublicProducts } from '../models/publicProductModel.js';
-import { getAllProductPublic } from '../controllers/publicProductCrotroller.js';
+import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductCrotroller.js';
 import { createNewOption, deleteOption, getAllOptions, getSingleOption } from '../controllers/optionController.js';
 
 
@@ -31,9 +31,19 @@ router.delete('/delete-product/:productId', deleteProduct);
 
 router.get('/get-products', getAllProduct)
 
-// products public routes 
+// _________________________________________________________________________________________________________________
 
+// products public routes 
 router.get('/public/getall-products',getAllProductPublic); 
+
+// get a single products public
+router.get('/public/get-product/:productId', getSingleProductPublic);
+
+
+
+// _________________________________________________________________________________________________________________
+
+
 // get product by category
 router.get('/get-products-category/:categoryId', getProductsOfCategory);
 
