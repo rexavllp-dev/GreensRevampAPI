@@ -108,7 +108,6 @@ export const getAllProducts = async (page, per_page, search, filters) => {
                 )
             ) as product_img
         `)
-            
         )
         .distinct('products.id')
         .groupBy(

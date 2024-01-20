@@ -375,13 +375,18 @@ export const deleteProductImage = async (req, res) => {
         res.status(200).json({
           status:200,
           success:true,
-          message:"",
-          result:""
+          message:"Product image deleted successfully",
+          result:deletedImage
         });
     } catch (error) {
-        
+        res.status(500).json({
+          status:500,
+          success:false,
+          message:"Failed to delete product image",
+          error: error
+        });
     }
-}
+};
 
 
 
