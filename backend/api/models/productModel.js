@@ -21,14 +21,22 @@ export const getProductById = async (productId) => {
     const products = await db('products')
         .select(
             'products.*',
-            'product_gallery.*',
-            'products_price.*',
+            'brands.*',
+            'brands.id as brand_id',
+            'categories.*',
+            "categories.id as category_id",
+            "products_price.*",
+            "products_price.id as products_price_id",
+            "product_gallery.*",
+            "product_gallery.id as product_gallery_id",
             "product_inventory.*",
-            "categories.*",
-            "product_category.*",
+            "product_inventory.id as product_inventory_id",
             "product_seo.*",
-            "brands.*",
+            "product_seo.id as product_seo_id",
             "product_badge.*",
+            "product_badge.id as product_badge_id",
+            "product_category.*",
+            "product_category.id as product_category_id",
 
         )
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
@@ -61,14 +69,21 @@ export const getAllProducts = async (page, per_page, search, filters) => {
         .select(
             'products.*',
             'brands.*',
+            'brands.id as brand_id',
             'categories.*',
+            "categories.id as category_id",
             "products_price.*",
+            "products_price.id as products_price_id",
             "product_gallery.*",
+            "product_gallery.id as product_gallery_id",
             "product_inventory.*",
+            "product_inventory.id as product_inventory_id",
             "product_seo.*",
+            "product_seo.id as product_seo_id",
             "product_badge.*",
+            "product_badge.id as product_badge_id",
             "product_category.*",
-            
+            "product_category.id as product_category_id",
             )
             .distinct('products.id');
 
@@ -162,13 +177,21 @@ export const getProductsByCategory = async (page, per_page, search, filters, cat
         .select(
             'products.*',
             'brands.*',
+            'brands.id as brand_id',
             'categories.*',
+            "categories.id as category_id",
             "products_price.*",
+            "products_price.id as products_price_id",
             "product_gallery.*",
+            "product_gallery.id as product_gallery_id",
             "product_inventory.*",
+            "product_inventory.id as product_inventory_id",
             "product_seo.*",
+            "product_seo.id as product_seo_id",
             "product_badge.*",
+            "product_badge.id as product_badge_id",
             "product_category.*",
+            "product_category.id as product_category_id",
             
             )
             .distinct('products.id');

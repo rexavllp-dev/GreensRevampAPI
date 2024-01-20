@@ -387,6 +387,8 @@ export const getProductsWithSorting = async (req, res) => {
 
 
 export const getProductsOfCategory = async (req, res) => {
+
+    const categoryId = req.params.categoryId;
     try {
 
         let page = null;
@@ -412,7 +414,7 @@ export const getProductsOfCategory = async (req, res) => {
             filters = JSON.parse(filtersParam);
         };
        
-        const products = await getProductsByCategory(page, per_page, search_query, filters);
+        const products = await getProductsByCategory(page, per_page, search_query, filters, categoryId);
         console.log("products",products);
 
         res.status(200).json({

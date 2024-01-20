@@ -28,7 +28,7 @@ router.delete('/delete-product/:productId', deleteProduct);
 router.get('/get-products', getAllProduct)
 
 // get product by category
-router.get('/get-products-category', getProductsOfCategory);
+router.get('/get-products-category/:categoryId', getProductsOfCategory);
 
 // __________________________________________________________________________________________________________________________________________________________________________
 // __________________________________________________________________________________________________________________________________________________________________________
