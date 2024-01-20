@@ -1,4 +1,4 @@
-import { createAProduct, createProductGallery, deleteAProduct, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, updateAProduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, updateAProduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -363,6 +363,27 @@ export const addProductImages = async (req, res) => {
         });
     }
 };
+
+
+
+// delete product image
+export const deleteProductImage = async (req, res) => {
+    const imageId = req.params.imageId;
+    try {
+        const deletedImage = await deleteProductImageById(imageId);
+
+        res.status(200).json({
+          status:200,
+          success:true,
+          message:"",
+          result:""
+        });
+    } catch (error) {
+        
+    }
+}
+
+
 
 
 // product sorting

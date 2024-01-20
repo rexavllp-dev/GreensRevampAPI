@@ -1,4 +1,3 @@
-import { deleteAOption } from "../models/optionModel.js";
 import { createProductOption, deleteAOptionLabel, getOptionLabel, updateOptionLabel } from "../models/productOptionModel.js";
 
 

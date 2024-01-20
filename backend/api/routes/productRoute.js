@@ -6,10 +6,11 @@ import { createProductInventory, updateProductInventory } from '../controllers/i
 import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
-import { getPublicProducts } from '../models/publicProductModel.js';
-import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductCrotroller.js';
+import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getAllOptions, getSingleOption } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsByProductId, updateAOptionLabel,  } from '../controllers/productOptionController.js';
+import { createNewVariant, deleteVariant, getAllVariants, getSingleVariant } from '../controllers/variantController.js';
+import { addProductVariantValues, deleteVariantLabel, getVariantsByProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 
 
 const router = express.Router();
@@ -120,8 +121,9 @@ router.put('/approve-review', approveReviewByAdmin);
 
 // get all reviews 
 router.get('/get-reviews', getAllReviews);
-
+// __________________________________________________________________________________________________
 // option route
+
 
 // create option
 router.post('/create-option', createNewOption);
@@ -149,5 +151,36 @@ router.put('/update-product-option/:product_optionId', updateAOptionLabel);
 
 // delete product option
 router.delete('/delete-product-option/:product_optionId', deleteOptionLabel);
+// __________________________________________________________________________________________
+
+
+// variants routes
+// create option
+router.post('/create-variants', createNewVariant);
+
+// get option
+router.get('/get-variants/:variantId', getSingleVariant);
+
+// get all options
+router.get('/get-all-variants', getAllVariants);
+
+// delete option
+router.delete('/delete-option/:variantId', deleteVariant);
+
+
+// product variants route
+
+// create product option
+router.post('/create-product-variant', addProductVariantValues);
+
+// get Options By ProductId
+router.get('/get-variant', getVariantsByProductId);
+
+// update product option
+router.put('/update-product-variant/:product_variantId', updateAVariantLabel);
+
+// delete product option
+router.delete('/delete-product-variant/:product_variantId', deleteVariantLabel);
+
 
 export default router;

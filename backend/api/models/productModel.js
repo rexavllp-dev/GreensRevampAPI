@@ -90,9 +90,7 @@ export const getAllProducts = async (page, per_page, search, filters) => {
             'categories.*',
             "categories.id as category_id",
             "products_price.*",
-            "products_price.id as products_price_id",
-            "product_gallery.*",
-            "product_gallery.id as product_gallery_id",
+            "products_price.id as products_price_id",     
             "product_inventory.*",
             "product_inventory.id as product_inventory_id",
             "product_seo.*",
@@ -101,8 +99,28 @@ export const getAllProducts = async (page, per_page, search, filters) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
+            db.raw(`
+            jsonb_agg(
+                jsonb_build_object(
+                    'url', product_gallery.url,
+                    'id', product_gallery.id,
+                    'is_baseimage', product_gallery.is_baseimage
+                )
+            ) as product_img
+        `)
+            
         )
-        .distinct('products.id');
+        .distinct('products.id')
+        .groupBy(
+            'products.id',
+            'brands.id',
+            'categories.id',
+            'products_price.id',
+            'product_inventory.id',
+            'product_seo.id',
+            'product_badge.id',
+            'product_category.id',
+        );
 
     if (search) {
         console.log(search)
@@ -125,7 +143,25 @@ export const getAllProducts = async (page, per_page, search, filters) => {
         }
     });
 
-    return query;
+    const totalCountQuery = query.clone().clearSelect().countDistinct('products.id as total');
+    
+    // pagination 
+    if (per_page && page) {
+        const limit = per_page;
+        const offsetValue = (page - 1) * per_page;
+        query.limit(limit)
+            .offset(offsetValue)
+    }
+
+    const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
+    return {
+        products: products,
+        totalCount: totalCountResult[0],
+        totalPage: Math.ceil(totalCountResult[0].total / per_page),
+        per_page: per_page ,
+        page: page
+    }
+
 };
 
 // delete product
@@ -150,6 +186,12 @@ export const getProductGalleryByProductId = async (productId) => {
     const images = db('product_gallery').where({ product_id: productId }).select('*');
     return images;
 };
+
+
+export const deleteProductImageById = async (imageId) => {
+    const deletedImage = await db('product_gallery').where({ id: imageId }).del();
+    return deletedImage;
+}
 
 
 export const getSortedProducts = async (sortBy) => {
