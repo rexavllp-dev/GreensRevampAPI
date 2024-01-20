@@ -38,7 +38,7 @@ export const getProductById = async (productId) => {
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
-        .leftJoin('products_badge', 'products.id', 'product_badge.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .where('products.id', productId)
         .distinct('products.id');
         
@@ -57,7 +57,7 @@ export const getAllProducts = async (page, per_page, search, filters) => {
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
-        .leftJoin('products_badge', 'products.id', 'product_badge.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .select(
             'products.*',
             'brands.*',
@@ -144,6 +144,58 @@ export const getSortedProducts = async (sortBy) => {
     return products;
 
 };
+
+
+// get products by category
+export const getProductsByCategory = async (page, per_page, search, filters) => {
+    let query = db('products')
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .select(
+            'products.*',
+            'brands.*',
+            'categories.*',
+            "products_price.*",
+            "product_gallery.*",
+            "product_inventory.*",
+            "product_seo.*",
+            "product_badge.*",
+            
+            )
+            .distinct('products.id');
+
+    if (search) {
+        console.log(search)
+        query.where("products.prd_name", "ilike", `%${search}%`);
+    }
+
+    // Apply complex filters
+
+    filters.forEach(filter => {
+        console.log("filters", filters);
+        console.log("filter", filter);
+        if (filter.operator === '>') {
+            query.where(filter.column, '>', filter.value);
+        }
+        if (filter.operator === '<') {
+            query.where(filter.column, '<', filter.value);
+        }
+        if (filter.operator === '=') {
+            query.where(filter.column, '=', filter.value);
+        }
+    });
+
+    return query;
+};
+
+
+
 
 // ____________________________________________________________________________________________________________________________________________________________________________
 
