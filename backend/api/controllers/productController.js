@@ -386,7 +386,7 @@ export const getProductsWithSorting = async (req, res) => {
     
 
 
-export const getProductsCategories = async (req, res) => {
+export const getProductsOfCategory = async (req, res) => {
     try {
 
         let page = null;

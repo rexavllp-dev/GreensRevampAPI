@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProductImages, createProduct, deleteProduct, getAllProduct, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
+import { addProductImages, createProduct, deleteProduct, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
@@ -26,6 +26,9 @@ router.delete('/delete-product/:productId', deleteProduct);
 // get all products.
 
 router.get('/get-products', getAllProduct)
+
+// get product by category
+router.get('/get-products-category', getProductsOfCategory);
 
 // __________________________________________________________________________________________________________________________________________________________________________
 // __________________________________________________________________________________________________________________________________________________________________________
