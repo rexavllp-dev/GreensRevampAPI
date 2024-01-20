@@ -32,12 +32,12 @@ export const getProductById = async (productId) => {
 
         )
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
-        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
-        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('products_badge', 'products.id', 'product_badge.product_id')
         .where('products.id', productId)
         .distinct('products.id');
@@ -50,7 +50,7 @@ export const getProductById = async (productId) => {
 
 export const getAllProducts = async (page, per_page, search, filters) => {
     let query = db('products')
-        .join('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
         .leftJoin('products_price', 'products.id', 'products_price.product_id')
