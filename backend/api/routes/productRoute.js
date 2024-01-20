@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProductImages, createProduct, deleteProduct, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
+import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
@@ -69,6 +69,9 @@ router.delete('/delete-price/:priceId', deletePrice);
 
 // upload images
 router.post('/images/:productId', addProductImages);
+
+// delete image
+router.delete('/delete-product-image/:imageId', deleteProductImage);
 
 // sort products
 router.get('/sort-products', getProductsWithSorting);

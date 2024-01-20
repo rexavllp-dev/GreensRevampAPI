@@ -34,3 +34,9 @@ export const deleteABrand = async (brandId) => {
 };
 
 
+export const deleteProductImageById = async (brandId) => {
+    const deletedImage = await db('brands').where({ id: brandId }).del();
+    return deletedImage;
+};
+
+

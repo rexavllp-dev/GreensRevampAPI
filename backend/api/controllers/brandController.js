@@ -162,6 +162,33 @@ export const uploadBrandImages = async (req, res) => {
     }
 };
 
+
+
+// delete brand image
+export const deleteBrandImage = async (req, res) => {
+    const imageId = req.params.imageId;
+    try {
+        const deletedImage = await deleteBrandImageById(imageId);
+
+        res.status(200).json({
+          status:200,
+          success:true,
+          message:"Product image deleted successfully",
+          result:deletedImage
+        });
+    } catch (error) {
+        res.status(500).json({
+          status:500,
+          success:false,
+          message:"Failed to delete product image",
+          error: error
+        });
+    }
+};
+
+
+
+
 // update brands
 export const updateBrand = async (req, res) => {
     try {
