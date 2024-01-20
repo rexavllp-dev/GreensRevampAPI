@@ -25,7 +25,9 @@ export const getProductById = async (productId) => {
         )
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('products_price', 'products.id', 'products_price.product_id')
-        .where('products.id', productId);
+        .where('products.id', productId)
+        .distinct('products.id');
+        
 
     return products;
 };
