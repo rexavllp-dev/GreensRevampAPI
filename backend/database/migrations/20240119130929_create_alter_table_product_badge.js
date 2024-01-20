@@ -4,13 +4,9 @@ export const up = async (knex) => {
         table.increments('id').primary();
         table.integer('product_id').unsigned().references('id').inTable('products');
         table.string('badge_name');
-        
-
-
     });
 
  
-
 };
 
 /**

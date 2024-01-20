@@ -19,12 +19,26 @@ export const updateAProduct = async (productId, updatedData) => {
 // get a product
 export const getProductById = async (productId) => {
     const products = await db('products')
-        .select('products.*',
+        .select(
+            'products.*',
             'product_gallery.*',
             'products_price.*',
+            "product_inventory.*",
+            "categories.*",
+            "products_category.*",
+            "product_seo.*",
+            "brands.*",
+            "product_badge.*",
+
         )
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('products_badge', 'products.id', 'product_badge.product_id')
         .where('products.id', productId)
         .distinct('products.id');
         
@@ -41,12 +55,19 @@ export const getAllProducts = async (page, per_page, search, filters) => {
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
         .leftJoin('products_price', 'products.id', 'products_price.product_id')
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('products_badge', 'products.id', 'product_badge.product_id')
         .select(
             'products.*',
             'brands.*',
             'categories.*',
             "products_price.*",
-            "product_gallery.*"
+            "product_gallery.*",
+            "product_inventory.*",
+            "product_seo.*",
+            "product_badge.*",
+            
             )
             .distinct('products.id');
 

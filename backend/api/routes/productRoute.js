@@ -4,6 +4,7 @@ import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '..
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
+import { createNewOption, deleteOption, getAllOptions, getSingleOption } from '../controllers/optionController.js';
 
 
 const router = express.Router();
@@ -74,14 +75,28 @@ router.delete('/delete-seo/:seoId', deleteSeo);
 
 // inventory routes
 
+// create inventory
 router.post('/create-inventory', createProductInventory);
-
 // update inventory 
-
 router.put('/update-inventory/:productId', updateProductInventory);
 
-// product badege route
 
+// product badge route
 router.post('/create-badge', createProductBadge);
+
+// option route
+
+// create option
+router.post('/create-option', createNewOption);
+
+// get option
+router.get('/get-option/:optionId', getSingleOption);
+
+// get all options
+router.get('/get-all-options', getAllOptions);
+
+// delete option
+router.delete('/delete-option/:optionId', deleteOption);
+
 
 export default router;
