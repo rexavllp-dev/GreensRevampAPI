@@ -248,12 +248,12 @@ export const getSingleProduct = async (req, res) => {
         };
 
 
-        const productUrls = products.map(product => ({
-            id: product.id,
-            product_id: product.id,
-            url: product.url,
-            is_baseimage: product.is_baseimage,
-        }));
+        // const productUrls = products.map(product => ({
+        //     id: product.id,
+        //     product_id: product.id,
+        //     url: product.url,
+        //     is_baseimage: product.is_baseimage,
+        // }));
        
 
         res.status(200).json({
@@ -262,7 +262,7 @@ export const getSingleProduct = async (req, res) => {
             message: 'Product single fetched successfully',
             data: {
                 product : products,
-                productUrls: productUrls
+                // productUrls: productUrls
             }
         });
     } catch (error) {

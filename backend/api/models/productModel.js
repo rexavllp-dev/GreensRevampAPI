@@ -19,39 +19,56 @@ export const updateAProduct = async (productId, updatedData) => {
 // get a product
 export const getProductById = async (productId) => {
     const products = await db('products')
-        .select(
-            'products.*',
-            'brands.*',
-            'brands.id as brand_id',
-            'categories.*',
-            "categories.id as category_id",
-            "products_price.*",
-            "products_price.id as products_price_id",
-            "product_gallery.*",
-            "product_gallery.id as product_gallery_id",
-            "product_inventory.*",
-            "product_inventory.id as product_inventory_id",
-            "product_seo.*",
-            "product_seo.id as product_seo_id",
-            "product_badge.*",
-            "product_badge.id as product_badge_id",
-            "product_category.*",
-            "product_category.id as product_category_id",
+    .select(
+        'products.*',
+        'brands.*',
+        'brands.id as brand_id',
+        'categories.*',
+        'categories.id as category_id',
+        'products_price.*',
+        'products_price.id as products_price_id',
+        'product_inventory.*',
+        'product_inventory.id as product_inventory_id',
+        'product_seo.*',
+        'product_seo.id as product_seo_id',
+        'product_badge.*',
+        'product_badge.id as product_badge_id',
+        'product_category.*',
+        'product_category.id as product_category_id',
+        db.raw(`
+            jsonb_agg(
+                jsonb_build_object(
+                    'url', product_gallery.url,
+                    'id', product_gallery.id,
+                    'is_baseimage', product_gallery.is_baseimage
+                )
+            ) as product_img
+        `)
+    )
+    .from('products')
+    .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+    .leftJoin('product_category', 'products.id', 'product_category.product_id')
+    .leftJoin('categories', 'product_category.category_id', 'categories.id')
+    .leftJoin('products_price', 'products.id', 'products_price.product_id')
+    .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+    .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+    .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+    .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+    .where('products.id', productId)
+    .groupBy(
+        'products.id',
+        'brands.id',
+        'categories.id',
+        'products_price.id',
+        'product_inventory.id',
+        'product_seo.id',
+        'product_badge.id',
+        'product_category.id'
+    )
+    .first();
 
-        )
-        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
-        .leftJoin('product_category', 'products.id', 'product_category.product_id')
-        .leftJoin('categories', 'product_category.category_id', 'categories.id')
-        .leftJoin('products_price', 'products.id', 'products_price.product_id')
-        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
-        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
-        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
-        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        .where('products.id', productId)
-        .distinct('products.id');
-        
+return products;
 
-    return products;
 };
 
 // get all products
@@ -84,8 +101,8 @@ export const getAllProducts = async (page, per_page, search, filters) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
-            )
-            .distinct('products.id');
+        )
+        .distinct('products.id');
 
     if (search) {
         console.log(search)
@@ -173,7 +190,7 @@ export const getProductsByCategory = async (page, per_page, search, filters, cat
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        .where({ 'categories.id': categoryId})
+        .where({ 'categories.id': categoryId })
         .select(
             'products.*',
             'brands.*',
@@ -192,9 +209,9 @@ export const getProductsByCategory = async (page, per_page, search, filters, cat
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
-            
-            )
-            .distinct('products.id');
+
+        )
+        .distinct('products.id');
 
     if (search) {
         console.log(search)
