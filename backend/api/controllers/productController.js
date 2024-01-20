@@ -31,7 +31,7 @@ export const createProduct = async (req, res) => {
         prd_sales_unit,
         prd_return_type,
         prd_brand_id,
-        sku_code,
+        
         
 
     } = req.body;
@@ -70,12 +70,13 @@ export const createProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            sku_code,
+            
             
 
         };
 
         const { error } = schema.validate(validate_data, joiOptions);
+        console.log(error)
         if (error) {
             return res.status(500).json({
                 status: 500,
@@ -100,7 +101,7 @@ export const createProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            sku_code
+            
 
         })
 

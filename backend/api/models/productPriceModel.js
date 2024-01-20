@@ -77,7 +77,7 @@ export const deletePrdPrice = async (priceId) => {
 }
 
 
-// 
+// get price by product id
 
 export const getProductPriceById = async (productId) => {
     const product = await db('products_price')
@@ -94,4 +94,7 @@ export const updatePriceHistory = async (priceData) => {
     const PriceHistory = db('price_history').insert(priceData).returning('*');
     return PriceHistory;
 }
+
+
+
 

@@ -4,6 +4,10 @@ import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '..
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
+import { createRelatedProduct } from '../controllers/relatedProductController.js';
+import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
+import { getPublicProducts } from '../models/publicProductModel.js';
+import { getAllProductPublic } from '../controllers/publicProductCrotroller.js';
 
 
 const router = express.Router();
@@ -25,6 +29,10 @@ router.delete('/delete-product/:productId', deleteProduct);
 // get all products.
 
 router.get('/get-products', getAllProduct)
+
+// products public routes 
+
+router.get('/public/getall-products',getAllProductPublic); 
 
 // __________________________________________________________________________________________________________________________________________________________________________
 // __________________________________________________________________________________________________________________________________________________________________________
@@ -83,5 +91,23 @@ router.put('/update-inventory/:productId', updateProductInventory);
 // product badege route
 
 router.post('/create-badge', createProductBadge);
+
+// related products
+
+router.post('/create-related-product/:product_id', createRelatedProduct);
+
+
+// reviews routes
+
+router.post('/create-review', addProductReview);
+
+// approve review by admin 
+router.put('/approve-review', approveReviewByAdmin);
+
+
+// get all reviews 
+router.get('/get-reviews', getAllReviews);
+
+
 
 export default router;

@@ -107,6 +107,8 @@ export const updateProductInventory = async (req, res) => {
     try {
 
         const product = await getProductInventorybyId(productId);
+
+
     
         if (!product) {
           return res.status(404).json({
@@ -115,11 +117,14 @@ export const updateProductInventory = async (req, res) => {
             message: 'Product Inventory not found',
           });
         };
+
+        
         
      
     
         //  update the inventory
         await updateInventory(productId,inventoryData);
+
     
         
     
