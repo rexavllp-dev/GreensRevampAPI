@@ -5,6 +5,7 @@ import {
     blockUserPermanently,
     checkUserExist,
     checkUserExistWithMobile,
+    checkUserExistWithMobileAndCountryCode,
     createUser,
     deleteAUser,
     getAllUsersData,
@@ -15,6 +16,7 @@ import {
     refreshTokenModel,
     updateEmail,
     updateIncorrectAttempts,
+    updateLastResendTime,
     updateMobile,
     updateOtp,
     updateRegisterOtp,
@@ -26,7 +28,7 @@ import {
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 import jwt from 'jsonwebtoken';
-import { sendBlockVerification, sendVerificationEmail } from '../utils/emailer.js';
+import { sendBlockVerification, sendUserRegistrationEmail, sendVerificationEmail } from '../utils/emailer.js';
 import sendVerificationCode from '../utils/mobileOtp.js';
 import validateAuth from '../middleware/validateAuth.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
@@ -80,6 +82,7 @@ export const registerUser = async (req, res) => {
         usr_newsletter_accepted,
         email_verified,
         mobile_verified,
+
 
 
 
@@ -176,7 +179,7 @@ export const registerUser = async (req, res) => {
 
 
         // jwt user token 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        const token = jwt.sign({ userId, usr_email, usr_firstname, usr_company }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
 
         // Send email verification link
         await sendVerificationEmail(usr_email, usr_firstname, token, 'individual');
@@ -231,9 +234,22 @@ export const loginWithPassword = async (req, res) => {
 
         };
 
+
+        // Check if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
+            });
+        };
+
+
+
+
         const userId = existingUser?.id;
         const usr_firstname = existingUser.usr_firstname
-    
+
 
         // Check if the user is blocked
         if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
@@ -243,38 +259,6 @@ export const loginWithPassword = async (req, res) => {
                 message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
             });
         };
-
-
-        // Check if the user's company is verified
-        const userCompany = existingUser.usr_company;
-        let userType;
-        if (!userCompany) {
-            userType = "individual";
-        } else {
-            userType = "company"
-        }
-
-        if (!userCompany === null) {
-            const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
-
-            if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
-                return res.status(403).json({
-                    status: 403,
-                    success: false,
-                    message: 'your account activation is under process we will update once your account is active.',
-                });
-            }
-
-        };
-
-        // Check if the user is blocked by the admin
-        if (!existingUser.is_status) {
-            return res.status(403).json({
-                status: 403,
-                success: false,
-                message: "User is blocked.Please contact admin for assistance."
-            });
-        }
 
 
         // Check if password is correct
@@ -298,7 +282,7 @@ export const loginWithPassword = async (req, res) => {
                 // Block the user permanently
                 await blockUserPermanently(existingUser?.id);
 
-                await sendBlockVerification(usr_email, usr_firstname)
+                await sendBlockVerification(existingUser.usr_email, usr_firstname)
 
                 return res.status(403).json({
                     status: 403,
@@ -320,8 +304,16 @@ export const loginWithPassword = async (req, res) => {
         // Reset the incorrect attempts counter upon successful login
         await updateIncorrectAttempts(existingUser.id, 0);
 
+        // Check if the user's company is verified
+        const userCompany = existingUser.usr_company;
+        let userType;
+        if (!userCompany) {
+            userType = "individual";
+        } else {
+            userType = "company"
+        }
 
-        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        const token = jwt.sign({ userId, usr_email, usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "24h" });
 
         // Check if both email and mobile are verified
         if (!existingUser.email_verified || !existingUser.mobile_verified) {
@@ -336,7 +328,7 @@ export const loginWithPassword = async (req, res) => {
                     success: false,
                     message: "Email and mobile must be verified to login, Please complete the email verification",
                     from: userType,
-                    unverified:"email",
+                    unverified: "email",
                     token: token
                 });
             }
@@ -359,13 +351,32 @@ export const loginWithPassword = async (req, res) => {
                     success: false,
                     message: "Otp send successfully, Check your mobile for verification",
                     from: userType,
-                    unverified:"mobile",
+                    unverified: "mobile",
                     token: token,
 
                 });
             };
-        }
+        };
 
+
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
+                return res.status(403).json({
+                    status: 403,
+                    success: true,
+                    message: 'Please wait for company verification. Your account is pending for approval.'
+                });
+            } else if (existingUser.usr_approval_id === 3) {
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: 'Your company is rejected. Contact admin for further assistance.'
+                });
+            }
+        };
 
         //create token
 
@@ -470,13 +481,8 @@ export const loginWithOtp = async (req, res) => {
 
     try {
 
-        //check user exist 
-
+        //check user exist with mobile number
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
-        ;
-
-
-
 
         if (!existingUser) {
 
@@ -484,6 +490,16 @@ export const loginWithOtp = async (req, res) => {
                 status: 404,
                 success: false,
                 message: "Mobile number not found , please register your mobile number!"
+            });
+        }
+
+
+        // Check attempt  if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
             });
         }
 
@@ -500,30 +516,28 @@ export const loginWithOtp = async (req, res) => {
             userType = "company"
         }
 
-        if (!userCompany === null) {
-            const companyVerificationStatus = await iSCompanyStatusVerified(existingUser.usr_company);
+        console.log(userCompany !== null);
 
-            if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+
+        // Check if the user's company is verified
+        const companyVerificationStatus = await iSCompanyStatusVerified(userCompany);
+
+        if (!companyVerificationStatus || !companyVerificationStatus.verification_status) {
+            if (existingUser.usr_approval_id === 1) {
                 return res.status(403).json({
                     status: 403,
                     success: false,
-                    message: 'your account activation is under process we will update once your account is active.',
+                    message: 'Please wait for company verification. Your account is pending for approval.'
+                });
+            } else if (existingUser.usr_approval_id === 3) {
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: 'Your company is rejected. Contact admin for further assistance.'
                 });
             }
-
-        };
-
-
-        // Check if the user is blocked by the admin
-        if (!existingUser.is_status) {
-            return res.status(403).json({
-                status: 403,
-                success: false,
-                message: "User is blocked.Please contact admin for assistance."
-            });
         }
 
-    
 
         // token
         //create token
@@ -580,7 +594,6 @@ export const loginWithOtp = async (req, res) => {
 };
 
 
-
 // #region email verification 
 
 export const verifyEmail = async (req, res) => {
@@ -593,8 +606,20 @@ export const verifyEmail = async (req, res) => {
         const userId = decoded.userId;
         // console.log(decoded);
 
+        const existingUser = await getUserById(userId)
+
+        if (existingUser.email_verified) {
+            return res.status(409).json({
+                status: 409,
+                success: false,
+                message: "User already verified"
+            });
+        }
+
+
         // Update user verification status
         const email_verified = await updateUserVerificationStatus(userId, true);
+
         // generate otp
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
@@ -699,11 +724,126 @@ export const resendOtp = async (req, res) => {
             });
         }
 
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
+
+        // Check if the user is blocked by the admin
+        if (userInfo.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple incorrect attempts. Contact admin for assistance"
+            });
+        };
+
+
+        // Check if enough time has passed since the last resend attempt
+        const currentTime = new Date();
+        const lastResendTime = userInfo.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
+        const timeDifference = currentTime - lastResendTime;
+        const resendCooldown = 60 * 1000; // 1 minute cool down
+
+        if (timeDifference < resendCooldown) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
+            });
+        };
+
+        await updateLastResendTime(userInfo.id, currentTime);
+
+
+
         await updateRegisterOtp(userInfo.id, otp, otpExpiry);
         const country = await getCountryDialCode(userInfo.id)
         const countryDialCode = country?.country_dial_code;
 
         await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Otp send successfully"
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to send otp"
+        });
+    }
+};
+
+
+export const resendLoginOtp = async (req, res) => {
+    const { usr_mobile_number } = req.body;
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+    try {
+
+
+        const existingUser = await getUserByPhoneNumber(usr_mobile_number);
+
+        if (!existingUser) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "User not found"
+            });
+        };
+
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
+
+        // Check if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple attempts. Contact admin for assistance"
+            });
+        };
+
+
+        // Check if enough time has passed since the last resend attempt
+        const currentTime = new Date();
+        const lastResendTime = existingUser.last_resend_time || new Date(0); // Default to 1970-01-01 if last_resend_time is not set
+        const timeDifference = currentTime - lastResendTime;
+        const resendCooldown = 60 * 1000; // 1 minute cooldown
+
+        if (timeDifference < resendCooldown) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: `Please wait for ${resendCooldown / 1000} seconds before requesting another OTP.`
+            });
+        };
+
+        await updateLastResendTime(existingUser.id, currentTime);
+
+
+        await updateRegisterOtp(existingUser.id, otp, otpExpiry);
+        const country = await getCountryDialCode(existingUser.id)
+        const countryDialCode = country?.country_dial_code;
+
+        await sendVerificationCode(existingUser.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
 
         res.status(200).json({
@@ -731,57 +871,111 @@ export const verifyOtp = async (req, res) => {
 
     try {
         const userInfo = await validateAuth(token);
+
         // OTP valid for 5 minutes
         // Check if OTP is valid and not expired
-        const user = await getUserById(userInfo.userId);
-        if (!user) {
+        const existingUser = await getUserById(userInfo.userId);
+        if (!existingUser) {
             return res.status(401).json({
                 status: 401,
                 success: false,
-                message: "User not found"
+                message: "User not found, please login again"
             });
-        }
+        };
+
+        // Check if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple incorrect attempts. Contact admin for assistance"
+            });
+        };
+
+        const userId = existingUser?.id;
+        const usr_firstname = existingUser.usr_firstname
+
+
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
+
 
         // console.log(user.otp_expiry);
 
-        if (!user || user.otp !== otp || new Date() > new Date(user.otp_expiry)) {
-            console.log("otp", otp);
-            console.log(user.otp);
-            console.log(user.otp_expiry);
-            console.log(user.id);
+        if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
+
+            const attempts = (existingUser.login_attempts || 0) + 1;
+            const failedCount = existingUser.failed_count
+
+            if (attempts > 3 && failedCount === 0) {
+                // Block the user
+                await blockUser(existingUser.id);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
+                });
+            } else if (attempts > 3 && failedCount === 1) {
+                // Block the user permanently
+                await blockUserPermanently(existingUser?.id);
+
+                await sendBlockVerification(existingUser.usr_email, usr_firstname)
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked temporary due to repeated incorrect attempts. Contact admin for assistance.`
+                });
+            };
+
+            // Update the incorrect attempts counter in the database
+            await updateIncorrectAttempts(existingUser.id, attempts);
 
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: 'Invalid OTP or OTP expired'
             });
-        }
+        };
 
-        if (user && user.otp === otp) {
+        // Reset the incorrect attempts counter upon successful login
+        await updateIncorrectAttempts(existingUser.id, 0);
+
+        if (existingUser && existingUser.otp === otp) {
             // Clear OTP after successful verification and update
-            await updateOtp(user.id, true);
+            await updateOtp(existingUser.id, true);
 
         }
 
         if (from === 'individual') {
-            const accessToken = generateAccessToken(user);
-            const refreshToken = generateRefreshToken(user);
+            const accessToken = generateAccessToken(existingUser);
+            const refreshToken = generateRefreshToken(existingUser);
+
+            await sendUserRegistrationEmail(existingUser.usr_email, existingUser.usr_firstname);
             return res.status(200).json({
                 status: 200,
                 success: true,
                 message: "OTP verified successfully",
                 result: {
                     user: {
-                        id: user.id,
-                        usr_email: user.usr_email,
-                        usr_firstname: user.usr_firstname,
-                        usr_lastname: user.usr_lastname,
+                        id: existingUser.id,
+                        usr_email: existingUser.usr_email,
+                        usr_firstname: existingUser.usr_firstname,
+                        usr_lastname: existingUser.usr_lastname,
                     },
                     accessToken,
                     refreshToken
                 }
             });
         } else {
+            await sendUserRegistrationEmail(existingUser.usr_email, existingUser.usr_firstname);
             // Perform additional user registration steps if needed
             res.status(200).json({
                 status: 200,
@@ -803,23 +997,83 @@ export const verifyLoginOtp = async (req, res) => {
     const { usr_mobile_number, otp } = req.body;
 
     try {
-        
+
         // Check if OTP is valid and not expired
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
 
+        // Check if the user is blocked
+        if (existingUser.blocked_until && existingUser.blocked_until > new Date()) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: `User is blocked until ${existingUser.blocked_until}. Please try again later.`
+            });
+        };
 
-          // Check if the user's company is verified
-          const userCompany = existingUser.usr_company;
-          let userType;
-          if (!userCompany) {
-              userType = "individual";
-          } else {
-              userType = "company"
-          };
+        // Check if the user is blocked by the admin
+        if (existingUser.attempt_blocked) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Your account has been temporarily suspended due to multiple incorrect password attempts. Contact admin for assistance"
+            });
+        };
 
-          const token = jwt.sign({ userId: existingUser.id, usr_email: existingUser.usr_email, usr_firstname: existingUser.usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
-          // Check if both email and mobile are verified
-          if (!existingUser.email_verified || !existingUser.mobile_verified) {
+
+
+        if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
+
+            const attempts = (existingUser.login_attempts || 0) + 1;
+            const failedCount = existingUser.failed_count;
+
+            if (attempts > 3 && failedCount === 0) {
+                // Block the user
+                await blockUser(existingUser.id);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked for 2 minutes due to too many incorrect attempts. Please try again later.`
+                });
+            } else if (attempts > 3 && failedCount === 1) {
+                // Block the user permanently
+                await blockUserPermanently(existingUser?.id);
+
+                await sendBlockVerification(existingUser.usr_email, existingUser.usr_firstname);
+
+                return res.status(403).json({
+                    status: 403,
+                    success: false,
+                    message: `User is blocked temporary due to repeated incorrect attempts. Contact admin for assistance.`
+                });
+            };
+
+            // Update the incorrect attempts counter in the database
+            await updateIncorrectAttempts(existingUser.id, attempts);
+
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'Invalid OTP or OTP expired'
+            });
+        };
+
+        // Reset the incorrect attempts counter upon successful login
+        await updateIncorrectAttempts(existingUser.id, 0);
+
+
+        // Check if the user's company is verified
+        const userCompany = existingUser?.usr_company;
+        let userType;
+        if (!userCompany) {
+            userType = "individual";
+        } else {
+            userType = "company"
+        };
+
+        const token = jwt.sign({ userId: existingUser.id, usr_email: existingUser.usr_email, usr_firstname: existingUser.usr_firstname, userCompany }, process.env.EMAIL_SECRET, { expiresIn: "600s" });
+        // Check if both email and mobile are verified
+        if (!existingUser.email_verified || !existingUser.mobile_verified) {
 
             if (!existingUser.email_verified) {
                 // jwt user token 
@@ -831,7 +1085,7 @@ export const verifyLoginOtp = async (req, res) => {
                     success: false,
                     message: "Email and mobile must be verified to login, Please complete the email verification",
                     from: userType,
-                    unverified:"email",
+                    unverified: "email",
                     token: token
                 });
             }
@@ -854,24 +1108,16 @@ export const verifyLoginOtp = async (req, res) => {
                     success: false,
                     message: "Otp send successfully, Check your mobile for verification",
                     from: userType,
-                    unverified:"mobile",
+                    unverified: "mobile",
                     token: token,
 
                 });
             };
         };
-        
-        if (!existingUser || existingUser.otp !== otp || new Date() > new Date(existingUser.otp_expiry)) {
-           
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: 'Invalid OTP or OTP expired'
-            });
-        }
+
 
         if (existingUser && existingUser.otp === otp) {
-            
+
             // Clear OTP after successful verification
             await updateOtp(existingUser.id);
 
@@ -894,9 +1140,9 @@ export const verifyLoginOtp = async (req, res) => {
                 }
             });
         }
-    } catch(error) {
+    } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: 'internal server error please try again' });
+        return res.status(500).json({ message: 'Something went wrong, please try again' });
     }
 
 }
@@ -1039,14 +1285,10 @@ export const updateMobileUsingToken = async (req, res) => {
     console.log(token);
 
 
-
-
     try {
-
-
         const user = await validateAuth(token);
         const userInfo = await getUserById(user.userId);
-        const existingUser = await checkUserExistWithMobile(usr_mobile_number);
+        const existingUser = await checkUserExistWithMobileAndCountryCode(usr_mobile_country_code, usr_mobile_number);
         console.log(userInfo);
 
 
@@ -1054,7 +1296,7 @@ export const updateMobileUsingToken = async (req, res) => {
             return res.status(409).json({
                 status: 409,
                 success: false,
-                message: "User already exist",
+                message: "User already exists with the mobile number and country code",
 
             });
         }
@@ -1068,26 +1310,64 @@ export const updateMobileUsingToken = async (req, res) => {
             });
         }
 
-        await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+         // Check if the user is changing the country code
+         if (userInfo.usr_mobile_country_code !== usr_mobile_country_code) {
+            // Update the mobile number and country code
+            await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
 
-        await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+            // Update the OTP and send a new verification code
+            await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+            const country = await getCountryDialCode(userInfo.id)
+            const countryDialCode = country?.country_dial_code;
 
+            await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
-        const country = await getCountryDialCode(userInfo.id)
-        const countryDialCode = country?.country_dial_code;
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                message: "Mobile number and country code updated successfully, verify your OTP",
+            });
+        } else {
+            // User is not changing the country code, only update the mobile number
+            await updateMobile(userInfo.id, null, usr_mobile_number);
 
-
-        await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Mobile number updated successfully, verify your otp"
-        });
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                message: "Mobile number updated successfully, verify your OTP",
+            });
+        }
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to update mobile' });
     }
-}
+};
+
+//         // Only update the country code if it has changed
+//         if (userInfo.usr_mobile_country_code !== usr_mobile_country_code) {
+//             await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+//         }
+
+//         // await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+
+//         await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+
+
+//         const country = await getCountryDialCode(userInfo.id)
+//         const countryDialCode = country?.country_dial_code;
+
+
+//         await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
+//         res.status(200).json({
+//             status: 200,
+//             success: true,
+//             message: "Mobile number updated successfully, verify your otp"
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ success: false, message: 'Failed to update mobile' });
+//     }
+// }
 
 
 // update using details 

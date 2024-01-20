@@ -10,6 +10,7 @@ import {
     refreshAccessToken,
     registerUser,
     resendEmail,
+    resendLoginOtp,
     resendOtp,
     updateEmailUsingToken,
     updateMobileUsingToken,
@@ -54,6 +55,8 @@ router.post('/verify-login-otp', verifyLoginOtp);
 router.get('/resendemail/:token', resendEmail);
 // for mobile resend
 router.get('/resendotp/:token', resendOtp);
+// login rend otp
+router.post('/resend-login-otp',resendLoginOtp);
 
 // forgot password
 router.post('/forgot-password', forgotPassword);

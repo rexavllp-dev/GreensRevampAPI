@@ -5,29 +5,35 @@ import userRoute from './api/routes/userRoute.js';
 import companyRoute from './api/routes/companyRoute.js';
 import countryRoute from './api/routes/countryRoute.js';
 import adminRoute from './api/routes/adminRoute.js';
+import productRoute from './api/routes/productRoute.js';
+import brandRoute from './api/routes/brandRoute.js';
+import categoryRoutes from './api/routes/categoryRoute.js';
 import session from 'express-session';
 import passport from 'passport';
 import './api/utils/passport-config.js';
 import fileUpload from 'express-fileupload';
 import axios from 'axios';
-import createSocketServer from './api/utils/socketIo.js';
-import http from 'http';
+import morgan from 'morgan';
+// import createSocketServer from './api/utils/socketIo.js';
+// import http from 'http';
 
 
 
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app); // Use the createSocketIO function
+// const server = http.createServer(app); // Use the createSocketIO function
 
-const io = createSocketServer(server);
-app.set('socketio', io);
+// const io = createSocketServer(server);
+// app.set('socketio', io);
 
 const PORT = 5000;
 const corsOptions = {
   credentials: true,
   origin: true,
 };
+
+app.use(morgan('combined'))
 
 // set up session
 app.use(
@@ -47,6 +53,7 @@ app.use(passport.session());
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use('/public', express.static('public'));
 
@@ -54,6 +61,9 @@ app.use('/api/v1/users', userRoute);
 app.use('/api/v1/company', companyRoute);
 app.use('/api/v1/country', countryRoute);
 app.use('/api/v1/admin', adminRoute);
+app.use('/api/v1/products', productRoute);
+app.use('/api/v1/brands', brandRoute);
+app.use('/api/v1/categories', categoryRoutes);
 
 
 app.get('/', (req, res) => {

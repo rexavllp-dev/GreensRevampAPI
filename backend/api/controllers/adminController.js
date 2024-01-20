@@ -1,5 +1,5 @@
 import { joiOptions } from "../helpers/joiOptions.js";
-import { fetchSingleCompany, isActive, isNotActive, notverifyCompany, updateUserVerificationByAdmin, verifyCompany } from "../models/adminModel.js";
+import { fetchSingleCompany, isActive, isNotActive,  updateCompanyStatus, updateUserVerificationByAdmin } from "../models/adminModel.js";
 import { checkUserExist, createUser } from "../models/userModel.js";
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
@@ -184,12 +184,10 @@ export const isNotActiveByAdmin = async (req, res) => {
 
 export const approveCompanyByAdmin = async (req, res) => {
     const { companyId } = req.params;
-  
-   
     try {
         const companyData = await fetchSingleCompany(companyId);
         // console.log(companyData);
-        const companyStatus = await verifyCompany(companyId);
+         await updateCompanyStatus({companyId, approvalId: 2, verificationStatus: true});
         const userId = companyData?.id;
         // console.log(companyData.id);
         console.log( companyData.usr_email, companyData.usr_firstname );
@@ -203,7 +201,7 @@ export const approveCompanyByAdmin = async (req, res) => {
             status: 200,
             success: true,
             message: "Company approved successfully",
-            result: companyStatus,
+           
         });
 
     } catch (error) {
@@ -225,7 +223,7 @@ export const rejectCompanyByAdmin = async (req, res) => {
     try {
         const companyData = await fetchSingleCompany(companyId);
         // console.log(companyData);
-        const companyStatus = await notverifyCompany(companyId);
+         await updateCompanyStatus({ companyId, approvalId: 3, verificationStatus: false });
         const userId = companyData?.id;
         await isNotActive(userId)
 
@@ -235,7 +233,7 @@ export const rejectCompanyByAdmin = async (req, res) => {
             status: 200,
             success: true,
             message: "Company rejected successfully",
-            result: companyStatus,
+            
         });
 
     } catch (error) {
