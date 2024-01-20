@@ -69,7 +69,10 @@ export const createProduct = async (req, res) => {
             prd_status,
             prd_sales_unit,
             prd_return_type,
-            prd_brand_id
+            prd_brand_id,
+            sku_code,
+            
+
         };
 
         const { error } = schema.validate(validate_data, joiOptions);
@@ -140,6 +143,7 @@ export const updateProduct = async (req, res) => {
             prd_brand_id,
             prd_price,
 
+            
         } = req.body;
 
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
@@ -157,7 +161,7 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            prd_price,
+            
         });
 
         res.status(200).json({

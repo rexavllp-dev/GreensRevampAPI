@@ -54,55 +54,20 @@ export const updatePrice = async (req, res) => {
       });
     };
     
-    const calculateSpecialPrice = () => {
-      console.log("product", product);
-      const specialPriceType = product.special_price_type;
-      console.log(specialPriceType)
-      const specialPriceValue = product.special_price;
-      console.log(specialPriceType, specialPriceValue);
-
-      if (specialPriceType === 'percentage') {
-        const percentageDiscount = (specialPriceValue / 100) * product.product_price;
-        return product.product_price - percentageDiscount;
-      } else if (specialPriceType === 'fixed') {
-        return product.product_price - specialPriceValue; 
-      } else {
-        // No special price or invalid type, return the current price
-        return product.product_price;
-      }
-    }
-
-    const currentPrice = product.product_price;
-    const specialPrice = calculateSpecialPrice();
-
-    const specialPriceType = product.special_price_type
-    console.log(specialPriceType);
-    const specialPriceStart = product.special_price_start;
-    const specialPriceEnd = product.special_price_end;
-    const currentDate = new Date();
-
-    if (specialPrice && specialPriceStart <= currentDate && currentDate <= specialPriceEnd) {
-      // Apply the special price
-      await updatePrdPrice(productId , priceData,{ product_price: specialPrice });
-    } else {
-      // Revert to the regular price
-      await updatePrdPrice(productId,priceData,{ product_price: currentPrice });
-    }
-
-    const specialPriceValue = product.special_price;
+ 
 
      // Apply the special price
-    await updatePrdPrice(productId,priceData, { product_price: specialPrice });
+    await updatePrdPrice(productId,priceData);
 
     //update the price history
 
-    await updatePriceHistory(priceData,{
+    await updatePriceHistory({
       product_price_id: product.id,
-      product_price: currentPrice,
-      special_price: specialPriceValue,
-      special_price_type: specialPriceType,
-      special_price_start: specialPriceStart,
-      special_price_end: specialPriceEnd,
+      product_price: product.product_price,
+      special_price: product.special_price, 
+      special_price_type: product.special_price_type,
+      special_price_start: product.special_price_start,
+      special_price_end: product.special_price_end,
       user_id: req?.user?.id
     });
 
@@ -110,7 +75,15 @@ export const updatePrice = async (req, res) => {
       status: 201,
       success: true,
       message: "update successfully",
-      result: { product_price: specialPrice, special_price_type: specialPriceType }
+      result: { 
+        product_price_id: product.id,
+        product_price: product.product_price,
+        special_price: product.special_price, 
+        special_price_type: product.special_price_type,
+        special_price_start: product.special_price_start,
+        special_price_end: product.special_price_end,
+        user_id: req?.user?.id
+      },
     });
   } catch (error) {
     console.log(error);
@@ -127,12 +100,15 @@ export const updatePrice = async (req, res) => {
 // get price
 export const getPrice = async (req, res) => {
   const { priceId } = req.params;
+  console.log(priceId)
   try {
     const price = await getPrdPrice(priceId);
+    console.log(price)
     if (!price) {
       res.status(404).json({ error: 'Price not found' });
       return;
     };
+
     res.status(201).json({
       status: 201,
       success: true,
@@ -171,7 +147,7 @@ export const getAllPrice = async (req, res) => {
   }
 }
 
-
+ 
 // delete price
 
 export const deletePrice = async (req, res) => {

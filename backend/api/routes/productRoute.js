@@ -2,6 +2,8 @@ import express from 'express';
 import { addProductImages, createProduct, deleteProduct, getAllProduct, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
+import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
+import { createProductBadge } from '../controllers/badgeController.js';
 
 
 const router = express.Router();
@@ -68,5 +70,18 @@ router.get('/getall-seo', getAllSeo);
 router.delete('/delete-seo/:seoId', deleteSeo);
 
 
+//_____________________________________________________________________________________________________________________________________________________________________________
+
+// inventory routes
+
+router.post('/create-inventory', createProductInventory);
+
+// update inventory 
+
+router.put('/update-inventory/:productId', updateProductInventory);
+
+// product badege route
+
+router.post('/create-badge', createProductBadge);
 
 export default router;
