@@ -7,23 +7,6 @@ export const createProductOption = async (optionData) => {
 };
 
 
-export const getOptionLabel = async (optionId) => {
-    
-    const option = await db('product_options')
-        .leftJoin('options', 'product_options.option_id', 'options.id')
-        .select(
-            'product_options.*',
-            'product_options.id as product_option_id',
-            'options.*',
-            'options.id as option_id',
-        )
-        .where({
-            "options.id": optionId,
-           
-        });
-    return option;
-};
-
 // update option label
 export const updateOptionLabel = async (product_optionId, option_label) => {
     const updatedOption = await db('product_options')
@@ -42,22 +25,23 @@ export const deleteAOptionLabel = async (product_optionId) => {
 }
 
 
-export const getOptionsByProductId = async (productId) => {
-    const options = await db('product_options')
-        .leftJoin('options', 'product_options.option_id', 'options.id')
-        .where({
-            'product_options.product_id': productId
-        })
-        .select(
-        
-            'options.*',
+
+
+export const getOptionLabel = async (optionId) => {
     
+    const option = await db('product_options')
+        .leftJoin('options', 'product_options.option_id', 'options.id')
+        .select(
+            'product_options.*',
+            'product_options.id as product_option_id',
+            'options.*',
+            'options.id as option_id',
         )
-
-    return options
+        .where({
+            "options.id": optionId,
+           
+        });
+    return option;
 };
-
-
-
 
 

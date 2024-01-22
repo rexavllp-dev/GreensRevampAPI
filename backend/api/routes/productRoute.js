@@ -7,11 +7,12 @@ import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
-import { createNewOption, deleteOption, getAllOptions, getSingleOption } from '../controllers/optionController.js';
-import { addProductOptionValues, deleteOptionLabel, getOptionsByProductId, updateAOptionLabel,  } from '../controllers/productOptionController.js';
+import { createNewOption, deleteOption, getOptionsByProductId } from '../controllers/optionController.js';
+import { addProductOptionValues, deleteOptionLabel, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createNewVariant, deleteVariant, getAllVariants, getSingleVariant } from '../controllers/variantController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsByProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
+
 
 
 const router = express.Router();
@@ -132,11 +133,10 @@ router.get('/get-reviews', getAllReviews);
 // create option
 router.post('/create-option', createNewOption);
 
-// get option
-router.get('/get-option/:optionId', getSingleOption);
 
-// get all options
-router.get('/get-all-options', getAllOptions);
+
+// get option
+router.get('/get-options/:productId', getOptionsByProductId);
 
 // delete option
 router.delete('/delete-option/:optionId', deleteOption);
@@ -148,7 +148,7 @@ router.delete('/delete-option/:optionId', deleteOption);
 router.post('/create-product-option', addProductOptionValues);
 
 // get Options By ProductId
-router.get('/get-options', getOptionsByProductId);
+
 
 // update product option
 router.put('/update-product-option/:product_optionId', updateAOptionLabel);

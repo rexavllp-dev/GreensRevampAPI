@@ -1,4 +1,4 @@
-import { createProductOption, deleteAOptionLabel, getOptionLabel, updateOptionLabel } from "../models/productOptionModel.js";
+import { createProductOption, deleteAOptionLabel, updateOptionLabel } from "../models/productOptionModel.js";
 
 
 export const addProductOptionValues = async (req, res) => {
@@ -32,28 +32,28 @@ export const addProductOptionValues = async (req, res) => {
 
 
 // get option label by product id
-export const getOptionsByProductId = async (req, res) => {
-    const { optionId, productId } = req.query;
-    console.log(optionId, productId);
-    try {
-        const options = await getOptionLabel(optionId, productId);
-        console.log(options);
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Fetched option successfully",
-            result: options
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to fetch option",
-            error: error
-        });
-    }
-};
+// export const getOptionsByProductId = async (req, res) => {
+//     const  productId = req.params;
+   
+//     try {
+//         const options = await getOptionsWithProductId(productId);
+//         console.log(options);
+//         res.status(200).json({
+//             status: 200,
+//             success: true,
+//             message: "Fetched option successfully",
+//             result: options
+//         });
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({
+//             status: 500,
+//             success: false,
+//             message: "Failed to fetch option",
+//             error: error
+//         });
+//     }
+// };
 
 
 //  updated option
