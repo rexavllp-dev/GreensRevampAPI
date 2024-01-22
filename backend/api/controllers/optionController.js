@@ -98,6 +98,13 @@ export const deleteOption = async (req, res) => {
   const optionId = req.params.optionId;
   try {
     const deleted = await deleteAOption(optionId);
+    if(!deleted) {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: "Option not found"
+      });
+    }
 
     res.status(200).json({
       status: 200,
