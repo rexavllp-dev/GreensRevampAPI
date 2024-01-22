@@ -7,9 +7,13 @@ export const up = async(knex) => {
         table.increments('id').primary();
         table.integer('user_id').unsigned().references('id').inTable('users');
         table.integer('product_id').unsigned().references('id').inTable('products');
-        table.string('review',10000);
-        table.float('rating');
-        table.boolean('is_approved').defaultTo(false);
+        table.string('sku');
+        table.integer('previous_stock');
+        table.integer('qty');
+        table.integer('remaining_stock');
+        table.string('order_id');
+        table.string('action');
+        table.string('comment');
         table.dateTime('created_at').defaultTo(knex.fn.now());
         table.dateTime('updated_at').defaultTo(knex.fn.now());
     });
