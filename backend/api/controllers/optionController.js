@@ -1,4 +1,4 @@
-import { createOption, deleteAOption,  getOptions, getOptionsWithProductId } from "../models/optionModel.js";
+import { createOption, deleteAOption, getOptionsWithProductId } from "../models/optionModel.js";
 import { createProductOption } from "../models/productOptionModel.js";
 
 

@@ -27,20 +27,24 @@ export const deleteAOptionLabel = async (product_optionId) => {
 
 
 
-export const getOptionLabel = async (optionId) => {
+export const getOptionValuesByOptionId = async (optionId) => {
     
     const option = await db('product_options')
         .leftJoin('options', 'product_options.option_id', 'options.id')
+        .leftJoin('products', 'product_options.product_id', 'products.id')
         .select(
             'product_options.*',
-            'product_options.id as product_option_id',
             'options.*',
             'options.id as option_id',
+            'products.*',
+            'products.id as product_id',
+
         )
         .where({
             "options.id": optionId,
-           
+
         });
+        console.log(optionId);
     return option;
 };
 

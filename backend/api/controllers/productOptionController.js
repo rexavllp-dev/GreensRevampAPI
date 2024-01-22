@@ -1,4 +1,4 @@
-import { createProductOption, deleteAOptionLabel, updateOptionLabel } from "../models/productOptionModel.js";
+import { createProductOption, deleteAOptionLabel, getOptionValuesByOptionId, updateOptionLabel } from "../models/productOptionModel.js";
 
 
 export const addProductOptionValues = async (req, res) => {
@@ -31,30 +31,6 @@ export const addProductOptionValues = async (req, res) => {
 };
 
 
-// get option label by product id
-// export const getOptionsByProductId = async (req, res) => {
-//     const  productId = req.params;
-   
-//     try {
-//         const options = await getOptionsWithProductId(productId);
-//         console.log(options);
-//         res.status(200).json({
-//             status: 200,
-//             success: true,
-//             message: "Fetched option successfully",
-//             result: options
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({
-//             status: 500,
-//             success: false,
-//             message: "Failed to fetch option",
-//             error: error
-//         });
-//     }
-// };
-
 
 //  updated option
 export const updateAOptionLabel = async (req, res) => {
@@ -86,7 +62,33 @@ export const updateAOptionLabel = async (req, res) => {
 };
 
 
-//  updated option
+// get option values by option id
+export const getOptionsValues = async (req, res) => {
+    const optionId = req.params.optionId;
+    console.log(optionId);
+    try {
+        const option = await getOptionValuesByOptionId(optionId);
+        console.log(option);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Option values retrieved successfully",
+            result: option
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to get option values",
+            error: error
+        });
+    }
+};
+
+
+//  delete option
 export const deleteOptionLabel = async (req, res) => {
     const product_optionId = req.params.product_optionId;
     try {

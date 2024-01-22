@@ -8,7 +8,7 @@ import { createRelatedProduct } from '../controllers/relatedProductController.js
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getOptionsByProductId } from '../controllers/optionController.js';
-import { addProductOptionValues, deleteOptionLabel, updateAOptionLabel  } from '../controllers/productOptionController.js';
+import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createNewVariant, deleteVariant, getAllVariants, getSingleVariant } from '../controllers/variantController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsByProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
@@ -135,19 +135,21 @@ router.post('/create-option', createNewOption);
 
 
 
-// get option
+// get option by product id
 router.get('/get-options/:productId', getOptionsByProductId);
 
 // delete option
 router.delete('/delete-option/:optionId', deleteOption);
 
+//______________________________________________________________________________________________________________________________________________________________ 
 
 // product option route
 
 // create product option
 router.post('/create-product-option', addProductOptionValues);
 
-// get Options By ProductId
+// get Options values by option id
+router.get('/get-option-values/:optionId', getOptionsValues);
 
 
 // update product option
