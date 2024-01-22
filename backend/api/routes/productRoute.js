@@ -11,6 +11,7 @@ import { createNewOption, deleteOption, getAllOptions, getSingleOption } from '.
 import { addProductOptionValues, deleteOptionLabel, getOptionsByProductId, updateAOptionLabel,  } from '../controllers/productOptionController.js';
 import { createNewVariant, deleteVariant, getAllVariants, getSingleVariant } from '../controllers/variantController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsByProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
+import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 
 
 const router = express.Router();
@@ -185,5 +186,14 @@ router.put('/update-product-variant/:product_variantId', updateAVariantLabel);
 // delete product option
 router.delete('/delete-product-variant/:product_variantId', deleteVariantLabel);
 
+
+// product language route
+router.post('/create-product-language', createProductLanguage);
+// update product language
+router.put('/update-product-language/:languageId', updateProductLanguage);
+// get all languages
+router.get('/get-product-languages', getAllProductLanguages);
+// delete language
+router.delete('/delete-product-language/:languageId', deleteLanguage);
 
 export default router;

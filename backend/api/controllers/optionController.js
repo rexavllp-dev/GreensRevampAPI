@@ -1,10 +1,20 @@
 import { createOption, deleteAOption, getOptionById, getOptions } from "../models/optionModel.js";
+import { createProductOption, getOptionsByProductId } from "../models/productOptionModel.js";
 
 
 // create option
 export const createNewOption = async (req, res) => {
   try {
-    const newOption = await createOption(req.body);
+    let data = { option_name : req.body.option_name };
+    const newOption = await createOption(data);
+
+
+    let optionData = { option_id: newOption[0].id, option_label: "", product_id: req.body.product_id };
+
+  console.log(optionData)
+
+  const productOptions = await createProductOption(optionData);
+  console.log(productOptions);
 
     res.status(200).json({
       status: 200,
@@ -13,6 +23,7 @@ export const createNewOption = async (req, res) => {
       result: newOption
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: 500,
       success: false,
@@ -100,6 +111,29 @@ export const deleteOption = async (req, res) => {
       status: 500,
       success: false,
       message: "Failed to delete option",
+      error: error
+    });
+  }
+};
+
+export const getOptionsWithProductId = async (req, res) => {
+  const productId = req.params.productId;
+  try {
+    const options = await getOptionsByProductId(productId);
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: "Options fetched successfully",
+      result: options
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      status: 500,
+      success: false,
+      message: "Failed to fetch options",
       error: error
     });
   }
