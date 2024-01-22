@@ -32,12 +32,15 @@ export const getOptionValuesByOptionId = async (optionId) => {
     const option = await db('product_options')
         .leftJoin('options', 'product_options.option_id', 'options.id')
         .leftJoin('products', 'product_options.product_id', 'products.id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .select(
             'product_options.*',
             'options.*',
             'options.id as option_id',
             'products.*',
             'products.id as product_id',
+            "product_inventory.*",
+            "product_inventory.id as product_inventory_id",
 
         )
         .where({
