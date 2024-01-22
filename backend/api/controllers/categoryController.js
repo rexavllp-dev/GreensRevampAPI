@@ -2,7 +2,7 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
-import { createACategory, deleteACategory, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById,  updateACategory } from '../models/categoryModel.js';
+import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById,  updateACategory } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
 
@@ -169,6 +169,39 @@ export const uploadCategoryImages = async (req, res) => {
     }
 };
 
+
+// delete category image
+export const deleteCategoryImage = async (req, res) => {
+    const imageId = req.params.categoryId;
+    try {
+        const deletedImage = await deleteCategoryImageById(imageId);
+        if(!deletedImage){
+            return res.status(404).json({
+              status:404,
+              success:false,
+              message:"Category image not found"
+            });
+        }
+
+        res.status(200).json({
+          status:200,
+          success:true,
+          message:"Category image deleted successfully",
+          result:deletedImage
+        });
+    } catch (error) {
+        res.status(500).json({
+          status:500,
+          success:false,
+          message:"Failed to delete category image",
+          error: error
+        });
+    }
+};
+
+
+
+
 // update Category
 export const updateCategory = async (req, res) => {
     try {
@@ -232,14 +265,14 @@ export const getCategoriesWithParentId = async (req, res) => {
 
 
 export const getSingleCategory = async (req, res) => {
-    const CategoryId = req.params.categoryId;
+    const categoryId = req.params.categoryId;
     try {
-        const category = await getCategoryById(CategoryId);
+        const category = await getCategoryById(categoryId);
         if (!category) {
             return res.status(404).json({
                 status: 404,
                 success: false,
-                message: "Category not found",
+                message: "category not found",
             });
         };
         
@@ -259,7 +292,6 @@ export const getSingleCategory = async (req, res) => {
         });
     }
 };
-
 
 
 export const getAllCategories = async (req, res) => {

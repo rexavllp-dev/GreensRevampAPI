@@ -23,7 +23,13 @@ export const getBrandById = async (brandId) => {
 
 // get all brands
 export const getBrands = async () => {
-    const brands = await db('brands').select('*');
+    const brands = await db('brands')
+    .leftJoin('brand_seo', 'brands.id', 'brand_seo.brand_id')
+    .select(
+        'brands.*',
+        'brand_seo.*',
+        'brand_seo.id as brand_seo_id',
+        );
     return brands;
 };
 
@@ -34,8 +40,10 @@ export const deleteABrand = async (brandId) => {
 };
 
 
-export const deleteProductImageById = async (brandId) => {
-    const deletedImage = await db('brands').where({ id: brandId }).del();
+export const deleteBrandImageById = async (brandId) => {
+    const deletedImage = await db('brands')
+    .where({ id: brandId })
+    .update({ brd_banner: null, brd_logo: null });
     return deletedImage;
 };
 

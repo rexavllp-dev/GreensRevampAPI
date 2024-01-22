@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategory, deleteCategory, getAllCategories, getCategoriesByTree, getCategoriesWithParentId, getSingleCategory, updateCategory, uploadCategoryImages } from '../controllers/categoryController.js';
+import { createCategory, deleteCategory, deleteCategoryImage, getAllCategories, getCategoriesByTree, getCategoriesWithParentId, getSingleCategory, updateCategory, uploadCategoryImages } from '../controllers/categoryController.js';
 
 
 const router = express.Router();
@@ -9,6 +9,9 @@ router.post('/create-category', createCategory);
 
 // upload Category logo and Category banner
 router.post('/upload-category-images/:categoryId', uploadCategoryImages);
+
+// delete brand image
+router.delete('/delete-category-image/:categoryId', deleteCategoryImage);
 
 // update a product
 router.put('/update-category/:categoryId', updateCategory);

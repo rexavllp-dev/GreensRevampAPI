@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBrand, deleteBrand, getAllBrands, getSingleBrand, updateBrand, uploadBrandImages } from '../controllers/brandController.js';
+import { createBrand, deleteBrand, deleteBrandImage, getAllBrands, getSingleBrand, updateBrand, uploadBrandImages } from '../controllers/brandController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/brandSeoController.js';
 
 const router = express.Router();
@@ -9,6 +9,9 @@ router.post('/create-brand', createBrand);
 
 // upload brand logo and brand banner
 router.post('/upload-brand-images/:brandId', uploadBrandImages);
+
+// delete brand image
+router.delete('/delete-brand-image/:imageId', deleteBrandImage);
 
 // update a product
 router.put('/update-brand/:brandId', updateBrand);

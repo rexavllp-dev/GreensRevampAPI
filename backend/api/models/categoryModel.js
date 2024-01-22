@@ -61,4 +61,14 @@ export const getCategoriesTree = async () => {
     });
 
     return rootCategories;
-}
+};
+
+
+// delete image
+
+export const deleteCategoryImageById = async (categoryId) => {
+    const deletedImage = await db('categories')
+    .where({ id: categoryId })
+    .update({ cat_banner: null, cat_logo: null });
+    return deletedImage;
+};

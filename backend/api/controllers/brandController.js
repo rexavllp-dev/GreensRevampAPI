@@ -1,6 +1,6 @@
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
-import { createABrand, deleteABrand, getBrandById, getBrands, updateABrand } from '../models/brandModel.js';
+import { createABrand, deleteABrand, deleteBrandImageById, getBrandById, getBrands, updateABrand } from '../models/brandModel.js';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -169,23 +169,29 @@ export const deleteBrandImage = async (req, res) => {
     const imageId = req.params.imageId;
     try {
         const deletedImage = await deleteBrandImageById(imageId);
+        if(!deletedImage){
+            return res.status(404).json({
+              status:404,
+              success:false,
+              message:"Brand image not found"
+            });
+        }
 
         res.status(200).json({
           status:200,
           success:true,
-          message:"Product image deleted successfully",
+          message:"Brand image deleted successfully",
           result:deletedImage
         });
     } catch (error) {
         res.status(500).json({
           status:500,
           success:false,
-          message:"Failed to delete product image",
+          message:"Failed to delete brand image",
           error: error
         });
     }
 };
-
 
 
 
