@@ -1,23 +1,55 @@
+import { createProductOption } from "../models/productOptionModel.js";
 import { createVariants, deleteAVariants, getVariants, getVariantsById } from "../models/variantModel.js";
 
 
 
 // create Variant
+// export const createNewVariant = async (req, res) => {
+//   try {
+//     const newVariant = await createVariants(req.body);
+
+//     res.status(200).json({
+//       status: 200,
+//       success: true,
+//       message: "Variant created successfully",
+//       result: newVariant
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       status: 500,
+//       success: false,
+//       message: "Failed to create Variant",
+//       error: error
+//     });
+//   }
+// };
+
+// create option
 export const createNewVariant = async (req, res) => {
   try {
-    const newVariant = await createVariants(req.body);
+    let data = { variant_name : req.body.variant_name };
+    const newVariant = await createVariants(data);
+
+
+    let variantData = { variant_id: newVariant[0].id, variant_label: "", product_id: req.body.product_id };
+
+  console.log(variantData)
+
+  const productOptions = await createProductOption(optionData);
+  console.log(productOptions);
 
     res.status(200).json({
       status: 200,
       success: true,
-      message: "Variant created successfully",
-      result: newVariant
+      message: "Option created successfully",
+      result: newOption
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: 500,
       success: false,
-      message: "Failed to create Variant",
+      message: "Failed to create option",
       error: error
     });
   }

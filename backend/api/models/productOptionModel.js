@@ -44,8 +44,7 @@ export const getOptionValuesByOptionId = async (optionId) => {
 
         )
         .where({
-            "options.id": optionId,
-
+            "product_options.option_id": optionId,
         });
     console.log(optionId);
     return option;
