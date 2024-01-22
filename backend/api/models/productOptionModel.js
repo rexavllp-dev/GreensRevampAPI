@@ -35,6 +35,7 @@ export const getOptionValuesByOptionId = async (optionId) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .select(
             'product_options.*',
+            'product_options.id as product_option_id',
             'options.*',
             'options.id as option_id',
             'products.*',
