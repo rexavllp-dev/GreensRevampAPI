@@ -1,17 +1,36 @@
-import { createProductOption, deleteAOptionLabel, getOptionValuesByOptionId, updateOptionLabel } from "../models/productOptionModel.js";
+import { checkOptionLabelExist, createProductOption, deleteAOptionLabel, getOptionValuesByOptionId, updateOptionLabel } from "../models/productOptionModel.js";
 
 
 export const addProductOptionValues = async (req, res) => {
     const { optionId, optionValues } = req.body;
     try {
 
-        let optionData = optionValues.map((value) => {
+        // let optionData = optionValues.map((value) => {
 
-            return { option_id: optionId, option_label: value.option_label, product_id: value.product_id };
-        });
-        console.log(optionData)
+        //     return { option_id: optionId, option_label: value.option_label, product_id: value.product_id };
+        // });
 
-        const productOptions = await createProductOption(optionData);
+        let optionData = [];
+        for (let i = 0; i < optionValues.length; i++) {
+            const isOptionLabelExist = await checkOptionLabelExist(optionId, optionValues[i].product_id); 
+
+            if(isOptionLabelExist.length > 0) {
+                console.log(isOptionLabelExist);
+                continue;
+            }
+
+            optionData.push({
+                option_id: optionId,
+                option_label: optionValues[i].option_label,
+                product_id: optionValues[i].product_id
+            });
+        }
+        console.log("option data",optionData)
+
+        let  productOptions;
+        if(optionData.length !== 0) {
+            productOptions = await createProductOption(optionData);
+        }
 
         res.status(200).json({
             status: 200,

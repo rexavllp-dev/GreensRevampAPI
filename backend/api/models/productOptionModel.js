@@ -28,7 +28,7 @@ export const deleteAOptionLabel = async (product_optionId) => {
 
 
 export const getOptionValuesByOptionId = async (optionId) => {
-    
+
     const option = await db('product_options')
         .leftJoin('options', 'product_options.option_id', 'options.id')
         .leftJoin('products', 'product_options.product_id', 'products.id')
@@ -47,8 +47,18 @@ export const getOptionValuesByOptionId = async (optionId) => {
             "options.id": optionId,
 
         });
-        console.log(optionId);
+    console.log(optionId);
     return option;
 };
 
+
+export const checkOptionLabelExist = async (optionId, productId) => {
+    const option = await db('product_options')
+        .where({
+            option_id: optionId,
+            product_id: productId,
+        })
+        .select('*')
+    return option;
+}
 
