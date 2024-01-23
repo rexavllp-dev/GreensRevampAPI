@@ -7,7 +7,7 @@ import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
-import { createNewOption, deleteOption, getOptionsByProductId } from '../controllers/optionController.js';
+import { createNewOption, deleteOption, getAllOptions, getOptionsByProductId } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, updateAVariantLabel } from '../controllers/productVariantsController.js';
@@ -137,6 +137,8 @@ router.get('/get-reviews', getAllReviews);
 // __________________________________________________________________________________________________
 // option route
 
+//get all options
+router.get('/get-options/:productId', getAllOptions);
 
 // create option
 router.post('/create-option', createNewOption);
@@ -175,7 +177,6 @@ router.post('/create-product-variant', addProductVariantValues);
 
 // get variants values by variant id
 router.get('/get-variant-values/:variantId', getVariantsValues);
-
 
 // update product variant
 router.put('/update-product-variant/:product_variantId', updateAVariantLabel);
