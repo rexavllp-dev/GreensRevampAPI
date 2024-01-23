@@ -1,8 +1,11 @@
 import db from '../../config/dbConfig.js';
 
 
-export const createProductVariant = async (variantData) => {
-    const productVariant = await db('product_variants').insert(variantData).returning('*');
+export const createProductVariant = async (variantId, productId) => {
+    const productVariant = await db('product_variants').insert({
+        variant_id: variantId,
+        product_id: productId
+    }).returning('*');
     return productVariant;
 };
 

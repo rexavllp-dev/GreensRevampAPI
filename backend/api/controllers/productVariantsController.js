@@ -5,51 +5,32 @@ import { checkVariantLabelExist, createProductVariant, deleteAVariantLabel, getV
 
 
 export const addProductVariantValues = async (req, res) => {
-    const { variantId, variantValues } = req.body;
+    const { variantId, productId } = req.body;
+
     try {
+        const productVariants = [];
 
      
-
-        let variantData = [];
-        for (let i = 0; i < variantValues.length; i++) {
-            const isVariantLabelExist = await checkVariantLabelExist(variantId, variantValues[i].product_id); 
-
-            if(isVariantLabelExist.length > 0) {
-                console.log(isVariantLabelExist);
-                continue;
-            }
-
-           variantData.push({
-                variant_id: variantId,
-               variant_label: variantValues[i].variant_label,
-                product_id: variantValues[i].product_id
-            });
-        }
-        console.log("variant data",variantData)
-
-        let  productVariants;
-        if(variantData.length !== 0) {
-            productVariants = await createProductVariant(variantData);
-        }
+            const newVariant = await createProductVariant(variantId, productId);
+        
+            productVariants.push(newVariant);
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "variant values added successfully",
-            result: productVariants
+            message: "Variant values added successfully",
+            data: productVariants,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             status: 500,
             success: false,
             message: "Failed to add variant values",
-            error: error
+            error: error,
         });
     }
-};
-
-
+}
 
 //  update variant
 export const updateAVariantLabel = async (req, res) => {
