@@ -158,14 +158,14 @@ router.delete('/delete-product-option/:product_optionId', deleteOptionLabel);
 
 
 // variants routes
-// create option
+// create variant
 router.post('/create-variants', createNewVariant);
 
 // get variant by product id
 router.get('/get-variants/:productId', getVariantsByProductId);
 
-// delete option
-router.delete('/delete-option/:variantId', deleteVariant);
+// delete variant
+router.delete('/delete-variant/:variantId', deleteVariant);
 
 
 // product variants route
@@ -173,15 +173,15 @@ router.delete('/delete-option/:variantId', deleteVariant);
 // create product variant
 router.post('/create-product-variant', addProductVariantValues);
 
-// get Options values by option id
+// get variants values by variant id
 router.get('/get-variant-values/:variantId', getVariantsValues);
 
 
-// update product option
+// update product variant
 router.put('/update-product-variant/:product_variantId', updateAVariantLabel);
 
-// delete product option
-router.delete('/delete-product-variant/:product_variantId', deleteVariantLabel);
+// delete product variant
+router.delete('/delete-product-variant/:productVariantId', deleteVariantLabel);
 // _
 
 

@@ -37,9 +37,9 @@ export const createNewVariant = async (req, res) => {
 
 // delete Variant
 export const deleteVariant = async (req, res) => {
-  const VariantId = req.params.VariantId;
+  const variantId = req.params.variantId;
   try {
-    const deleted = await deleteAVariant(VariantId);
+    const deleted = await deleteAVariant(variantId);
     if(!deleted) {
       return res.status(404).json({
         status: 404,
@@ -59,7 +59,7 @@ export const deleteVariant = async (req, res) => {
     res.status(500).json({
       status: 500,
       success: false,
-      message: "Failed to delete Variant",
+      message: "Failed to delete variant",
       error: error
     });
   }
