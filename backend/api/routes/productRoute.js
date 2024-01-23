@@ -4,13 +4,12 @@ import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '..
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
-import { createRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
+import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getOptionsByProductId } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
-import { createNewVariant, deleteVariant, getVariantsByProductId } from '../controllers/variantController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { getStockHistory } from '../controllers/stockHistory.js';
 
@@ -122,6 +121,8 @@ router.post('/create-related-product/:product_id', createRelatedProduct);
 router.get('/get-related-products/:productId', getRelatedProductsWithProductId);
 
 // ______________________________________________________________________________________________
+// delete related product
+router.delete('/delete-related-product/:relatedProductId', deleteRelatedProduct);
 
 // reviews routes
 
@@ -166,15 +167,6 @@ router.delete('/delete-product-option/:product_optionId', deleteOptionLabel);
 
 
 // variants routes
-// create variant
-router.post('/create-variants', createNewVariant);
-
-// get variant by product id
-router.get('/get-variants/:productId', getVariantsByProductId);
-
-// delete variant
-router.delete('/delete-variant/:variantId', deleteVariant);
-
 
 // product variants route
 

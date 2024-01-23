@@ -1,4 +1,4 @@
-import { addRelatedProduct, getRelatedProductsByProductId } from "../models/relatedProductModel.js";
+import { addRelatedProduct, deleteARelatedProduct, getRelatedProductsByProductId } from "../models/relatedProductModel.js";
 
 // creates related products
 
@@ -71,3 +71,25 @@ export const getRelatedProductsWithProductId = async (req, res) => {
     }
 };
 
+
+export const deleteRelatedProduct = async (req,res) => {
+    const relatedProductId = req.params.relatedProductId;
+
+    try {
+        const deleted = await deleteARelatedProduct(relatedProductId);
+        res.status(200).json({
+            status:200,
+            success:true,
+            message:"Deleted related product successfully",
+            result:deleted
+          });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+          status:500,
+          success:false,
+          message:"Failed to delete related product",
+          error: error
+        });
+    }
+};
