@@ -173,13 +173,13 @@ router.delete('/delete-option/:variantId', deleteVariant);
 // create product variant
 router.post('/create-product-variant', addProductVariantValues);
 
-// get Options By ProductId
+// get variants By ProductId
 router.get('/get-variant', getVariantsByProductId);
 
-// update product option
+// update product variant
 router.put('/update-product-variant/:product_variantId', updateAVariantLabel);
 
-// delete product option
+// delete product variant
 router.delete('/delete-product-variant/:product_variantId', deleteVariantLabel);
 
 
