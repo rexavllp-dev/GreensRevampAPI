@@ -1,5 +1,5 @@
 
-import { checkVariantLabelExist, createProductVariant, deleteAVariantLabel, getVariantValuesByVariantId, updateVariantLabel } from "../models/productVariantsModel.js";
+import {  createProductVariant, deleteAVariantLabel, getVariantValuesByVariantId, updateVariantLabel } from "../models/productVariantsModel.js";
 
 
 
@@ -32,7 +32,7 @@ export const addProductVariantValues = async (req, res) => {
             error: error,
         });
     }
-}
+};
 
 //  update variant
 export const updateAVariantLabel = async (req, res) => {
