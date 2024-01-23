@@ -4,7 +4,7 @@ import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '..
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
-import { createRelatedProduct } from '../controllers/relatedProductController.js';
+import { createRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getOptionsByProductId } from '../controllers/optionController.js';
@@ -111,9 +111,11 @@ router.put('/update-inventory/:productId', updateProductInventory);
 router.post('/create-badge', createProductBadge);
 
 // related products
-
+// create related product
 router.post('/create-related-product/:product_id', createRelatedProduct);
 
+// get related products by product id
+router.get('/get-related-products/:productId', getRelatedProductsWithProductId);
 
 // reviews routes
 

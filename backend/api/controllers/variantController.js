@@ -1,5 +1,6 @@
-import { createVariant, deleteAVariant, getVariantsWithProductId } from "../models/VariantModel.js";
+
 import { createProductVariant } from "../models/productVariantsModel.js";
+import { createVariant, deleteAVariant, getVariantsWithProductId } from "../models/variantModel.js";
 
 // create Variant
 export const createNewVariant = async (req, res) => {

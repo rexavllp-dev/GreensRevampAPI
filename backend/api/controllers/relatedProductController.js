@@ -1,18 +1,16 @@
-import { addRelatedProduct } from "../models/relatedProductModel.js";
+import { addRelatedProduct, getRelatedProductsByProductId } from "../models/relatedProductModel.js";
 
 // creates related products
 
 export const createRelatedProduct = async (req, res) => {
-    
+
     const { product_id } = req.params;
-    const {relatedProductData} = req.body;
+    const { relatedProductData } = req.body;
     console.log(relatedProductData)
 
     try {
 
-
-
-        if(!relatedProductData) {
+        if (!relatedProductData) {
 
             return res.status(400).json({
                 status: 400,
@@ -46,5 +44,30 @@ export const createRelatedProduct = async (req, res) => {
             error
         });
     }
-}
+};
+
+
+// get related products by product id
+
+export const getRelatedProductsWithProductId = async (req, res) => {
+    const productId = req.params.productId;
+    try {
+        const relatedProducts = await getRelatedProductsByProductId(productId);
+
+        res.status(200).json({
+          status:200,
+          success:true,
+          message:"Fetched related products successfully",
+          result:relatedProducts
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+          status:500,
+          success:false,
+          message:"Failed to fetch related products",
+          error: error
+        });
+    }
+};
 

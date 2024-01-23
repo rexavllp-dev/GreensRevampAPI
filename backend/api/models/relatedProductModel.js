@@ -6,8 +6,18 @@ export const addRelatedProduct = async (relatedProductData) => {
 
     const relatedProduct = await db('related_products').insert(relatedProductData).returning('*');
     return relatedProduct;
-}
+};
 
+
+// get related products by product id
+
+export const getRelatedProductsByProductId = async (productId) => {
+    const relatedProducts = await db('related_products')
+        .leftJoin('products', 'related_products.related_product_id', '=', 'products.id')
+        .where('related_products.product_id', productId);
+
+    return relatedProducts;
+}
 
 
 
