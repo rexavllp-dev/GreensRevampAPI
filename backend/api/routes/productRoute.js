@@ -9,14 +9,13 @@ import { addProductReview, approveReviewByAdmin, getAllReviews } from '../contro
 import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getOptionsByProductId } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
-import { createNewVariant, deleteVariant, getAllVariants, getSingleVariant } from '../controllers/variantController.js';
-import { addProductVariantValues, deleteVariantLabel, getVariantsByProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
+import { createNewVariant, deleteVariant, getVariantsByProductId } from '../controllers/variantController.js';
+import { addProductVariantValues, deleteVariantLabel, updateAVariantLabel } from '../controllers/productVariantsController.js';
 
 
 
 const router = express.Router();
-
 
 
 // create a product
@@ -133,8 +132,6 @@ router.get('/get-reviews', getAllReviews);
 // create option
 router.post('/create-option', createNewOption);
 
-
-
 // get option by product id
 router.get('/get-options/:productId', getOptionsByProductId);
 
@@ -164,11 +161,8 @@ router.delete('/delete-product-option/:product_optionId', deleteOptionLabel);
 // create option
 router.post('/create-variants', createNewVariant);
 
-// get option
-router.get('/get-variants/:variantId', getSingleVariant);
-
-// get all options
-router.get('/get-all-variants', getAllVariants);
+// get variant by product id
+router.get('/get-variants/:productId', getVariantsByProductId);
 
 // delete option
 router.delete('/delete-option/:variantId', deleteVariant);
@@ -176,7 +170,7 @@ router.delete('/delete-option/:variantId', deleteVariant);
 
 // product variants route
 
-// create product option
+// create product variant
 router.post('/create-product-variant', addProductVariantValues);
 
 // get Options By ProductId

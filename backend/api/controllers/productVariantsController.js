@@ -1,4 +1,6 @@
-import { createProductVariant, deleteAVariantLabel, getVariantLabel, updateVariantLabel } from "../models/productVariantsModel.js";
+
+import { checkVariantLabelExist, createProductVariant, deleteAVariantLabel, getVariantValuesByVariantId, updateVariantLabel } from "../models/productVariantsModel.js";
+
 
 
 
@@ -6,18 +8,34 @@ export const addProductVariantValues = async (req, res) => {
     const { variantId, variantValues } = req.body;
     try {
 
-        let variantData = variantValues.map((value) => {
+     
 
-            return { variant_id: variantId, variant_label: value.variant_label, product_id: value.product_id };
-        });
-        console.log(variantData)
+        let variantData = [];
+        for (let i = 0; i < variantValues.length; i++) {
+            const isVariantLabelExist = await checkVariantLabelExist(variantId, variantValues[i].product_id); 
 
-        const productVariants = await createProductVariant(variantData);
+            if(isVariantLabelExist.length > 0) {
+                console.log(isVariantLabelExist);
+                continue;
+            }
+
+           variantData.push({
+                variant_id: variantId,
+               variant_label: variantValues[i].variant_label,
+                product_id: variantValues[i].product_id
+            });
+        }
+        console.log("variant data",variantData)
+
+        let  productVariants;
+        if(variantData.length !== 0) {
+            productVariants = await createProductVariant(variantData);
+        }
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Variant values added successfully",
+            message: "variant values added successfully",
             result: productVariants
         });
     } catch (error) {
@@ -25,44 +43,20 @@ export const addProductVariantValues = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to add Variant values",
+            message: "Failed to add variant values",
             error: error
         });
     }
 };
 
 
-// get Variant label by product id
-export const getVariantsByProductId = async (req, res) => {
-    const { variantId, productId } = req.query;
-    console.log(variantId, productId);
-    try {
-        const variants = await getVariantLabel(variantId, productId);
-        console.log(variants);
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Fetched Variant successfully",
-            result: variants
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to fetch Variant",
-            error: error
-        });
-    }
-};
 
-
-//  updated Variant
+//  updated variant
 export const updateAVariantLabel = async (req, res) => {
-    const product_variantId = req.params.product_VariantId;
+    const productVariantId = req.params.productVariantId;
     const variant_label = req.body;
     try {
-        const updatedVariant = await updateVariantLabel(product_variantId, variant_label);
+        const updatedVariant = await updateVariantLabel(productVariantId, variant_label);
 
         if (updatedVariant.length > 0) {
             return res.status(200).json({
@@ -87,11 +81,37 @@ export const updateAVariantLabel = async (req, res) => {
 };
 
 
-//  updated Variant
-export const deleteVariantLabel = async (req, res) => {
-    const product_variantId = req.params.product_variantId;
+// get variant values by variant id
+export const getVariantsValues = async (req, res) => {
+    const variantId = req.params.variantId;
+    console.log(variantId);
     try {
-        const deleteVariant = await deleteAVariantLabel(product_variantId);
+        const variant = await getVariantValuesByVariantId(variantId);
+        console.log(variant);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Variant values retrieved successfully",
+            result: variant
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to get variant values",
+            error: error
+        });
+    }
+};
+
+
+//  delete variant
+export const deleteVariantLabel = async (req, res) => {
+    const productVariantId = req.params.productVariantId;
+    try {
+        const deleteVariant = await deleteAVariantLabel(productVariantId);
 
         return res.status(200).json({
             status: 200,
@@ -104,7 +124,7 @@ export const deleteVariantLabel = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to delete Variant label",
+            message: "Failed to delete variant label",
             error: error
         });
     }

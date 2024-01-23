@@ -1,24 +1,25 @@
 import db from '../../config/dbConfig.js';
 
 
-export const createVariants = async (variantsData) => {
-    const variants = await db('variants').insert(variantsData).returning('*');
-    return variants;
-};
-
-export const getVariantsById = async (variantsId) => {
-    const variants = await db('variants').select('*').where({ id: variantsId }).first();
-    return variants;
+export const createVariant = async (variantData) => {
+    const variant = await db('variants').insert(variantData).returning('*');
+    return variant;
 };
 
 
-export const getVariants = async () => {
-    const variants = await db('variants').select('*');
-    return variants;
+export const deleteAVariant = async (variantId) => {
+    const deleteVariant = db('variants').where({ id: variantId }).del();
+    return deleteVariant;
 };
 
-
-export const deleteAVariants = async (variantsId) => {
-    const deleteVariants = db('variants').where({ id: variantsId }).del();
-    return deleteVariants;
+export const getVariantsWithProductId = async (productId) => {
+    const variants = await db('product_variants')
+        .leftJoin('variants', 'product_variants.variant_id', 'variants.id')
+        .where({
+            'product_variants.product_id': productId
+        })
+        .select(
+            'variants.*',
+        )
+    return variants;
 };
