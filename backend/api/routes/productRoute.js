@@ -12,6 +12,7 @@ import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOpt
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 import { createNewVariant, deleteVariant, getVariantsByProductId } from '../controllers/variantController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, updateAVariantLabel } from '../controllers/productVariantsController.js';
+import { getStockHistory } from '../controllers/stockHistory.js';
 
 
 
@@ -184,7 +185,7 @@ router.put('/update-product-variant/:product_variantId', updateAVariantLabel);
 
 // delete product variant
 router.delete('/delete-product-variant/:productVariantId', deleteVariantLabel);
-// _
+
 
 
 // product language route
@@ -195,5 +196,12 @@ router.put('/update-product-language/:languageId', updateProductLanguage);
 router.get('/get-product-languages', getAllProductLanguages);
 // delete language
 router.delete('/delete-product-language/:languageId', deleteLanguage);
+
+
+// stock history route
+
+// get all stock history
+
+router.get('/getall-stock-history', getStockHistory);
 
 export default router;
