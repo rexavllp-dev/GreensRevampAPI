@@ -5,21 +5,23 @@ import { checkVariantLabelExist, createProductVariant, deleteAVariantLabel, getV
 
 
 export const addProductVariantValues = async (req, res) => {
-    const { variantId, productId } = req.body;
+    const { productId, variantsData } = req.body;
 
     try {
-        const productVariants = [];
+        let productVariants = [];
 
-     
-            const newVariant = await createProductVariant(variantId, productId);
-        
-            productVariants.push(newVariant);
+        for (let i = 0; i < variantsData.length; i++) {
+            const variantId = variantsData[i].variant_id;
+            productVariants.push({ variant_id: variantId, product_id: productId });
+        }
+
+        const newVariant = await createProductVariant(productVariants);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Variant values added successfully",
-            data: productVariants,
+            data: newVariant,
         });
     } catch (error) {
         console.error(error);

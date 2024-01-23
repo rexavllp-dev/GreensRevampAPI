@@ -212,7 +212,6 @@ export const getAllProduct = async (req, res) => {
         };
        
         const products = await getAllProducts(page, per_page, search_query, filters);
-        console.log("products",products);
 
         res.status(200).json({
             status: 200,
