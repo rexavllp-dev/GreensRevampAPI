@@ -51,12 +51,12 @@ export const addProductVariantValues = async (req, res) => {
 
 
 
-//  updated variant
+//  update variant
 export const updateAVariantLabel = async (req, res) => {
-    const productVariantId = req.params.productVariantId;
+    const product_variantId = req.params.product_variantId;
     const variant_label = req.body;
     try {
-        const updatedVariant = await updateVariantLabel(productVariantId, variant_label);
+        const updatedVariant = await updateVariantLabel(product_variantId, variant_label);
 
         if (updatedVariant.length > 0) {
             return res.status(200).json({

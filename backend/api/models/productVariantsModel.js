@@ -8,6 +8,7 @@ export const createProductVariant = async (variantData) => {
 
 
 // update Variant label
+
 export const updateVariantLabel = async (product_variantId, variant_label) => {
     const updatedVariant = await db('product_variants')
         .where({
@@ -17,6 +18,7 @@ export const updateVariantLabel = async (product_variantId, variant_label) => {
         .returning('*');
     return updatedVariant;
 };
+
 
 // delete Variant label
 export const deleteAVariantLabel = async (product_variantId) => {
