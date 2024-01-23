@@ -78,7 +78,7 @@ router.delete('/delete-product-image/:imageId', deleteProductImage);
 // sort products
 router.get('/sort-products', getProductsWithSorting);
 
-
+// ___________________________________________________________________________________________
 
 // seo routes
 
@@ -107,9 +107,12 @@ router.post('/create-inventory', createProductInventory);
 // update inventory 
 router.put('/update-inventory/:productId', updateProductInventory);
 
+// _______________________________________________________________________________________________________________________
 
 // product badge route
 router.post('/create-badge', createProductBadge);
+
+// _____________________________________________________________________________________________
 
 // related products
 // create related product
@@ -117,6 +120,8 @@ router.post('/create-related-product/:product_id', createRelatedProduct);
 
 // get related products by product id
 router.get('/get-related-products/:productId', getRelatedProductsWithProductId);
+
+// ______________________________________________________________________________________________
 
 // reviews routes
 
@@ -186,7 +191,7 @@ router.put('/update-product-variant/:product_variantId', updateAVariantLabel);
 // delete product variant
 router.delete('/delete-product-variant/:productVariantId', deleteVariantLabel);
 
-
+// __________________________________________________________________________________________
 
 // product language route
 router.post('/create-product-language', createProductLanguage);
@@ -197,11 +202,11 @@ router.get('/get-product-languages', getAllProductLanguages);
 // delete language
 router.delete('/delete-product-language/:languageId', deleteLanguage);
 
+// _________________________________________________________________________________________________
 
 // stock history route
 
 // get all stock history
-
 router.get('/getall-stock-history', getStockHistory);
 
 export default router;
