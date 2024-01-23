@@ -1,6 +1,6 @@
 // get all stock history
 
-import { getAllStockHistory } from "../models/stockHistoryModel";
+import { getAllStockHistory } from "../models/stockHistoryModel.js";
 
 export const getStockHistory = async (req, res) => {
 
