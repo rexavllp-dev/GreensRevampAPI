@@ -10,8 +10,9 @@ import { getAllProductPublic, getSingleProductPublic } from '../controllers/publ
 import { createNewOption, deleteOption, getOptionsByProductId } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
-import { addProductVariantValues, deleteVariantLabel, getVariantsValues, updateAVariantLabel } from '../controllers/productVariantsController.js';
+import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { getStockHistory } from '../controllers/stockHistory.js';
+import { getVariantsByProductId } from '../models/productVariantsModel.js';
 
 
 
@@ -175,6 +176,8 @@ router.post('/create-product-variant', addProductVariantValues);
 
 // get variants values by variant id
 router.get('/get-variant-values/:variantId', getVariantsValues);
+
+router.get('/get-variants-by-product/:productId', getVariantsWithProductId);
 
 
 // update product variant

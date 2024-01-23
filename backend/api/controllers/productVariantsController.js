@@ -1,5 +1,5 @@
 
-import {  createProductVariant, deleteAVariantLabel, getVariantValuesByVariantId, updateVariantLabel } from "../models/productVariantsModel.js";
+import {  createProductVariant, deleteAVariantLabel, getVariantValuesByVariantId, getVariantsByProductId, updateVariantLabel } from "../models/productVariantsModel.js";
 
 
 
@@ -110,5 +110,29 @@ export const deleteVariantLabel = async (req, res) => {
             message: "Failed to delete variant label",
             error: error
         });
+    }
+};
+
+
+export const getVariantsWithProductId = async (req, res) => {
+    const productId = req.params.productId;
+    console.log(productId);
+    try {
+        const variants = await getVariantsByProductId(productId);
+
+        res.status(200).json({
+          status:200,
+          success:true,
+          message:"Fetched variants successfully",
+          result:variants
+        });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        status:500,
+        success:false,
+        message:"Failed to fetch variants",
+        error: error
+      });  
     }
 };

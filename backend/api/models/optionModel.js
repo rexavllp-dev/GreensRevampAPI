@@ -7,7 +7,7 @@ export const createOption = async (optionData) => {
 };
 
 
-export const  deleteAOption = async (optionId) => {
+export const deleteAOption = async (optionId) => {
     const deleteOption = db('options').where({ id: optionId }).del();
     return deleteOption;
 };
@@ -23,3 +23,4 @@ export const getOptionsWithProductId = async (productId) => {
         )
     return options;
 };
+
