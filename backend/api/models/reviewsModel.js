@@ -25,5 +25,5 @@ export const approveReview = async (reviewId) => {
     const approvedReview = await db('product_reviews').where({ id: reviewId })
     .update({is_approved: true}).returning('*')
     return approvedReview;
-}
+};
 

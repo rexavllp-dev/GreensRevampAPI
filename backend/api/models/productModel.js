@@ -278,6 +278,15 @@ export const getProductsByCategory = async (page, per_page, search, filters, cat
     return query;
 };
 
+
+
+
+export const saveImageUrl = async (productId, imageUrl) => {
+    return db('products')
+        .where('id', productId)
+        .update({ image_url: imageUrl });
+};
+
 // ____________________________________________________________________________________________________________________________________________________________________________
 
 

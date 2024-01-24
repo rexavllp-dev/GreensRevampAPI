@@ -1,4 +1,4 @@
-import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, updateAProduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -343,7 +343,15 @@ export const addProductImages = async (req, res) => {
         console.log(productImages);
 
         // Save product images to the database
-        await createProductGallery(productImages);
+       const savedImages = await createProductGallery(productImages);
+
+       if (isBaseImage && savedImages.length > 0) {
+        const imageUrl = savedImages[0]?.url; // Assuming the URL is stored in the 'url' property
+        if (imageUrl) {
+            // Update the image_url column using the imageUpdater module
+            await saveImageUrl(productId, imageUrl);
+        }
+    }
 
         res.status(201).json({
             status: 201,
