@@ -26,9 +26,6 @@ export const deleteAVariantLabel = async (product_variantId) => {
     return deleteVariant;
 }
 
-
-
-
 export const getVariantValuesByVariantId = async (variantId) => {
 
     const variant = await db('product_variants')
@@ -73,8 +70,17 @@ export const getVariantsByProductId = async (productId) => {
         .select(
             'product_variants.*',
             'products.*',
-            'product_gallery.*'
+            db.raw(`
+            jsonb_agg(
+                jsonb_build_object(
+                    'url', product_gallery.url,
+                    'id', product_gallery.id,
+                    'is_baseimage', product_gallery.is_baseimage
+                )
+            ) as product_img
+        `)
 
-        );
+        ).distinct('products.id').groupBy(
+            'products.id', 'product_variants.id');
     return variants;
 };

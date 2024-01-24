@@ -10,7 +10,7 @@ import { getAllProductPublic, getSingleProductPublic } from '../controllers/publ
 import { createNewOption, deleteOption, getAllOptions, getOptionsByProductId } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
-import { getStockHistory } from '../controllers/stockHistoryController.js';
+import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 
 
@@ -208,7 +208,7 @@ router.delete('/delete-product-language/:languageId', deleteLanguage);
 
 // stock history route
 
-// get all stock history
-router.get('/getall-stock-history', getStockHistory);
+// get all stock history by product
+router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);
 
 export default router;
