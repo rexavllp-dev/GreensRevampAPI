@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 export const up = async(knex) => {
-    await knex.schema.createTable('stock_history', (table) => {
+    await knex.schema.createTable('product_stock_history', (table) => {
         table.increments('id').primary();
         table.integer('user_id').unsigned().references('id').inTable('users');
         table.integer('product_id').unsigned().references('id').inTable('products');
@@ -26,5 +26,5 @@ export const up = async(knex) => {
  * @returns { Promise<void> }
  */
 export const down = async (knex) => {
-    return knex.schema.dropTable('stock_history');
+    return knex.schema.dropTable('product_stock_history');
 };
