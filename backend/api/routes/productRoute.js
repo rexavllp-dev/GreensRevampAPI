@@ -11,7 +11,7 @@ import { createNewOption, deleteOption, getOptionsByProductId } from '../control
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, updateAVariantLabel } from '../controllers/productVariantsController.js';
-import { getStockHistory } from '../controllers/stockHistory.js';
+import { getStockHistory } from '../controllers/stockHistoryController.js';
 
 
 
