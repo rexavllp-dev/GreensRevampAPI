@@ -191,6 +191,7 @@ export const getAllProduct = async (req, res) => {
         let page = null;
         let per_page = null;
         let search_query = null;
+        
         if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
             search_query = req.query.search_query;
         }

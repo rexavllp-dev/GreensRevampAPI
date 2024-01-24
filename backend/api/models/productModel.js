@@ -123,7 +123,7 @@ export const getAllProducts = async (page, per_page, search, filters) => {
 
     if (search) {
         console.log(search)
-        query.where("products.prd_name", "ilike", `%${search}%`);
+        query.whereRaw("similarity(products.prd_name, ?) > 0.3", [search]);
     }
 
     // Apply complex filters
@@ -156,7 +156,7 @@ export const getAllProducts = async (page, per_page, search, filters) => {
     return {
         products: products,
         totalCount: totalCountResult[0],
-        totalPage: Math.ceil(totalCountResult[0].total / per_page),
+        totalPage: Math.ceil(totalCountResult[0]?.total || 0 / per_page),
         per_page: per_page ,
         page: page
     }

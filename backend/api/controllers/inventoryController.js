@@ -1,4 +1,4 @@
-import { createInventory, getProductInventorybyId, getProductQuantity, updateInventory, updateProductQuantity } from "../models/inventoryModel.js";
+import { createInventory, getProductInventoryById, getProductQuantity, updateInventory, updateProductQuantity } from "../models/inventoryModel.js";
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
@@ -107,7 +107,7 @@ export const updateProductInventory = async (req, res) => {
 
   try {
 
-    const product = await getProductInventorybyId(productId);
+    const product = await getProductInventoryById(productId);
 
 
 
@@ -141,19 +141,37 @@ export const updateProductInventory = async (req, res) => {
 };
 
 
-export const addStock = async (req, res) => {
+
+
+// Add or reduce stock
+export const modifyStock = async (req, res) => {
   const productId = req.params.productId;
-  const { quantityToAdd } = req.body;
+  const { action, quantity, comment } = req.body;
 
   try {
     const currentQuantity = await getProductQuantity(productId);
+
     if (currentQuantity !== null) {
-      const newQuantity = currentQuantity + quantityToAdd;
-      await updateProductQuantity(productId, newQuantity);
+      let newQuantity;
+
+      if (action === 'add') {
+        newQuantity = currentQuantity + quantity;
+      } else if (action === 'reduce') {
+        newQuantity = currentQuantity - quantity;
+      } else {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "Invalid action. Use 'add' or 'reduce'.",
+        });
+      }
+
+      await updateProductQuantity(productId, newQuantity, comment);
+
       return res.status(200).json({
         status: 200,
         success: true,
-        message: "Stock added successfully",
+        message: `Stock ${action === 'add' ? 'added' : 'reduced'} successfully`,
       });
     } else {
       return res.status(404).json({
@@ -167,40 +185,8 @@ export const addStock = async (req, res) => {
     res.status(500).json({
       status: 500,
       success: false,
-      message: "Failed to add stock, something went wrong",
-      error: error
-    });
-  }
-};
-
-
-export const reduceStock = async (req, res) => {
-  const productId = req.params.productId;
-  const { quantityToReduce } = req.body;
-  try {
-    const currentQuantity = await getProductQuantity(productId);
-    if (currentQuantity !== null) {
-      const newQuantity = currentQuantity - quantityToReduce;
-      await updateProductQuantity(productId, newQuantity);
-      return res.status(200).json({
-        status: 200,
-        success: true,
-        message: "Stock reduced successfully",
-      });
-    } else {
-      return res.status(404).json({
-        status: 404,
-        success: false,
-        message: "Product not found",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: "Failed to reduce stock, something went wrong",
-      error: error
+      message: "Failed to modify stock, something went wrong",
+      error: error,
     });
   }
 };

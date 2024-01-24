@@ -2,7 +2,7 @@ import express from 'express';
 import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
-import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
+import {  createProductInventory,  modifyStock,  updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
@@ -107,6 +107,10 @@ router.delete('/delete-seo/:seoId', deleteSeo);
 router.post('/create-inventory', createProductInventory);
 // update inventory 
 router.put('/update-inventory/:productId', updateProductInventory);
+// add stock and reduce stock
+router.post('/modify-stock/:productId', modifyStock);
+
+
 
 // _______________________________________________________________________________________________________________________
 
