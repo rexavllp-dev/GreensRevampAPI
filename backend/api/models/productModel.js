@@ -123,9 +123,8 @@ export const getAllProducts = async (page, per_page, search, filters) => {
 
     if (search) {
         console.log(search);
-        query.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]);
-        
-    }
+        query.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]); 
+    };
 
     // Apply complex filters
 
