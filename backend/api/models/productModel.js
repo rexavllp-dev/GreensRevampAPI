@@ -122,7 +122,7 @@ export const getAllProducts = async (page, per_page, search, filters) => {
         );
 
     if (search) {
-        console.log(search)
+        console.log("search",search)
         query.whereRaw("similarity(products.prd_name, ?) > 0.3", [search]);
     }
 
