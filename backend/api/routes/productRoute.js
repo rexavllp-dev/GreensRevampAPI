@@ -2,7 +2,7 @@ import express from 'express';
 import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
-import { createProductInventory, updateProductInventory } from '../controllers/inventoryController.js';
+import {  createProductInventory,  modifyStock,  updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
@@ -10,9 +10,10 @@ import { getAllProductPublic, getSingleProductPublic } from '../controllers/publ
 import { createNewOption, deleteOption, getAllOptions, getOptionsByProductId } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
+import { getStockHistory } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
-import { getStockHistory } from '../controllers/stockHistory.js';
-import { getVariantsByProductId } from '../models/productVariantsModel.js';
+
+
 
 
 
@@ -106,6 +107,10 @@ router.delete('/delete-seo/:seoId', deleteSeo);
 router.post('/create-inventory', createProductInventory);
 // update inventory 
 router.put('/update-inventory/:productId', updateProductInventory);
+// add stock and reduce stock
+router.post('/modify-stock/:productId', modifyStock);
+
+
 
 // _______________________________________________________________________________________________________________________
 

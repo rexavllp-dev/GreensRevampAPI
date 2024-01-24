@@ -5,7 +5,7 @@ import db from '../../config/dbConfig.js';
 
 export const getAllStockHistory = async () => {
 
-    const stockHistory = await db('stock_history').select('*');
+    const stockHistory = await db('product_stock_history').select('*');
     return stockHistory;
 }
 
