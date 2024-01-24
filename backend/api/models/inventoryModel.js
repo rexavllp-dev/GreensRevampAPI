@@ -50,7 +50,7 @@ export const updateProductQuantity = async (productId, newQuantity, comment) => 
   // Determine the action based on the change in stock
   const action = newQuantity >= currentStock ? 'add' : 'reduce';
 
-  await db('product_stock_history').insert({
+  await db('stock_history').insert({
     product_id: productId,
     previous_stock: currentStock,
     qty: newQuantity,
