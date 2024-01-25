@@ -34,7 +34,7 @@ router.delete('/delete-product/:productId', deleteProduct);
 
 // get all products.
 
-router.get('/get-products', getAllProduct)
+router.get('/get-products', getAllProduct);
 
 // _________________________________________________________________________________________________________________
 

@@ -1,3 +1,4 @@
+
 import db from '../../config/dbConfig.js';
 
 // create product
@@ -55,6 +56,7 @@ export const getProductById = async (productId) => {
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .where('products.id', productId)
+        .whereNull('products.deleted_at')
         .groupBy(
             'products.id',
             'brands.id',
@@ -73,7 +75,7 @@ export const getProductById = async (productId) => {
 
 // get all products
 
-export const getAllProducts = async (page, per_page, search, filters) => {
+export const getAllProducts = async (page, per_page, search, filters, sort) => {
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -119,11 +121,12 @@ export const getAllProducts = async (page, per_page, search, filters) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
-        );
+        )
+        .whereNull('deleted_at');
 
     if (search) {
         console.log(search);
-        query.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]); 
+        query.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]);
     };
 
     // Apply complex filters
@@ -141,6 +144,14 @@ export const getAllProducts = async (page, per_page, search, filters) => {
             query.where(filter.column, '=', filter.value);
         }
     });
+
+
+    // Sorting by price
+    if (sort === 'price_asc') {
+        query.orderBy('products_price.product_price', 'asc');
+    } else if (sort === 'price_desc') {
+        query.orderBy('products_price.product_price', 'desc');
+    }
 
     const totalCountQuery = query.clone().clearSelect().countDistinct('products.id as total');
 
@@ -166,7 +177,10 @@ export const getAllProducts = async (page, per_page, search, filters) => {
 // delete product
 
 export const deleteAProduct = async (productId) => {
-    const deletedProduct = await db('products').where({ id: productId }).del();
+    const deletedProduct = await db('products')
+        .where({ id: productId })
+        .update({ deleted_at: db.fn.now() });
+
     return deletedProduct;
 };
 
