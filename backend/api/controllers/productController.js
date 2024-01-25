@@ -192,15 +192,26 @@ export const getAllProduct = async (req, res) => {
         let page = null;
         let per_page = null;
         let search_query = null;
+        let sort = null;
+
         if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
             search_query = req.query.search_query;
         }
+
         if (req.query.page !== null && req.query.page !== undefined && req.query.page !== 'undefined') {
             page = req.query.page;
         }
+
         if (req.query.per_page !== null && req.query.per_page !== undefined && req.query.per_page !== 'undefined') {
             per_page = req.query.per_page;
         }
+
+        if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
+            sort = req.query.sort;
+        }
+
+
+
         console.log("search",search_query);                                                                                                     
 
         const filtersParam = req.query.filters;
@@ -212,7 +223,7 @@ export const getAllProduct = async (req, res) => {
             filters = JSON.parse(filtersParam);
         };
        
-        const products = await getAllProducts(page, per_page, search_query, filters);
+        const products = await getAllProducts(page, per_page, search_query, filters, sort);
 
         res.status(200).json({
             status: 200,
