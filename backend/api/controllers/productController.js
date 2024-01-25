@@ -39,53 +39,53 @@ export const createProduct = async (req, res) => {
 
     try {
 
-    const schema = Joi.object({
-        prd_name: Joi.string().required().label("prd_name"),
-        prd_description: Joi.string().required().label("prd_description"),
-        prd_storage_type: Joi.string().required().label("prd_storage_type"),
-        prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
-        prd_tags: Joi.string().required().label("prd_tags"),
-        prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
-        prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
-        prd_status: Joi.boolean().required().label("prd_status "),
-        prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
-        prd_return_type: Joi.string().required().label("prd_return_type"),
-        prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
+    // const schema = Joi.object({
+    //     prd_name: Joi.string().required().label("prd_name"),
+    //     prd_description: Joi.string().required().label("prd_description"),
+    //     prd_storage_type: Joi.string().required().label("prd_storage_type"),
+    //     prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
+    //     prd_tags: Joi.string().required().label("prd_tags"),
+    //     prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
+    //     prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
+    //     prd_status: Joi.boolean().required().label("prd_status "),
+    //     prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
+    //     prd_return_type: Joi.string().required().label("prd_return_type"),
+    //     prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
        
-    });
+    // });
       
 
 
         // product validation data
 
-        const validate_data = {
+        // const validate_data = {
 
-            prd_name,
-            prd_description,
-            prd_storage_type,
-            prd_tax_class,
-            prd_tags,
-            prd_expiry_date,
-            prd_dashboard_status,
-            prd_status,
-            prd_sales_unit,
-            prd_return_type,
-            prd_brand_id,
+        //     prd_name,
+        //     prd_description,
+        //     prd_storage_type,
+        //     prd_tax_class,
+        //     prd_tags,
+        //     prd_expiry_date,
+        //     prd_dashboard_status,
+        //     prd_status,
+        //     prd_sales_unit,
+        //     prd_return_type,
+        //     prd_brand_id,
             
             
 
-        };
+        // };
 
-        const { error } = schema.validate(validate_data, joiOptions);
-        console.log(error)
-        if (error) {
-            return res.status(500).json({
-                status: 500,
-                success: false,
-                message: "Validation Error",
-                error: getErrorsInArray(error?.details),
-            });
-        };
+        // const { error } = schema.validate(validate_data, joiOptions);
+        // console.log(error)
+        // if (error) {
+        //     return res.status(500).json({
+        //         status: 500,
+        //         success: false,
+        //         message: "Validation Error",
+        //         error: getErrorsInArray(error?.details),
+        //     });
+        // };
 
 
         // create a product
