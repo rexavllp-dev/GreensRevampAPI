@@ -1,10 +1,10 @@
 import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
-import { joiOptions } from '../helpers/joiOptions.js';
-import Joi from 'joi';
-import getErrorsInArray from '../helpers/getErrors.js';
+// import { joiOptions } from '../helpers/joiOptions.js';
+// import Joi from 'joi';
+// import getErrorsInArray from '../helpers/getErrors.js';
 import sharp from "sharp";
 import aws from 'aws-sdk';
-import Fuse from 'fuse.js';
+
 
 
 const awsConfig = ({
@@ -295,14 +295,19 @@ export const getSingleProduct = async (req, res) => {
 // delete a product
 
 export const deleteProduct = async (req, res) => {
+    const productIds = req.params.productIds;
     try {
-        const productId = req.params.productId;
-        const deletedProduct = await deleteAProduct(productId);
+
+        let products = JSON.parse(productIds.data);
+
+        for(let i = 0; i < products.length; i++) {
+            await deleteAProduct(products[i]);
+        }
         res.status(200).json({
             status: 200,
             success: true,
             message: 'Product deleted successfully',
-            data: deletedProduct,
+       
         });
     } catch (error) {
         console.error(error);
