@@ -30,7 +30,7 @@ router.put('/update-product/:productId', updateProduct)
 router.get('/get-product/:productId', getSingleProduct)
 
 // delete a product
-router.delete('/delete-product/:productIds', deleteProduct);
+router.delete('/delete-product', deleteProduct);
 
 // get all products.
 

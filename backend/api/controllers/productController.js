@@ -295,10 +295,10 @@ export const getSingleProduct = async (req, res) => {
 // delete a product
 
 export const deleteProduct = async (req, res) => {
-    const productIds = req.params.productIds;
+    const productIds = req.query.data;
     try {
 
-        let products = JSON.parse(productIds.data);
+        let products = JSON.parse(productIds);
 
         for(let i = 0; i < products.length; i++) {
             await deleteAProduct(products[i]);
