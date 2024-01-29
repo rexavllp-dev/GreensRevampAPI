@@ -157,6 +157,7 @@ export const getPublicProductById = async (productId) => {
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .where('products.id', productId)
+        .andWhere('products.prd_status', true) // Add condition for product status
         .whereNull('products.deleted_at')
         .groupBy(
             'products.id',
