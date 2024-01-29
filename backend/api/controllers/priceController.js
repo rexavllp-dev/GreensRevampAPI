@@ -3,9 +3,10 @@ import { createPrdPrice, deletePrdPrice, getAllPrdPrice, getPrdPrice, getProduct
 
 // create price
 export const createPrice = async (req, res) => {
-  const priceData = req.body;
+  
   try {
-    const newPrice = await createPrdPrice(priceData, priceData.prd_status);
+    const {prd_status, ...priceData} = req.body;
+    const newPrice = await createPrdPrice(priceData, prd_status);
     
 
     await updatePriceHistory({
