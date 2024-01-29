@@ -75,7 +75,7 @@ export const getProductById = async (productId) => {
 
 // get all products
 
-export const getAllProducts = async (page, per_page, search, filters, sort, sortFeatured) => {
+export const getAllProducts = async (page, per_page, search, filters, sort) => {
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -176,10 +176,11 @@ export const getAllProducts = async (page, per_page, search, filters, sort, sort
     }
 
     const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
+
     return {
         products: products,
         totalCount: totalCountResult[0],
-        totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
+        totalPage: Math.ceil(totalCountResult[0].total / per_page),
         per_page: per_page,
         page: page
     }
