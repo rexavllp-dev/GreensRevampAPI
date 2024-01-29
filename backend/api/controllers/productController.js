@@ -1,9 +1,10 @@
 import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
-import { joiOptions } from '../helpers/joiOptions.js';
-import Joi from 'joi';
-import getErrorsInArray from '../helpers/getErrors.js';
+// import { joiOptions } from '../helpers/joiOptions.js';
+// import Joi from 'joi';
+// import getErrorsInArray from '../helpers/getErrors.js';
 import sharp from "sharp";
 import aws from 'aws-sdk';
+
 
 
 const awsConfig = ({
@@ -31,60 +32,60 @@ export const createProduct = async (req, res) => {
         prd_sales_unit,
         prd_return_type,
         prd_brand_id,
-        
-        
+
+
 
     } = req.body;
 
     try {
 
-    const schema = Joi.object({
-        prd_name: Joi.string().required().label("prd_name"),
-        prd_description: Joi.string().required().label("prd_description"),
-        prd_storage_type: Joi.string().required().label("prd_storage_type"),
-        prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
-        prd_tags: Joi.string().required().label("prd_tags"),
-        prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
-        prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
-        prd_status: Joi.boolean().required().label("prd_status "),
-        prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
-        prd_return_type: Joi.string().required().label("prd_return_type"),
-        prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
-       
-    });
-      
+        // const schema = Joi.object({
+        //     prd_name: Joi.string().required().label("prd_name"),
+        //     prd_description: Joi.string().required().label("prd_description"),
+        //     prd_storage_type: Joi.string().required().label("prd_storage_type"),
+        //     prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
+        //     prd_tags: Joi.string().required().label("prd_tags"),
+        //     prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
+        //     prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
+        //     prd_status: Joi.boolean().required().label("prd_status "),
+        //     prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
+        //     prd_return_type: Joi.string().required().label("prd_return_type"),
+        //     prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
+
+        // });
+
 
 
         // product validation data
 
-        const validate_data = {
+        // const validate_data = {
 
-            prd_name,
-            prd_description,
-            prd_storage_type,
-            prd_tax_class,
-            prd_tags,
-            prd_expiry_date,
-            prd_dashboard_status,
-            prd_status,
-            prd_sales_unit,
-            prd_return_type,
-            prd_brand_id,
-            
-            
+        //     prd_name,
+        //     prd_description,
+        //     prd_storage_type,
+        //     prd_tax_class,
+        //     prd_tags,
+        //     prd_expiry_date,
+        //     prd_dashboard_status,
+        //     prd_status,
+        //     prd_sales_unit,
+        //     prd_return_type,
+        //     prd_brand_id,
 
-        };
 
-        const { error } = schema.validate(validate_data, joiOptions);
-        console.log(error)
-        if (error) {
-            return res.status(500).json({
-                status: 500,
-                success: false,
-                message: "Validation Error",
-                error: getErrorsInArray(error?.details),
-            });
-        };
+
+        // };
+
+        // const { error } = schema.validate(validate_data, joiOptions);
+        // console.log(error)
+        // if (error) {
+        //     return res.status(500).json({
+        //         status: 500,
+        //         success: false,
+        //         message: "Validation Error",
+        //         error: getErrorsInArray(error?.details),
+        //     });
+        // };
 
 
         // create a product
@@ -101,7 +102,7 @@ export const createProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            
+
 
         })
 
@@ -144,7 +145,7 @@ export const updateProduct = async (req, res) => {
             prd_brand_id,
             prd_price,
 
-            
+
         } = req.body;
 
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
@@ -162,7 +163,7 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            
+
         });
 
         res.status(200).json({
@@ -191,17 +192,27 @@ export const getAllProduct = async (req, res) => {
         let page = null;
         let per_page = null;
         let search_query = null;
-        
+        let sort = null;
+
         if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
             search_query = req.query.search_query;
         }
+
         if (req.query.page !== null && req.query.page !== undefined && req.query.page !== 'undefined') {
             page = req.query.page;
         }
+
         if (req.query.per_page !== null && req.query.per_page !== undefined && req.query.per_page !== 'undefined') {
             per_page = req.query.per_page;
         }
-        console.log(search_query);                                                                                                     
+
+        if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
+            sort = req.query.sort;
+        }
+
+
+
+        console.log("search", search_query);
 
         const filtersParam = req.query.filters;
 
@@ -211,8 +222,8 @@ export const getAllProduct = async (req, res) => {
         if (filtersParam) {
             filters = JSON.parse(filtersParam);
         };
-       
-        const products = await getAllProducts(page, per_page, search_query, filters);
+
+        const products = await getAllProducts(page, per_page, search_query, filters, sort);
 
         res.status(200).json({
             status: 200,
@@ -232,16 +243,18 @@ export const getAllProduct = async (req, res) => {
     }
 };
 
+
+
 // get a product
 
 export const getSingleProduct = async (req, res) => {
     try {
         const productId = req.params.productId;
 
-      
+
         const products = await getProductById(productId);
         console.log(products);
-        if (!products  || products.length === 0) {
+        if (!products || products.length === 0) {
             return res.status(404).json({
                 status: 404,
                 success: false,
@@ -256,14 +269,14 @@ export const getSingleProduct = async (req, res) => {
         //     url: product.url,
         //     is_baseimage: product.is_baseimage,
         // }));
-       
+
 
         res.status(200).json({
             status: 200,
             success: true,
             message: 'Product single fetched successfully',
             data: {
-                product : products,
+                product: products,
                 // productUrls: productUrls
             }
         });
@@ -282,14 +295,19 @@ export const getSingleProduct = async (req, res) => {
 // delete a product
 
 export const deleteProduct = async (req, res) => {
+    const productIds = req.query.data;
     try {
-        const productId = req.params.productId;
-        const deletedProduct = await deleteAProduct(productId);
+
+        let products = JSON.parse(productIds);
+
+        for (let i = 0; i < products.length; i++) {
+            await deleteAProduct(products[i]);
+        }
         res.status(200).json({
             status: 200,
             success: true,
             message: 'Product deleted successfully',
-            data: deletedProduct,
+
         });
     } catch (error) {
         console.error(error);
@@ -305,12 +323,12 @@ export const deleteProduct = async (req, res) => {
 
 // add product images
 export const addProductImages = async (req, res) => {
-    
+
     try {
         const productId = req.params.productId;
         let files = req.files?.files;
-       
-        if(!files?.length) {
+
+        if (!files?.length) {
             files = [files]
         }
         const isBaseImage = req.body?.isBaseImage;
@@ -318,7 +336,7 @@ export const addProductImages = async (req, res) => {
 
         for (let i = 0; i < files?.length; i++) {
             const file = files[i];
-            
+
 
             const resizedBuffer = await sharp(file.data)
                 .resize({ width: 300, height: 300 })
@@ -344,15 +362,15 @@ export const addProductImages = async (req, res) => {
         console.log(productImages);
 
         // Save product images to the database
-       const savedImages = await createProductGallery(productImages);
+        const savedImages = await createProductGallery(productImages);
 
-       if (isBaseImage && savedImages.length > 0) {
-        const imageUrl = savedImages[0]?.url; // Assuming the URL is stored in the 'url' property
-        if (imageUrl) {
-            // Update the image_url column using the imageUpdater module
-            await saveImageUrl(productId, imageUrl);
+        if (isBaseImage && savedImages.length > 0) {
+            const imageUrl = savedImages[0]?.url; // Assuming the URL is stored in the 'url' property
+            if (imageUrl) {
+                // Update the image_url column using the imageUpdater module
+                await saveImageUrl(productId, imageUrl);
+            }
         }
-    }
 
         res.status(201).json({
             status: 201,
@@ -381,17 +399,17 @@ export const deleteProductImage = async (req, res) => {
         const deletedImage = await deleteProductImageById(imageId);
 
         res.status(200).json({
-          status:200,
-          success:true,
-          message:"Product image deleted successfully",
-          result:deletedImage
+            status: 200,
+            success: true,
+            message: "Product image deleted successfully",
+            result: deletedImage
         });
     } catch (error) {
         res.status(500).json({
-          status:500,
-          success:false,
-          message:"Failed to delete product image",
-          error: error
+            status: 500,
+            success: false,
+            message: "Failed to delete product image",
+            error: error
         });
     }
 };
@@ -419,7 +437,7 @@ export const getProductsWithSorting = async (req, res) => {
         });
     }
 };
-    
+
 
 
 export const getProductsOfCategory = async (req, res) => {
@@ -439,7 +457,7 @@ export const getProductsOfCategory = async (req, res) => {
         if (req.query.per_page !== null && req.query.per_page !== undefined && req.query.per_page !== 'undefined') {
             per_page = req.query.per_page;
         }
-        console.log(search_query);                                                                                                     
+        console.log(search_query);
 
         const filtersParam = req.query.filters;
 
@@ -449,9 +467,9 @@ export const getProductsOfCategory = async (req, res) => {
         if (filtersParam) {
             filters = JSON.parse(filtersParam);
         };
-       
+
         const products = await getProductsByCategory(page, per_page, search_query, filters, categoryId);
-        console.log("products",products);
+        console.log("products", products);
 
         res.status(200).json({
             status: 200,

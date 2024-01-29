@@ -30,11 +30,11 @@ router.put('/update-product/:productId', updateProduct)
 router.get('/get-product/:productId', getSingleProduct)
 
 // delete a product
-router.delete('/delete-product/:productId', deleteProduct);
+router.delete('/delete-product', deleteProduct);
 
 // get all products.
 
-router.get('/get-products', getAllProduct)
+router.get('/get-products', getAllProduct);
 
 // _________________________________________________________________________________________________________________
 
@@ -212,3 +212,4 @@ router.delete('/delete-product-language/:languageId', deleteLanguage);
 router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);  
 
 export default router;
+

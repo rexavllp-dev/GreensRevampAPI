@@ -80,7 +80,7 @@ export const getVariantsByProductId = async (productId) => {
             ) as product_img
         `)
 
-        ).distinct('products.id').groupBy(
-            'products.id', 'product_variants.id');
+        ).distinct('product_variants.variant_id').groupBy(
+            'product_variants.id','products.id')
     return variants;
 };

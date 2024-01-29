@@ -8,14 +8,16 @@ export const addProductVariantValues = async (req, res) => {
 
     try {
         const data = req.body;
-        //     let productVariants = [];
+            let productVariants = [];
 
-        //     for (let i = 0; i < variantsData.length; i++) {
-        //         const variantId = variantsData[i].variant_id;
-        //         productVariants.push({ variant_id: variantId, product_id: productId });
-        //     }
+            for (let i = 0; i < data.length; i++) {
+                const product_id = data[i].variant_id;
+                const variant_id = data[i].product_id;
+                productVariants.push({ variant_id, product_id });
+            }
 
         const newVariant = await createProductVariant(data);
+        const reverseVariant = await createProductVariant(productVariants);
 
         res.status(200).json({
             status: 200,

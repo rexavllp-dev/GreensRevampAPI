@@ -3,8 +3,8 @@
  * @returns { Promise<void> }
  */
 export const up = async (knex) => {
-    await knex.schema.alterTable('product_inventory', (table) => {
-        table.dropUnique(['sku']);
+    await knex.schema.alterTable('products', (table) => {
+        table.timestamp('deleted_at');
     });
 };
 
@@ -13,7 +13,7 @@ export const up = async (knex) => {
  * @returns { Promise<void> }
  */
 export const down = async (knex) => {
-    await knex.schema.alterTable('product_inventory', (table) => {
-        table.unique(['sku']);
+    await knex.schema.alterTable('products', (table) => {
+        table.dropColumn('deleted_at');
     });
 };
