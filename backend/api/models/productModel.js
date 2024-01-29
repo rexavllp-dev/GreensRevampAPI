@@ -75,7 +75,7 @@ export const getProductById = async (productId) => {
 
 // get all products
 
-export const getAllProducts = async (page, per_page, search, filters, sort) => {
+export const getAllProducts = async (page, per_page, search, filters, sort, sortFeatured) => {
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -151,7 +151,19 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         query.orderBy('products_price.product_price', 'asc');
     } else if (sort === 'price_desc') {
         query.orderBy('products_price.product_price', 'desc');
-    }
+    } else if (sort === 'newest') {
+        query.orderBy('products.created_at', 'desc'); //  'created_at' is the creation timestamp of products
+    } else if (sort === 'oldest') {
+        query.orderBy('products.created_at', 'asc');
+    } else if (sort === 'featured') {
+        query.orderBy('product_badge.is_featured', 'desc');
+    };
+
+
+     // Sorting by featured products
+    //  if (sortFeatured) {
+    //     query.orderBy('product_badge.id', 'asc'); // Assuming featured products are identified by the presence of badges
+    // };
 
     const totalCountQuery = query.clone().clearSelect().countDistinct('products.id as total');
 

@@ -12,4 +12,4 @@ export const createSearchHistory = async (searchData) => {
 export const getAllSearch = async () => {
     const searchHistory = await db("search_history").select('*');
     return searchHistory;
-}
+};
