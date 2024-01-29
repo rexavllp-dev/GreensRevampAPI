@@ -8,12 +8,14 @@ import adminRoute from './api/routes/adminRoute.js';
 import productRoute from './api/routes/productRoute.js';
 import brandRoute from './api/routes/brandRoute.js';
 import categoryRoutes from './api/routes/categoryRoute.js';
+import cartRoutes from './api/routes/cartRoute.js';
 import session from 'express-session';
 import passport from 'passport';
 import './api/utils/passport-config.js';
 import fileUpload from 'express-fileupload';
 import axios from 'axios';
 import morgan from 'morgan';
+
 // import createSocketServer from './api/utils/socketIo.js';
 // import http from 'http';
 
@@ -38,13 +40,14 @@ app.use(morgan('combined'))
 // set up session
 app.use(
   session({
-    secret: 'secret-key',
+    secret: 'PP1vPtETlCit2f2omXKKQhn1VUC2BSWOEHhYRAqy2W5rgs1Czl1mBPkLIJclwabVzs5HXhIzKYD8ZxlMWy4FNAbrNru8mh07Gr3vxIyDxUcZbnUIoYYcqt1iNldXB7yfbDVsg0n2MDurOXOpDOrFFw3sAwHj7ZHCzUrZEs5wAgGcX9xWQhBx7wTkoWeGW4rZXbx',
     resave: false,
     saveUninitialized: false,
   })
 );
 
 // Initialize Passport and restore authentication state from the session
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -64,11 +67,16 @@ app.use('/api/v1/admin', adminRoute);
 app.use('/api/v1/products', productRoute);
 app.use('/api/v1/brands', brandRoute);
 app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/cart', cartRoutes);
+
 
 
 app.get('/', (req, res) => {
   res.json("Greens_international Server is Online")
 });
+
+
+
 
 app.get('/download/:url', async function (req, res) {
   let fileUrl = req.params.url;

@@ -35,7 +35,7 @@ export const addProductVariantValues = async (req, res) => {
         });
     }
 };
-
+ 
 //  update variant
 export const updateAVariantLabel = async (req, res) => {
     const product_variantId = req.params.product_variantId;
