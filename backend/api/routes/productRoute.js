@@ -212,3 +212,4 @@ router.delete('/delete-product-language/:languageId', deleteLanguage);
 router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);
 
 export default router;
+

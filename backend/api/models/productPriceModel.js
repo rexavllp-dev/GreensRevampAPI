@@ -3,10 +3,16 @@ import db from '../../config/dbConfig.js';
 
 // create price
 
-export const createPrdPrice = async (priceData) => {
+export const createPrdPrice = async (priceData, prdStatus) => {
     const price = await db("products_price").insert(priceData).returning('*');
+
+    // Update the products table with prd_status
+    await db("products")
+        .where({ id: priceData.product_id }) // Assuming you have a product_id in priceData
+        .update({ prd_status: prdStatus });
     return price;
-}
+};
+
 
 
 
@@ -29,12 +35,14 @@ export const getPrdPrice = async (priceId) => {
                 const price = parseFloat(row.product_price);
                 const specialPriceType = row.special_price_type;
                 const specialPriceValue = parseFloat(row.special_price);
+                const offerStartDate = new Date(row.special_price_start);
                 const offerEndDate = new Date(row.special_price_end);
+                const currentDate = new Date();
+
 
                 let specialPrice;
 
-                if (offerEndDate < new Date()) {
-
+                if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
                     if (specialPriceType === 'percentage') {
                         const discountPercentage = specialPriceValue;
                         specialPrice = price - (price * (discountPercentage / 100));
@@ -44,12 +52,9 @@ export const getPrdPrice = async (priceId) => {
                         console.error('Invalid discount type:', specialPriceType);
                         return null; // Handle invalid discount type
                     }
-                    // Offer has expired, use the current price
-
                 } else {
-                    specialPrice = price;
+                    specialPrice = price; // Use the regular price if not within the offer period
                 }
-                console.log(specialPrice)
 
                 return { ...row, specialPrice };
             });
@@ -57,7 +62,7 @@ export const getPrdPrice = async (priceId) => {
             return result; // Return the calculated result
         }
         );
-    console.log(price, "hello")
+    console.log(price, "price")
     return price;
 }
 
