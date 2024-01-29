@@ -209,6 +209,6 @@ router.delete('/delete-product-language/:languageId', deleteLanguage);
 // stock history route
 
 // get all stock history by product
-router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);
+router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);  
 
 export default router;
