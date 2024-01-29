@@ -10,6 +10,7 @@ export const createPrdPrice = async (priceData, prdStatus) => {
     await db("products")
         .where({ id: priceData.product_id }) // Assuming you have a product_id in priceData
         .update({ prd_status: prdStatus });
+        
     return price;
 };
 

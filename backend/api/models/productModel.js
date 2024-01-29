@@ -176,7 +176,11 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
 
 // delete product
 
-export const deleteAProduct = async (productId) => {
+export const 
+
+
+
+deleteAProduct = async (productId) => {
     const deletedProduct = await db('products')
         .where({ id: productId })
         .update({ deleted_at: db.fn.now() });
