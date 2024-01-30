@@ -1,19 +1,20 @@
 import { createHmac } from "crypto";
 import { addToCart, getCart, getProductId, removeCartItem, updateCartItemQuantity } from "../models/cartModel.js";
+import { calculatePrice } from "../helpers/calculatePrice.js";
 // add product to the session cart and save it in the session
 export const addProductToCart = async (req, res) => {
 
-    const { productId, quantity, price } = req.body;
+    const { productId, quantity } = req.body;
 
     console.log(req.session);
 
-    console.log(productId, quantity, price);
+    console.log(productId, quantity);
 
 
 
     try {
 
-        // await addToCart(req.session, productId, quantity, price);
+        // await addToCart(req.session, productId, quantity);
 
         if (!req.session.cart) {
             req.session.cart = [];
@@ -28,7 +29,7 @@ export const addProductToCart = async (req, res) => {
                 result: req.session.cart.find(item => item.productId === productId)
             })
         }
-        req.session.cart.push({ productId, quantity, price });
+        req.session.cart.push({ productId, quantity });
 
         res.status(200).json({
             status: 200,
@@ -39,6 +40,7 @@ export const addProductToCart = async (req, res) => {
         })
 
     } catch (error) {
+        console.log(error);
 
         res.status(500).json({
             status: 500,
@@ -104,7 +106,8 @@ export const getProductFromCart = async (req, res) => {
 
     try {
         // const cart = await getCart(req.session);
-
+            calculatePrice({ session: req.session })
+    
         if (req.session.cart) {
             const cart = req.session.cart;
             // cart.map(item => item.price = (item.price * item.quantity)*0.05);
@@ -139,14 +142,44 @@ export const getProductFromCart = async (req, res) => {
 
 
             // Calculate VAT (5% of the subtotal)
-            const vat = subtotal * 0.05;
+            // const vat = subtotal * 0.05;
             // add vat of 5% to subtotal
-            subtotal = subtotal + vat;
+
+
+
+            // add shipping fee to subtotal
+            // let shippingFee = 0;
+            let grandTotal = subtotal;
+
+            // Apply reward point discount (adjust the logic as needed)
+            const rewardPointDiscount = 0;
+            // Implement your reward point discount logic here
+
+            // Calculate grand total with shipping charge and reward point discount
+            // let grandTotal = orderTotal + shippingFee - rewardPointDiscount;
+
+            // Check if the order is above 100 AED for free delivery
+
+            let shippingFee = 0;
+
+            if (subtotal >= 100) {
+                shippingFee = 0;
+
+                grandTotal = subtotal - rewardPointDiscount;
+            }
+
+          
+            // Calculate grand total with shipping charge and reward point discount
+            grandTotal = grandTotal + shippingFee - rewardPointDiscount;
+
             const totalProductCount = cart.length;
             const cartData = {
                 cart,
-                vat,
+                // vat,
                 subtotal,
+                shippingFee,
+                rewardPointDiscount,
+                grandTotal,
                 totalProductCount
 
             }
@@ -157,6 +190,14 @@ export const getProductFromCart = async (req, res) => {
                 message: 'Cart retrieved successfully',
             })
         }
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            result: [],
+            message: 'Cart is empty',
+        })
 
     } catch (error) {
         console.log(error);
