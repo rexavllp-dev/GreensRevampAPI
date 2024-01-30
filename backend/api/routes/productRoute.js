@@ -12,6 +12,8 @@ import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOpt
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
+import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
+import { createABulk, deleteABulk, getSingleBulk, getsAllBulks, updateABulk } from '../controllers/bulkController.js';
 
 
 
@@ -210,6 +212,28 @@ router.delete('/delete-product-language/:languageId', deleteLanguage);
 
 // get all stock history by product
 router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);  
+
+
+// search history route
+router.post('/create-search', createNewSearchHistory);
+
+// get all search
+router.get('/get-all-search', getAllSearchHistory);
+
+
+// products bulk route
+
+// create a bulk
+router.post('/create-bulk', createABulk);
+// update a bulk
+router.put('/update-bulk/:bulkId', updateABulk);
+// get a bulk
+router.get('/get-bulk/:bulkId', getSingleBulk);
+// get all bulk
+router.get('/get-all-bulk', getsAllBulks);
+// delete bulk
+router.delete('/delete-bulk/:bulkId', deleteABulk);
+
 
 export default router;
 

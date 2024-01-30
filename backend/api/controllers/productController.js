@@ -193,6 +193,7 @@ export const getAllProduct = async (req, res) => {
         let per_page = null;
         let search_query = null;
         let sort = null;
+        // let sortFeatured = false;
 
         if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
             search_query = req.query.search_query;
@@ -209,6 +210,10 @@ export const getAllProduct = async (req, res) => {
         if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
             sort = req.query.sort;
         }
+
+        // if (req.query.sort_featured !== null && req.query.sort_featured !== undefined && req.query.sort_featured !== 'undefined') {
+        //     sortFeatured = req.query.sort_featured === 'true';
+        // }
 
 
 
