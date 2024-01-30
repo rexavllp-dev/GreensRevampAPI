@@ -6,11 +6,9 @@ export const addProductToCart = async (req, res) => {
 
     const { productId, quantity } = req.body;
 
-    console.log(req.session);
+    // console.log(req.session);
 
-    console.log(productId, quantity);
-
-
+    // console.log(productId, quantity);
 
     try {
 
@@ -32,19 +30,19 @@ export const addProductToCart = async (req, res) => {
         req.session.cart.push({ productId, quantity });
 
         res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Product added to cart successfully',
-            result: req.session.cart
+            status: 200,    
+            success: true,      
+            message: 'Product added to cart successfully',  
+            result: req.session.cart    
 
         })
 
-    } catch (error) {
-        console.log(error);
+    } catch (error) {   
+        console.log(error); 
 
-        res.status(500).json({
+        res.status(500).json({  
             status: 500,
-            success: false,
+            success: false,         
             error: error,
             message: 'Failed to add product to cart. Please try again later.',
         })
@@ -61,7 +59,7 @@ export const updateProductCartQuantity = async (req, res) => {
 
     const { productId, newQuantity } = req.body;
 
-    console.log(req.session);
+    // console.log(req.session);
 
     try {
 
@@ -106,8 +104,8 @@ export const getProductFromCart = async (req, res) => {
 
     try {
         // const cart = await getCart(req.session);
-            calculatePrice({ session: req.session })
-    
+        console.log(await calculatePrice({ session: req.session }));
+            
         if (req.session.cart) {
             const cart = req.session.cart;
             // cart.map(item => item.price = (item.price * item.quantity)*0.05);
@@ -122,7 +120,7 @@ export const getProductFromCart = async (req, res) => {
                 const product = await getProductId(productId);
 
                 if (product) {
-                    console.log("Product:", product);
+                    // console.log("Product:", product);
                     cart[i].name = product.prd_name;
                     cart[i].image = product.image_url;
                     cart[i].price = product.product_price;
@@ -135,7 +133,7 @@ export const getProductFromCart = async (req, res) => {
 
             }
 
-            console.log("Cart:", cart);
+            // console.log("Cart:", cart);
 
             // Calculate subtotal without VAT
             let subtotal = cart.reduce((total, item) => total + item.totalPrice, 0);

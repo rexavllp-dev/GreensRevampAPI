@@ -1,56 +1,33 @@
-export const calculatePrice = ({
-    session
+import { getProductId } from "../models/cartModel.js";
+
+export const calculatePrice = async ({
+    session,
+    isShipping = true,
+    couponCodes = [],
+    rewardPoints = 0
 }) => {
 
-    // Add logic to calculate the total price of the cart
-    try {
-        const cart = req.session.cart;
-        // Calculate subtotal without VAT
-        let subtotal = cart.reduce((total, item) => total + item.totalPrice, 0);
-    
-        // Calculate VAT (5% of the subtotal)
-        // const vat = subtotal * 0.05;
-        // add vat of 5% to subtotal
-    
-        // add shipping fee to subtotal
-        // let shippingFee = 0;
-        let grandTotal = subtotal;
-    
-        // Apply reward point discount (adjust the logic as needed)
-        const rewardPointDiscount = 0;
-        // Implement your reward point discount logic here
-    
-        // Calculate grand total with shipping charge and reward point discount
-        // let grandTotal = orderTotal + shippingFee - rewardPointDiscount;
-    
-        // Check if the order is above 100 AED for free delivery
-        let shippingFee = 0;
-    
-        if (subtotal >= 100) {
-            shippingFee = 0;
-            grandTotal = subtotal - rewardPointDiscount;
-        }
-    
-        // Calculate grand total with shipping charge and reward point discount
-        grandTotal = grandTotal + shippingFee - rewardPointDiscount;
-    
-        const totalProductCount = cart.length;
-        const cartData = {
-            cart,
-            // vat,
-            subtotal,
-            shippingFee,
-            rewardPointDiscount,
-            grandTotal,
-            totalProductCount
-        };
-    
-        return cartData;
-    
-    console.log('Session:', session);
-}catch (error) {
+    let cart = session.cart;
 
-    console.log(error);
-}
+    for (let i = 0; i < session.cart?.length; i++) {
+
+        const cartProduct = session.cart[i];
+        const product = await getProductId(cartProduct.productId);
+
+        if (product) {
+
+            cart[i].name = product.prd_name;
+            cart[i].image = product.image_url;
+            cart[i].price = product.product_price;
+            cart[i].description = product.prd_description;
+
+            // Calculate the total price for each item considering quantity
+            cart[i].totalPrice = parseFloat(product.product_price) * parseInt(cart[i].quantity);
+        }
+    }
+
+    return {
+        products: cart
+    }
 
 }
