@@ -36,6 +36,8 @@ export const getProductById = async (productId) => {
             'product_badge.id as product_badge_id',
             'product_category.*',
             'product_category.id as product_category_id',
+            "products_bulks.*",
+            "products_bulks.id as product_bulks_id",
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -44,6 +46,17 @@ export const getProductById = async (productId) => {
                     'is_baseimage', product_gallery.is_baseimage
                 )
             ) as product_img
+        `),
+            db.raw(`
+            jsonb_agg(
+                jsonb_build_object(
+                    'id', products_bulks.id,
+                    'product_id', products_bulks.product_id,
+                    'start_range', products_bulks.start_range,
+                    'end_range', products_bulks.end_range,
+                    'discounted_price', products_bulks.discounted_price
+                )
+            ) as bulk_options
         `)
         )
         .from('products')
@@ -55,6 +68,7 @@ export const getProductById = async (productId) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .leftJoin('products_bulks', 'products.id', 'products_bulks.product_id')
         .where('products.id', productId)
         .whereNull('products.deleted_at')
         .groupBy(
@@ -65,9 +79,20 @@ export const getProductById = async (productId) => {
             'product_inventory.id',
             'product_seo.id',
             'product_badge.id',
-            'product_category.id'
+            'product_category.id',
+            'products_bulks.id'
         )
         .first();
+
+        if (products) {
+            // Retrieve bulk options separately since they are aggregated in the query
+            const bulkOptions = await db('products_bulks')
+                .select('*')
+                .where('product_id', productId);
+            
+            // Assign bulk options to the product
+            products.bulk_options = bulkOptions;
+        }
 
     return products;
 
@@ -85,6 +110,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+
         .select(
             'products.*',
             'brands.*',
@@ -101,6 +127,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -121,6 +148,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
+
         )
         .whereNull('deleted_at');
 
@@ -160,7 +188,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
     };
 
 
-     // Sorting by featured products
+    // Sorting by featured products
     //  if (sortFeatured) {
     //     query.orderBy('product_badge.id', 'asc'); // Assuming featured products are identified by the presence of badges
     // };
@@ -180,7 +208,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
     return {
         products: products,
         totalCount: totalCountResult[0],
-        totalPage: Math.ceil(totalCountResult[0].total / per_page),
+        totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
         per_page: per_page,
         page: page
     }
@@ -189,17 +217,17 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
 
 // delete product
 
-export const 
+export const
 
 
 
-deleteAProduct = async (productId) => {
-    const deletedProduct = await db('products')
-        .where({ id: productId })
-        .update({ deleted_at: db.fn.now() });
+    deleteAProduct = async (productId) => {
+        const deletedProduct = await db('products')
+            .where({ id: productId })
+            .update({ deleted_at: db.fn.now() });
 
-    return deletedProduct;
-};
+        return deletedProduct;
+    };
 
 
 
