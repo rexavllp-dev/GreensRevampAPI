@@ -5,6 +5,8 @@ export const addProductOptionValues = async (req, res) => {
     const { optionId, optionValues } = req.body;
     try {
 
+        let repeatedProducts = [];
+
         // let optionData = optionValues.map((value) => {
 
         //     return { option_id: optionId, option_label: value.option_label, product_id: value.product_id };
@@ -12,9 +14,10 @@ export const addProductOptionValues = async (req, res) => {
 
         let optionData = [];
         for (let i = 0; i < optionValues.length; i++) {
-            const isOptionLabelExist = await checkOptionLabelExist(optionId, optionValues[i].product_id); 
+            const isOptionLabelExist = await checkOptionLabelExist( optionValues[i].product_id); 
 
             if(isOptionLabelExist.length > 0) {
+                repeatedProducts.push(optionValues[i]);
                 console.log(isOptionLabelExist);
                 continue;
             }

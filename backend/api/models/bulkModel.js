@@ -38,3 +38,10 @@ export const deleteBulk = async (bulkId) => {
         .del();
     return bulk;
 };
+
+// _______________________________________________________________________________________________________________________________________________________________________
+
+export const createBulkAbove = async (bulkData) => {
+    const bulk = await db('bulk_above_max_orders').insert(bulkData);
+    return bulk;
+};

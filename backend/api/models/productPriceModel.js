@@ -6,6 +6,7 @@ import db from '../../config/dbConfig.js';
 export const createPrdPrice = async (priceData, prdStatus) => {
     const price = await db("products_price").insert(priceData).returning('*');
 
+    if(prdStatus)
     // Update the products table with prd_status
     await db("products")
         .where({ id: priceData.product_id })

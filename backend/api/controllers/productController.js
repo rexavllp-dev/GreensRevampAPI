@@ -1,4 +1,4 @@
-import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, fetchAllOptionProducts, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
 // import { joiOptions } from '../helpers/joiOptions.js';
 // import Joi from 'joi';
 // import getErrorsInArray from '../helpers/getErrors.js';
@@ -247,6 +247,70 @@ export const getAllProduct = async (req, res) => {
         });
     }
 };
+
+
+export const getAllOptionProducts = async (req, res) => {
+    try {
+
+        let page = null;
+        let per_page = null;
+        let search_query = null;
+        let sort = null;
+        // let sortFeatured = false;
+
+        if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
+            search_query = req.query.search_query;
+        }
+
+        if (req.query.page !== null && req.query.page !== undefined && req.query.page !== 'undefined') {
+            page = req.query.page;
+        }
+
+        if (req.query.per_page !== null && req.query.per_page !== undefined && req.query.per_page !== 'undefined') {
+            per_page = req.query.per_page;
+        }
+
+        if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
+            sort = req.query.sort;
+        }
+
+        // if (req.query.sort_featured !== null && req.query.sort_featured !== undefined && req.query.sort_featured !== 'undefined') {
+        //     sortFeatured = req.query.sort_featured === 'true';
+        // }
+
+
+
+        console.log("search", search_query);
+
+        const filtersParam = req.query.filters;
+
+        let filters = [];
+
+        // Attempt to parse the filters parameter
+        if (filtersParam) {
+            filters = JSON.parse(filtersParam);
+        };
+
+        const products = await fetchAllOptionProducts(page, per_page, search_query, filters, sort);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Products fetched successfully',
+            data: products,
+        });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: "Failed to fetch Product! Please try again later."
+        });
+    }
+};
+
 
 
 
