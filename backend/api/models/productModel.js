@@ -139,6 +139,9 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
                 )
             ) as product_img
         `),
+
+        db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+
         )
         .distinct('products.id')
         .groupBy(
@@ -179,9 +182,9 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
 
     // Sorting by price
     if (sort === 'price_asc') {
-        query.orderBy('products_price.product_price', 'asc');
+        query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) ASC');
     } else if (sort === 'price_desc') {
-        query.orderBy('products_price.product_price', 'desc');
+        query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) DESC');
     } else if (sort === 'newest') {
         query.orderBy('products.created_at', 'desc'); //  'created_at' is the creation timestamp of products
     } else if (sort === 'oldest') {
