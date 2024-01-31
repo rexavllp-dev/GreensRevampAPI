@@ -3,6 +3,7 @@ import db from '../../config/dbConfig.js';
 // get all products
 export const getPublicProducts = async (page, per_page, search, filters, sort) => {
 
+    const currentDateTime = DateTime.local(); // Get the current date and time
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -51,10 +52,15 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
         )
         .whereNull('deleted_at')
         .where('products.prd_status', true);
-        query.where(function () {
-            this.whereNull('products_price.special_price_expiry_date')
-                .orWhere('products_price.special_price_expiry_date', '>=', db.fn.now());
-        })
+       
+
+        // Modify the query to only include products with an active special price based on the current date and time
+        query.where(function() {
+            this.whereNull('products_price.special_price_start') // special price start is null
+                .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
+                .whereNull('products_price.special_price_end') // special price end is null
+                .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
+        });
 
 
     if (search) {

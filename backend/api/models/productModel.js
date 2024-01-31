@@ -110,7 +110,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        .leftJoin('product_variant', 'products.id', 'product_variant.product_id')
+        .leftJoin('product_variants', 'products.id', 'product_variants.product_id')
 
         .select(
             'products.*',
@@ -128,8 +128,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
-            "product_variant.*",
-            "product_variant.id as product_variant_id",
+            "product_variants.*",
+            "product_variants.id as product_variant_id",
 
             db.raw(`
             jsonb_agg(
@@ -151,7 +151,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
-            'product_variant.id',
+            'product_variants.id',
 
         )
         .whereNull('deleted_at');
