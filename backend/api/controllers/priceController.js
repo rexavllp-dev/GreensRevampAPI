@@ -8,6 +8,7 @@ export const createPrice = async (req, res) => {
     const {prd_status, ...priceData} = req.body;
     console.log(req.body)
     const newPrice = await createPrdPrice(priceData, prd_status);
+    console.log(newPrice);
     
 
     await updatePriceHistory({

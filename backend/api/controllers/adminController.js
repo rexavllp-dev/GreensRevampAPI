@@ -1,9 +1,9 @@
 import { joiOptions } from "../helpers/joiOptions.js";
-import { fetchSingleCompany, isActive, isNotActive,  updateCompanyStatus, updateUserVerificationByAdmin } from "../models/adminModel.js";
+import { approveBulkMaxOrder, fetchSingleCompany, getUserFromBulkOrder, isActive, isNotActive, rejectBulkMaxOrder, updateCompanyStatus, updateUserVerificationByAdmin } from "../models/adminModel.js";
 import { checkUserExist, createUser } from "../models/userModel.js";
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
-import { sendVerificationApproved, sendVerificationRejected } from "../utils/emailer.js";
+import { sendVerificationApproved, sendVerificationBulkApproved, sendVerificationBulkRejected, sendVerificationRejected } from "../utils/emailer.js";
 
 
 
@@ -187,21 +187,21 @@ export const approveCompanyByAdmin = async (req, res) => {
     try {
         const companyData = await fetchSingleCompany(companyId);
         // console.log(companyData);
-         await updateCompanyStatus({companyId, approvalId: 2, verificationStatus: true});
+        await updateCompanyStatus({ companyId, approvalId: 2, verificationStatus: true });
         const userId = companyData?.id;
         // console.log(companyData.id);
-        console.log( companyData.usr_email, companyData.usr_firstname );
+        console.log(companyData.usr_email, companyData.usr_firstname);
         await isActive(userId);
 
         await sendVerificationApproved(companyData.usr_email, companyData.usr_firstname);
-        
- 
-        
+
+
+
         res.status(200).json({
             status: 200,
             success: true,
             message: "Company approved successfully",
-           
+
         });
 
     } catch (error) {
@@ -223,7 +223,7 @@ export const rejectCompanyByAdmin = async (req, res) => {
     try {
         const companyData = await fetchSingleCompany(companyId);
         // console.log(companyData);
-         await updateCompanyStatus({ companyId, approvalId: 3, verificationStatus: false });
+        await updateCompanyStatus({ companyId, approvalId: 3, verificationStatus: false });
         const userId = companyData?.id;
         await isNotActive(userId)
 
@@ -233,7 +233,7 @@ export const rejectCompanyByAdmin = async (req, res) => {
             status: 200,
             success: true,
             message: "Company rejected successfully",
-            
+
         });
 
     } catch (error) {
@@ -247,3 +247,61 @@ export const rejectCompanyByAdmin = async (req, res) => {
 
 };
 
+
+
+export const approveBulkAboveMaxOrders = async (req, res) => {
+    const bulkId = req.params.bulkId;
+    try {
+
+        await approveBulkMaxOrder(bulkId);
+
+        // Get user information for the approved bulk order
+        const user = await getUserFromBulkOrder(bulkId);
+        console.log(user);
+        
+        await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Bulk order approved successfully",
+
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to approve bulk order",
+            result: ""
+        });
+    }
+};
+
+
+
+export const rejectBulkAboveMaxOrders = async (req, res) => {
+    const bulkId = req.params.bulkId;
+    try {
+        await rejectBulkMaxOrder(bulkId);
+
+        const user = await getUserFromBulkOrder(bulkId);
+        console.log(user);
+        console.log(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+
+        await sendVerificationBulkRejected(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Bulk order rejected successfully",
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to reject bulk order",
+            error: error
+        });
+    }
+};

@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
+import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllOptionProducts, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import {  createProductInventory,  modifyStock,  updateProductInventory } from '../controllers/inventoryController.js';
@@ -13,7 +13,7 @@ import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateP
 import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
-import { createABulk, deleteABulk, getSingleBulk, getsAllBulks, updateABulk } from '../controllers/bulkController.js';
+import { createABulk, createBulkAboveMaxOrders, deleteABulk, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, updateABulk } from '../controllers/bulkController.js';
 
 
 
@@ -37,6 +37,8 @@ router.delete('/delete-product', deleteProduct);
 // get all products.
 
 router.get('/get-products', getAllProduct);
+
+router.get('/get-all-option-products', getAllOptionProducts);
 
 // _________________________________________________________________________________________________________________
 
@@ -233,6 +235,15 @@ router.get('/get-bulk/:bulkId', getSingleBulk);
 router.get('/get-all-bulk', getsAllBulks);
 // delete bulk
 router.delete('/delete-bulk/:bulkId', deleteABulk);
+
+
+// bulk above route
+
+// create a bulk above
+router.post('/create-bulk-above-max-orders', createBulkAboveMaxOrders);
+
+// get a bulk above
+router.get('/get-bulk-above/:bulkId', getSingleBulkAboveMaxOrder);
 
 
 export default router;

@@ -52,10 +52,10 @@ export const getOptionValuesByOptionId = async (optionId) => {
 };
 
 
-export const checkOptionLabelExist = async (optionId, productId) => {
+export const checkOptionLabelExist = async (productId) => {
     const option = await db('product_options')
         .where({
-            option_id: optionId,
+              
             product_id: productId,
         })
         .select('*')
