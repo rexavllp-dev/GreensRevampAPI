@@ -71,9 +71,22 @@ export const rejectBulkMaxOrder = async (bulkId) => {
 
 export const getUserFromBulkOrder = async (bulkId) => {
     const user = await db('bulk_above_max_orders')
-    .where({ 'bulk_above_max_orders.id': bulkId })
-    .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
-    .select('users.*');
+        .where({ 'bulk_above_max_orders.id': bulkId })
+        .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
+        .join('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
+        .select(
+            'users.*',
+            'bulk_above_max_orders.*',
+            'products.*'
+        )
+        .first();
+
+    console.log(user);
+
+    return user;
 };
+
+
+
 
 
