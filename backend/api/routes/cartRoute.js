@@ -17,7 +17,7 @@ router.put('/update-cart-quantity', updateProductCartQuantity);
 router.get('/get-cart', getProductFromCart);
 
 // delete item from cart
-
+   
  router.delete('/delete-cart-item/:productId', removeProductFromCart);
 
 

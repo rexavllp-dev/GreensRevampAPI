@@ -34,8 +34,8 @@ export const addProductToCart = async (req, res) => {
             status: 200,
             success: true,
             message: 'Product added to cart successfully',
-            result: req.session.cart
-
+            result: req.session.cart,
+            connectSid: req.sessionID
         })
 
     } catch (error) {
@@ -55,33 +55,29 @@ export const addProductToCart = async (req, res) => {
 // update item quantity in express session
 
 export const updateProductCartQuantity = async (req, res) => {
-
-
-    const { productId, newQuantity } = req.body;
-
+    const { productId, newQuantity, operator } = req.body;
     console.log(req.session);
 
     try {
-
         // await updateCartItemQuantity(req.session, productId, newQuantity);
-
         if (req.session.cart) {
             req.session.cart = req.session.cart.map(item => {
                 if (item.productId === productId) {
-                    item.quantity += newQuantity;
+                    if(operator === 'add'){
+                        item.quantity += 1;
+                    }else {
+                        item.quantity -= 1;
+                    }
                 }
                 return item;
             })
-        }
-
+        } 
 
         res.status(200).json({
-
             status: 200,
             success: true,
             message: 'Product quantity updated successfully',
             result: req.session.cart
-
         })
 
     } catch (error) {
@@ -107,7 +103,7 @@ export const getProductFromCart = async (req, res) => {
 
         if (req.session.cart) {
             const cart = req.session.cart;
-            // cart.map(item => item.price = (item.price * item.quantity)*0.05);
+            // cart.map(item => item.price = (item.price * parseInt(item.quantity))*0.05);
 
 
             // for loop to fetch data of products from products collection
@@ -156,9 +152,16 @@ export const getProductFromCart = async (req, res) => {
                 result: cartData,
                 message: 'Cart retrieved successfully',
             })
+        }else {
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                result: [],
+                message: 'Cart is empty',    
+            })
         }
 
-    } catch (error) {
+    } catch (error) {    
         console.log(error);
         res.status(500).json({
             status: 500,
