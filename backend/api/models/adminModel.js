@@ -19,7 +19,7 @@ export const updateUserVerificationByAdmin = async (userId) => {
 
 // update company status
 export const updateCompanyStatus = async (companyData) => {
-  
+
     console.log(companyData.approvalId);
 
     const updateUserResult = await db('users')
@@ -49,5 +49,31 @@ export const fetchSingleCompany = async (companyId) => {
     return companyData;
 };
 
+
+
+// approve and reject Bulk Above Max Orders by admin
+export const approveBulkMaxOrder = async (bulkId) => {
+    return db('bulk_above_max_orders')
+        .where({ id: bulkId })
+        .update({ approved_status: true })
+
+
+};
+
+export const rejectBulkMaxOrder = async (bulkId) => {
+    return db('bulk_above_max_orders')
+        .where({ id: bulkId })
+        .update({ approved_status: false })
+
+};
+
+
+
+export const getUserFromBulkOrder = async (bulkId) => {
+    const user = await db('bulk_above_max_orders')
+    .where({ 'bulk_above_max_orders.id': bulkId })
+    .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
+    .select('users.*');
+};
 
 

@@ -45,3 +45,13 @@ export const createBulkAbove = async (bulkData) => {
     const bulk = await db('bulk_above_max_orders').insert(bulkData);
     return bulk;
 };
+
+
+export const  getBulkAboveOrder = async (bulkId) => {
+    const bulk = await db('bulk_above_max_orders')
+        .where({ id: bulkId })
+        .select('*')
+        .first();
+
+    return bulk;
+};
