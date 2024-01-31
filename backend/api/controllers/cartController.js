@@ -37,12 +37,12 @@ export const addProductToCart = async (req, res) => {
             connectSid: req.sessionID
         })
 
-    } catch (error) {   
-        console.log(error); 
+    } catch (error) {
+        console.log(error);
 
-        res.status(500).json({  
+        res.status(500).json({
             status: 500,
-            success: false,         
+            success: false,
             error: error,
             message: 'Failed to add product to cart. Please try again later.',
         })
@@ -63,15 +63,16 @@ export const updateProductCartQuantity = async (req, res) => {
         if (req.session.cart) {
             req.session.cart = req.session.cart.map(item => {
                 if (item.productId === productId) {
-                    if(operator === 'add'){
+                    if (operator === 'add') {
                         item.quantity += 1;
-                    }else {
+                    } else {
+                        if (item.quantity <= 1) { return item }
                         item.quantity -= 1;
                     }
                 }
                 return item;
             })
-        } 
+        }
 
         res.status(200).json({
             status: 200,
@@ -101,7 +102,7 @@ export const getProductFromCart = async (req, res) => {
     try {
         // const cart = await getCart(req.session);
         console.log(await calculatePrice({ session: req.session }));
-            
+
         if (req.session.cart) {
             const cart = req.session.cart;
             // cart.map(item => item.price = (item.price * parseInt(item.quantity))*0.05);
@@ -162,7 +163,7 @@ export const getProductFromCart = async (req, res) => {
                 grandTotal = subtotal - rewardPointDiscount;
             }
 
-          
+
             // Calculate grand total with shipping charge and reward point discount
             grandTotal = grandTotal + shippingFee - rewardPointDiscount;
 
@@ -183,16 +184,16 @@ export const getProductFromCart = async (req, res) => {
                 result: cartData,
                 message: 'Cart retrieved successfully',
             })
-        }else {
+        } else {
             return res.status(200).json({
                 status: 200,
                 success: true,
                 result: [],
-                message: 'Cart is empty',    
+                message: 'Cart is empty',
             })
         }
 
-    } catch (error) {    
+    } catch (error) {
         console.log(error);
         res.status(500).json({
             status: 500,
@@ -218,7 +219,7 @@ export const removeProductFromCart = async (req, res) => {
         let cart;
         if (req.session.cart) {
             console.log(req.session.cart);
-            cart = req.session.cart.filter((cartItem) => cartItem.productId !== parseInt(productId));
+            cart = req.session.cart.filter((cartItem) => parseInt(cartItem.productId) !== parseInt(productId));
         }
 
         req.session.cart = cart;
@@ -233,10 +234,7 @@ export const removeProductFromCart = async (req, res) => {
 
     } catch (error) {
 
-        console.log(error);
-
         res.status(500).json({
-
             status: 500,
             success: false,
             error: error,
