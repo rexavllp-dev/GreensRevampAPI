@@ -171,7 +171,10 @@ router.get('/get-option-values/:optionId', getOptionsValues);
 
 
 // update product option
-router.put('/update-product-option/:product_optionId', updateAOptionLabel);
+router.put('/update-product-option', updateAOptionLabel);
+
+// update all option label
+
 
 // delete product option
 router.delete('/delete-product-option/:product_optionId', deleteOptionLabel);
