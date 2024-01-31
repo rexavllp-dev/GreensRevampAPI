@@ -1,4 +1,5 @@
 import db from '../../config/dbConfig.js';
+import { DateTime } from 'luxon';
 
 // get all products
 export const getPublicProducts = async (page, per_page, search, filters, sort) => {
@@ -51,7 +52,7 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
             'product_category.id',
         )
         .whereNull('deleted_at')
-        .where('products.prd_status', true);
+        .where('products.prd_status', true)
        
 
         // Modify the query to only include products with an active special price based on the current date and time
@@ -61,6 +62,7 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
                 .whereNull('products_price.special_price_end') // special price end is null
                 .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
         });
+    
 
 
     if (search) {
