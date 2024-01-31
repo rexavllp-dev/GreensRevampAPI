@@ -51,6 +51,10 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
         )
         .whereNull('deleted_at')
         .where('products.prd_status', true);
+        query.where(function () {
+            this.whereNull('products_price.special_price_expiry_date')
+                .orWhere('products_price.special_price_expiry_date', '>=', db.fn.now());
+        })
 
 
     if (search) {

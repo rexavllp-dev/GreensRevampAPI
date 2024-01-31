@@ -56,15 +56,16 @@ export const addProductOptionValues = async (req, res) => {
 
 //  updated option
 export const updateAOptionLabel = async (req, res) => {
-    const { product_optionIds, option_labels } = req.body;
+    const { product_options } = req.body;
     
     try {
 
         const updatedOptions = [];
-        for (let i = 0; i < product_optionIds.length; i++) {
-            const updatedOption = await updateOptionLabel(product_optionIds[i], option_labels[i]);
+       
+        for (const { product_optionId, option_label } of product_options) {
+            const updatedOption = await updateOptionLabel(product_optionId, option_label);
             updatedOptions.push(updatedOption);
-        }
+        };
 
         if (updatedOptions.length > 0) {
             return res.status(200).json({
@@ -73,8 +74,6 @@ export const updateAOptionLabel = async (req, res) => {
                 message: "Option label updated successfully",
                 result: updatedOptions
             });
-        } else {
-            res.status(404).json({ success: false, message: 'Option not found' });
         };
 
     } catch (error) {
