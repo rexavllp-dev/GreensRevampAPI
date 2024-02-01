@@ -6,20 +6,23 @@ export const createPrice = async (req, res) => {
   
   try {
     const {prd_status, ...priceData} = req.body;
+    console.log(req.body)
     const newPrice = await createPrdPrice(priceData, prd_status);
+    console.log(newPrice);
     
 
     await updatePriceHistory({
-      product_price_id: newPrice[0].id,
+      product_price_id: newPrice[0].id, 
       product_price: newPrice[0].product_price,
       special_price: newPrice[0].special_price,
       special_price_type: newPrice[0].special_price_type,
-      special_price_start: newPrice[0].special_price_start,
+      special_price_start: newPrice[0].special_price_start,   
       special_price_end: newPrice[0].special_price_end,
       user_id: req?.user?.id
     });
+    
     res.status(201).json({
-      status: 201,
+      status: 201,    
       success: true,
       message: "Price added successfully",
       result: newPrice,

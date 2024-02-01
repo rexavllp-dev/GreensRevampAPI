@@ -9,20 +9,23 @@ export const createProductOption = async (optionData) => {
 
 // update option label
 export const updateOptionLabel = async (product_optionId, option_label) => {
+
     const updatedOption = await db('product_options')
-        .where({
-            id: product_optionId
-        })
-        .update(option_label)
-        .returning('*');
+    .where({
+        id: product_optionId
+    })
+    .update({ option_label })
+    .returning('*');
     return updatedOption;
 };
+
+
 
 // delete option label
 export const deleteAOptionLabel = async (product_optionId) => {
     const deleteOption = db('product_options').where({ id: product_optionId }).del();
     return deleteOption;
-}
+};
 
 
 
@@ -52,13 +55,15 @@ export const getOptionValuesByOptionId = async (optionId) => {
 };
 
 
-export const checkOptionLabelExist = async (optionId, productId) => {
+export const checkOptionLabelExist = async (productId) => {
     const option = await db('product_options')
         .where({
-            option_id: optionId,
+
             product_id: productId,
         })
         .select('*')
     return option;
-}
+};
+
+
 

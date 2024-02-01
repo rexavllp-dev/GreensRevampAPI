@@ -5,6 +5,8 @@ export const addProductOptionValues = async (req, res) => {
     const { optionId, optionValues } = req.body;
     try {
 
+        let repeatedProducts = [];
+
         // let optionData = optionValues.map((value) => {
 
         //     return { option_id: optionId, option_label: value.option_label, product_id: value.product_id };
@@ -12,9 +14,10 @@ export const addProductOptionValues = async (req, res) => {
 
         let optionData = [];
         for (let i = 0; i < optionValues.length; i++) {
-            const isOptionLabelExist = await checkOptionLabelExist(optionId, optionValues[i].product_id); 
+            const isOptionLabelExist = await checkOptionLabelExist( optionValues[i].product_id); 
 
             if(isOptionLabelExist.length > 0) {
+                repeatedProducts.push(optionValues[i]);
                 console.log(isOptionLabelExist);
                 continue;
             }
@@ -53,20 +56,24 @@ export const addProductOptionValues = async (req, res) => {
 
 //  updated option
 export const updateAOptionLabel = async (req, res) => {
-    const product_optionId = req.params.product_optionId;
-    const option_label = req.body;
+    const { product_options } = req.body;
+    
     try {
-        const updatedOption = await updateOptionLabel(product_optionId, option_label);
 
-        if (updatedOption.length > 0) {
+        const updatedOptions = [];
+       
+        for (const { product_optionId, option_label } of product_options) {
+            const updatedOption = await updateOptionLabel(product_optionId, option_label);
+            updatedOptions.push(updatedOption);
+        };
+
+        if (updatedOptions.length > 0) {
             return res.status(200).json({
                 status: 200,
                 success: true,
                 message: "Option label updated successfully",
-                result: updatedOption
+                result: updatedOptions
             });
-        } else {
-            res.status(404).json({ success: false, message: 'Option not found' });
         };
 
     } catch (error) {
@@ -105,6 +112,9 @@ export const getOptionsValues = async (req, res) => {
         });
     }
 };
+
+
+//  update all option label
 
 
 //  delete option

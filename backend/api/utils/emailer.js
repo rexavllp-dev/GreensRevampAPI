@@ -293,3 +293,100 @@ export const sendBlockVerification = async (usr_email, usr_firstname) => {
   }
 };
 
+// bulk orders
+
+export const sendVerificationBulkApproved = async (usr_email, usr_firstname, productName, quantity) => {
+
+  const emailData = {
+    from: process.env.FROM_GMAIL,
+    email: usr_email,
+    subject: 'Your Bulk Order Request Approved',
+    html: `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bulk order verification </title>
+    </head>
+    <body>
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+
+        <!-- Logo -->
+        <div style="text-align: center;">
+            <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+        </div>
+    
+            <h2> Your Bulk order request rejected </h2>
+    
+            <p> Hello, <b> ${usr_firstname} </b></p>
+    
+            <p>Your bulk order has been approved successfully for product <b>${productName}</b> with quantity <b> ${quantity} </b> </p>
+    
+  
+          
+            <p>Best regards,<br> <b>Greens International </b> </p>
+    
+        </div>
+    </body>
+    </html>`,
+    
+    
+  //   `<p> Dear ${usr_firstname} </p>
+  //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
+  //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
+  //   <p>Thank you</p>
+  // `,
+  };
+
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
+};
+
+
+
+export const sendVerificationBulkRejected = async (usr_email, usr_firstname, productName, quantity) => {
+
+  const emailData = {
+    from: process.env.FROM_GMAIL,
+    email: usr_email,
+    subject: 'Your Bulk Order Request Rejected',
+    html: `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bulk order verification </title>
+    </head>
+    <body>
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+
+        <!-- Logo -->
+        <div style="text-align: center;">
+            <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+        </div>
+    
+            <h2> Your bulk order Rejected  </h2>
+    
+            <p> Hello, <b> ${usr_firstname} </b></p>
+    
+            <p>Your bulk order has been rejected for product <b>${productName}</b> with quantity <b> ${quantity} </b> </p>
+    
+  
+          
+            <p>Best regards,<br> <b>Greens International </b> </p>
+    
+        </div>
+    </body>
+    </html>`,
+
+  };
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
+};
+

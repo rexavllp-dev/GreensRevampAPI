@@ -1,8 +1,10 @@
 import db from '../../config/dbConfig.js';
+import { DateTime } from 'luxon';
 
 // get all products
 export const getPublicProducts = async (page, per_page, search, filters, sort) => {
 
+    const currentDateTime = DateTime.local(); // Get the current date and time
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -12,6 +14,8 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        
+
         .select(
             'products.*',
             'brands.*',
@@ -28,6 +32,8 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
+
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -36,7 +42,10 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
                     'is_baseimage', product_gallery.is_baseimage
                 )
             ) as product_img
-        `)
+        `),
+
+            db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+
         )
         .distinct('products.id')
         .groupBy(
@@ -48,14 +57,25 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
+
+
         )
         .whereNull('deleted_at')
-        .where('products.prd_status', true);
 
+    // Modify the query to only include products with an active special price based on the current date and time
+    query.where(function () {
+        this.whereNull('products_price.special_price_start') // special price start is null
+            .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
+            .whereNull('products_price.special_price_end') // special price end is null
+            .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
+    });
 
     if (search) {
         console.log(search);
-        query.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]);
+        query.where(function () {
+            this.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]) // Search similarity in product name
+                .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
+        });
     };
 
     // Apply complex filters
@@ -77,9 +97,9 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
 
     // Sorting by price
     if (sort === 'price_asc') {
-        query.orderBy('products_price.product_price', 'asc');
+        query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) ASC');
     } else if (sort === 'price_desc') {
-        query.orderBy('products_price.product_price', 'desc');
+        query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) DESC');
     } else if (sort === 'newest') {
         query.orderBy('products.created_at', 'desc'); //  'created_at' is the creation timestamp of products
     } else if (sort === 'oldest') {
@@ -103,6 +123,8 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
         query.limit(limit)
             .offset(offsetValue)
     }
+
+
 
     const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
 

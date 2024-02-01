@@ -55,33 +55,30 @@ export const addProductToCart = async (req, res) => {
 
 // update item quantity in express session
 export const updateProductCartQuantity = async (req, res) => {
-
-
-    const { productId, newQuantity } = req.body;
-
-    // console.log(req.session);
+    const { productId, newQuantity, operator } = req.body;
+    console.log(req.session);
 
     try {
-
         // await updateCartItemQuantity(req.session, productId, newQuantity);
-
         if (req.session.cart) {
             req.session.cart = req.session.cart.map(item => {
                 if (item.productId === productId) {
-                    item.quantity += newQuantity;
+                    if (operator === 'add') {
+                        item.quantity += 1;
+                    } else {
+                        if (item.quantity <= 1) { return item }
+                        item.quantity -= 1;
+                    }
                 }
                 return item;
             })
         }
 
-
         res.status(200).json({
-
             status: 200,
             success: true,
             message: 'Product quantity updated successfully',
             result: req.session.cart
-
         })
 
     } catch (error) {
@@ -224,6 +221,13 @@ export const getProductFromCart = async (req, res) => {
                 result: data,
                 message: 'Cart retrieved successfully',
             })
+        } else {
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                result: [],
+                message: 'Cart is empty',
+            })
         }
 
         res.status(200).json({
@@ -258,7 +262,7 @@ export const removeProductFromCart = async (req, res) => {
         let cart;
         if (req.session.cart) {
             console.log(req.session.cart);
-            cart = req.session.cart.filter((cartItem) => cartItem.productId !== parseInt(productId));
+            cart = req.session.cart.filter((cartItem) => parseInt(cartItem.productId) !== parseInt(productId));
         }
 
         req.session.cart = cart;
@@ -273,10 +277,7 @@ export const removeProductFromCart = async (req, res) => {
 
     } catch (error) {
 
-        console.log(error);
-
         res.status(500).json({
-
             status: 500,
             success: false,
             error: error,
