@@ -1,16 +1,46 @@
-import { bulkInsert, createBulkAbove, deleteBulk, getABulk, getAllBulk, getBulkAboveOrder, updateBulk } from "../models/bulkModel.js";
+import { bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, updateBulk } from "../models/bulkModel.js";
 
 
 export const createABulk = async (req, res) => {
     const bulkData = req.body;
+
     try {
+
+        // Check if start_range exceeds end_range or if it is not provided
+        if (bulkData.start_range >= bulkData.end_range || bulkData.start_range === undefined) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Invalid range values. Start range must be less than end range and should be provided.",
+            });
+        };
+
+        // Check if start_range equals end_range and prompt admin to confirm
+        if (bulkData.start_range === bulkData.end_range) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Start range equals end range. Please confirm if this is intended.",
+            });
+        };
+
+        const existingRange = await existingBulk(bulkData);
+
+        if (existingRange) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Bulk range already exists.",
+            });
+        }
+
+
         const newBulk = await bulkInsert(bulkData);
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Discount Created successfully",
-
+            message: "Discount created successfully",
         });
     } catch (error) {
         console.log(error);
@@ -22,7 +52,6 @@ export const createABulk = async (req, res) => {
         });
     }
 };
-
 
 
 export const updateABulk = async (req, res) => {
