@@ -85,7 +85,7 @@ export const getProductById = async (productId) => {
         )
 
     // Modify the query to only include products with an active special price based on the current date and time
-    products.where(function () {
+    .where(function () {
         this.whereNull('products_price.special_price_start') // special price start is null
             .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
             .whereNull('products_price.special_price_end') // special price end is null

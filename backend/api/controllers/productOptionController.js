@@ -56,13 +56,19 @@ export const addProductOptionValues = async (req, res) => {
 
 //  updated option
 export const updateAOptionLabel = async (req, res) => {
-    const { product_options } = req.body;
+    const { data } = req.body;
     
     try {
 
+         // Convert data into an array of objects
+         const dataArray = Object.entries(data).map(([productId, label]) => ({
+            product_optionId: productId,
+            option_label: label
+        }));
+      
         const updatedOptions = [];
        
-        for (const { product_optionId, option_label } of product_options) {
+        for (const { product_optionId, option_label } of dataArray) {
             const updatedOption = await updateOptionLabel(product_optionId, option_label);
             updatedOptions.push(updatedOption);
         };
