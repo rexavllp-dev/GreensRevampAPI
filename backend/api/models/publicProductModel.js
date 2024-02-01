@@ -38,7 +38,10 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
                     'is_baseimage', product_gallery.is_baseimage
                 )
             ) as product_img
-        `)
+        `),
+
+        db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+
         )
         .distinct('products.id')
         .groupBy(
@@ -87,18 +90,19 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
     });
 
 
-    // Sorting by price
-    if (sort === 'price_asc') {
-        query.orderBy('products_price.product_price', 'asc');
-    } else if (sort === 'price_desc') {
-        query.orderBy('products_price.product_price', 'desc');
-    } else if (sort === 'newest') {
-        query.orderBy('products.created_at', 'desc'); //  'created_at' is the creation timestamp of products
-    } else if (sort === 'oldest') {
-        query.orderBy('products.created_at', 'asc');
-    } else if (sort === 'featured') {
-        query.orderBy('product_badge.is_featured', 'desc');
-    };
+   // Sorting by price
+   if (sort === 'price_asc') {
+    query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) ASC');
+} else if (sort === 'price_desc') {
+    query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) DESC');
+} else if (sort === 'newest') {
+    query.orderBy('products.created_at', 'desc'); //  'created_at' is the creation timestamp of products
+} else if (sort === 'oldest') {
+    query.orderBy('products.created_at', 'asc');
+} else if (sort === 'featured') {
+    query.orderBy('product_badge.is_featured', 'desc');
+};
+
 
 
     // Sorting by featured products

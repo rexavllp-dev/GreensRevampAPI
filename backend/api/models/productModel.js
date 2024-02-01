@@ -1,5 +1,5 @@
-
 import db from '../../config/dbConfig.js';
+import { DateTime } from 'luxon';
 
 // create product
 export const createAProduct = async (productData) => {
@@ -19,6 +19,7 @@ export const updateAProduct = async (productId, updatedData) => {
 
 // get a product
 export const getProductById = async (productId) => {
+    const currentDateTime = DateTime.local(); // Get the current date and time
     const products = await db('products')
         .select(
             'products.*',
@@ -82,6 +83,14 @@ export const getProductById = async (productId) => {
             'product_category.id',
             'products_bulks.id'
         )
+
+    // Modify the query to only include products with an active special price based on the current date and time
+    query.where(function () {
+        this.whereNull('products_price.special_price_start') // special price start is null
+            .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
+            .whereNull('products_price.special_price_end') // special price end is null
+            .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
+    })
         .first();
 
     if (products) {
@@ -101,6 +110,7 @@ export const getProductById = async (productId) => {
 // get all products
 
 export const getAllProducts = async (page, per_page, search, filters, sort) => {
+    const currentDateTime = DateTime.local(); // Get the current date and time
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -110,7 +120,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        // .leftJoin('product_variants', 'products.id', 'product_variants.product_id')
+        
 
         .select(
             'products.*',
@@ -128,7 +138,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
-      
+
 
             db.raw(`
             jsonb_agg(
@@ -140,7 +150,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             ) as product_img
         `),
 
-        db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+            db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
 
         )
         .distinct('products.id')
@@ -153,14 +163,25 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
-            
+
 
         )
-        .whereNull('deleted_at');
+        .whereNull('deleted_at')
+
+    // Modify the query to only include products with an active special price based on the current date and time
+    query.where(function () {
+        this.whereNull('products_price.special_price_start') // special price start is null
+            .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
+            .whereNull('products_price.special_price_end') // special price end is null
+            .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
+    });
 
     if (search) {
         console.log(search);
-        query.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]);
+        query.where(function () {
+            this.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]) // Search similarity in product name
+                .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
+        });
     };
 
     // Apply complex filters
@@ -209,7 +230,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             .offset(offsetValue)
     }
 
-    
+
 
     const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
 
@@ -281,6 +302,7 @@ export const getSortedProducts = async (sortBy) => {
     return products;
 
 };
+
 
 // ____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 // get products by category
@@ -362,8 +384,8 @@ export const fetchAllOptionProducts = async (page, per_page, search, filters, so
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .leftJoin('product_options', 'products.id', 'product_options.product_id')
-        .whereNull('product_options.product_id') 
-        
+        .whereNull('product_options.product_id')
+
 
         .select(
             'products.*',
