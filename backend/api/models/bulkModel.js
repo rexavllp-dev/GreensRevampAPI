@@ -2,9 +2,20 @@ import db from "../../config/dbConfig.js";
 
 
 export const bulkInsert = async (bulkData) => {
+    // Check if start_range is not provided, set it to the value of end_range
+    bulkData.start_range = bulkData.start_range || bulkData.end_range;
     const bulk = await db('products_bulks').insert(bulkData);
     return bulk;
 };
+
+export const existingBulk = async (bulkData) => {
+    const bulk = await db('products_bulks')
+    .where('start_range', '<=', bulkData.end_range)
+    .andWhere('end_range', '>=', bulkData.start_range)
+    .first();
+    
+    return bulk;
+}
 
 
 export const updateBulk = async (bulkData, bulkId) => {
@@ -13,6 +24,8 @@ export const updateBulk = async (bulkData, bulkId) => {
         .update(bulkData);
     return bulk;
 };
+
+
 
 
 export const getABulk = async (bulkId) => {
@@ -47,7 +60,7 @@ export const createBulkAbove = async (bulkData) => {
 };
 
 
-export const  getBulkAboveOrder = async (bulkId) => {
+export const getBulkAboveOrder = async (bulkId) => {
     const bulk = await db('bulk_above_max_orders')
         .where({ id: bulkId })
         .select('*')
