@@ -89,14 +89,15 @@ export const calculatePrice = async ({
     // Add 5 % tax to sub total 
     const taxRate = 0.05;
     const grandTotal = subTotal + (subTotal * taxRate) + shippingCharge + storePickupCharge + codCharge;
-
+    const totalProductCount = cart.length;
     const totals = {
         subTotal: subTotal.toFixed(2),
         grandTotal: grandTotal.toFixed(2),
         totalProductPrice : totalProductPrice.toFixed(2),
         shippingCharge: shippingCharge,
         storePickupCharge: storePickupCharge,
-        codCharge: codCharge
+        codCharge: codCharge,
+        totalProductCount: totalProductCount
     }
 
     return {

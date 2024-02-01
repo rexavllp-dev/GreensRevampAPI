@@ -21,6 +21,8 @@ router.put('/reject/:companyId', rejectCompanyByAdmin);
 router.put('/approve-bulk/:bulkId', approveBulkAboveMaxOrders);
 // reject Bulk Max Order
 router.put('/reject-bulk/:bulkId', rejectBulkAboveMaxOrders);
+
+
 export default router;
 
 
