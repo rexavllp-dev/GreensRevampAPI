@@ -1,4 +1,4 @@
-import { bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, updateBulk } from "../models/bulkModel.js";
+import { bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, updateBulk } from "../models/bulkModel.js";
 
 
 export const createABulk = async (req, res) => {
@@ -170,6 +170,35 @@ export const getSingleBulkAboveMaxOrder = async (req, res) => {
     const bulkId = req.params.bulkId;
     try {
         const bulk = await getBulkAboveOrder(bulkId);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Bulk fetched successfully",
+            result: bulk
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch bulk",
+            error: error
+        });
+    }
+};
+
+
+
+
+export const getBulkWithProductId = async (req, res) => {
+    const productId = req.params.productId;
+    try {
+        const bulk = await getBulkByProductId(productId);
+       
+        console.log(bulk);
+
+       
+
         res.status(200).json({
             status: 200,
             success: true,

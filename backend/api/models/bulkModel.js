@@ -68,3 +68,12 @@ export const getBulkAboveOrder = async (bulkId) => {
 
     return bulk;
 };
+
+
+export const getBulkByProductId = async (productId) => {
+    const bulk = await db('products_bulks')
+    .where({ product_id: productId })
+    .select('*')
+   
+    return bulk;
+}
