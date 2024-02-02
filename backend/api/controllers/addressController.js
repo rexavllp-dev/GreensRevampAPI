@@ -4,6 +4,7 @@ import {
     getAllUserAddresses,
     getUserAddress,
     getUserAddresses,
+    updateOtherUserAddress,
     updateUserAddress
 } from "../models/addressModel.js";
 
@@ -28,7 +29,6 @@ export const createAddress = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
-            error: error,
             message: 'Failed to create address. Please try again later.',
         })
     }
@@ -52,13 +52,17 @@ export const updateAddress = async (req, res) => {
             });
         }
 
-        const userAddress = await getUserAddresses(req.user.id); 
+        const userAddress = await getUserAddresses(req.user?.id); 
         if(userAddress.length === 1 && userAddress[0].id == addressId) {
             // User has only one address, set is_default to true
             addressData.is_default = true;
         }
 
         const address = await updateUserAddress(addressData, addressId);
+
+        // Update other addresses
+        await updateOtherUserAddress(req.user?.id, addressId);
+
         res.status(200).json({
             status: 200,
             success: true,
@@ -153,8 +157,6 @@ export const deleteAddress = async (req, res) => {
             });
         }
 
-
-
         res.status(200).json({
             status: 200,
             success: true,
@@ -171,3 +173,6 @@ export const deleteAddress = async (req, res) => {
         })
     }
 }
+
+
+
