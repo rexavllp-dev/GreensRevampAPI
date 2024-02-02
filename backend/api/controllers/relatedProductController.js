@@ -16,31 +16,37 @@ export const createRelatedProduct = async (req, res) => {
             });
         }
 
-         // Check if related product already exists
-         const existingRelatedProducts = await getRelatedProductsByProductId(product_id);
-         const existingRelatedProductIds = existingRelatedProducts.map(product => product.related_product_id);
+        // Check if related product already exists
+        const existingRelatedProducts = await getRelatedProductsByProductId(product_id);
+        const existingRelatedProductIds = existingRelatedProducts.map(product => product.related_product_id);
 
-         const newData = relatedProductData.filter(relatedProduct => !existingRelatedProductIds.includes(relatedProduct.id));
+    
+        const newData = [];
+        const nonExistingProductIds = [];
 
-         if (newData.length === 0) {
+        //  Check each related product ID if it exists in the database
+        for (const relatedProduct of relatedProductData) {
+            if (!existingRelatedProductIds.includes(relatedProduct.id)) {
+                newData.push({
+                    product_id: product_id,
+                    related_product_id: relatedProduct.id,
+                });
+            } else {
+                nonExistingProductIds.push(relatedProduct.id);
+            }
+        };
+
+        if (newData.length === 0) {
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: "All provided related products already exist",
             });
-        }
+        };
 
-        // map the ids
-        const data = relatedProductData.map((relatedProduct) => {
 
-            return {
-                product_id: product_id,
-                related_product_id: relatedProduct.id,
-            }
-        });
+        const relatedProduct = await addRelatedProduct(newData);
 
-        const relatedProduct = await addRelatedProduct(data);
-        
         res.status(201).json({
             status: 201,
             success: true,
@@ -57,6 +63,66 @@ export const createRelatedProduct = async (req, res) => {
         });
     }
 };
+
+
+//     const { product_id } = req.params;
+//     const { relatedProductData } = req.body;
+
+//     try {
+//         if (!relatedProductData) {
+//             return res.status(400).json({
+//                 status: 400,
+//                 success: false,
+//                 message: "Related product data is required",
+//             });
+//         }
+
+//         // Check if related product already exists
+//         const existingRelatedProducts = await getRelatedProductsByProductId(product_id);
+//         const existingRelatedProductIds = existingRelatedProducts.map(product => product.related_product_id);
+
+//         const newData = [];
+//         const nonExistingProductIds = [];
+
+//         // Check each related product ID if it exists in the database
+//         for (const relatedProduct of relatedProductData) {
+//             if (!existingRelatedProductIds.includes(relatedProduct.id)) {
+//                 newData.push({
+//                     product_id: product_id,
+//                     related_product_id: relatedProduct.id,
+//                 });
+//             } else {
+//                 nonExistingProductIds.push(relatedProduct.id);
+//             }
+//         }
+
+//         if (newData.length === 0) {
+//             return res.status(400).json({
+//                 status: 400,
+//                 success: false,
+//                 message: "All provided related products already exist",
+//                 existingProductIds: nonExistingProductIds,
+//             });
+//         }
+
+//         const createdRelatedProduct = await addRelatedProduct(newData);
+
+//         res.status(201).json({
+//             status: 201,
+//             success: true,
+//             message: "Related product created successfully",
+//             result: createdRelatedProduct
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({
+//             status: 500,
+//             success: false,
+//             message: "Failed to create related product, something went wrong",
+//             error
+//         });
+//     }
+// };
 
 
 // get related products by product id
