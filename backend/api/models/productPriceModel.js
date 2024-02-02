@@ -19,8 +19,15 @@ export const createPrdPrice = async (priceData, prdStatus) => {
 
 
 // update price
-export const updatePrdPrice = async (productId, priceData) => {
+export const updatePrdPrice = async (productId,priceData, prdStatus) => {
     const price = await db("products_price").where({ product_id: productId }).update(priceData).returning();
+
+    if(prdStatus !== undefined)
+    // Update the products table with prd_status
+    await db("products")
+        .where({ id: productId })
+        .update({ prd_status: prdStatus });
+
     return price;
 };
 

@@ -69,7 +69,9 @@ export const getVariantsByProductId = async (productId) => {
         .where('product_variants.product_id', productId)
         .select(
             'product_variants.*',
+            'product_variants.id as product_variant_id',
             'products.*',
+            'products.id as product_id',
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(

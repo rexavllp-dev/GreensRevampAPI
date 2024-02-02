@@ -10,8 +10,9 @@ export const bulkInsert = async (bulkData) => {
 
 export const existingBulk = async (bulkData) => {
     const bulk = await db('products_bulks')
-    .where('start_range', '<=', bulkData.end_range)
-    .andWhere('end_range', '>=', bulkData.start_range)
+    .where('product_id', bulkData.product_id)
+    .where('start_range', '<=', bulkData.end_range)     
+    .andWhere('end_range', '>=', bulkData.start_range)   
     .first();
     
     return bulk;
@@ -20,7 +21,7 @@ export const existingBulk = async (bulkData) => {
 
 export const updateBulk = async (bulkData, bulkId) => {
     const bulk = await db('products_bulks')
-        .where({ id: bulkId })
+        .where({ id: bulkId })  
         .update(bulkData);
     return bulk;
 };

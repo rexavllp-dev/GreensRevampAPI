@@ -6,8 +6,12 @@ export const createABulk = async (req, res) => {
 
     try {
 
+        // Parse float for start_range and end_range
+        bulkData.start_range = parseFloat(bulkData.start_range);
+        bulkData.end_range = parseFloat(bulkData.end_range);
+
         // Check if start_range exceeds end_range or if it is not provided
-        if (bulkData.start_range >= bulkData.end_range || bulkData.start_range === undefined) {
+        if (bulkData.start_range >= bulkData.end_range || isNaN(bulkData.start_range)) {
             return res.status(400).json({
                 status: 400,
                 success: false,
@@ -194,10 +198,10 @@ export const getBulkWithProductId = async (req, res) => {
     const productId = req.params.productId;
     try {
         const bulk = await getBulkByProductId(productId);
-       
+
         console.log(bulk);
 
-       
+
 
         res.status(200).json({
             status: 200,

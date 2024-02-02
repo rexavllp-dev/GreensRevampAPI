@@ -5,7 +5,7 @@ import { createPrdPrice, deletePrdPrice, getAllPrdPrice, getPrdPrice, getProduct
 export const createPrice = async (req, res) => {
   
   try {
-    const {prd_status, ...priceData} = req.body;
+    const { prd_status, ...priceData } = req.body;
     console.log(req.body)
     const newPrice = await createPrdPrice(priceData, prd_status);
     console.log(newPrice);
@@ -44,8 +44,8 @@ export const createPrice = async (req, res) => {
 
 export const updatePrice = async (req, res) => {
   const { productId } = req.params;
-  const priceData = req.body;
-
+  const  { prd_status, ...priceData } = req.body;
+  console.log(prd_status);
   try {
 
     const product = await getProductPriceById(productId);
@@ -61,7 +61,7 @@ export const updatePrice = async (req, res) => {
  
 
      // Apply the special price
-    await updatePrdPrice(productId,priceData);
+    await updatePrdPrice(productId, priceData, prd_status);
 
     //update the price history
 
@@ -86,7 +86,8 @@ export const updatePrice = async (req, res) => {
         special_price_type: product.special_price_type,
         special_price_start: product.special_price_start,
         special_price_end: product.special_price_end,
-        user_id: req?.user?.id
+        user_id: req?.user?.id,
+        prd_status
       },
     });
   } catch (error) {
@@ -103,7 +104,7 @@ export const updatePrice = async (req, res) => {
 
 // get price
 export const getPrice = async (req, res) => {
-  const { priceId } = req.params;
+  const  priceId = req.params.priceId;
   console.log(priceId)
   try {
     const price = await getPrdPrice(priceId);
