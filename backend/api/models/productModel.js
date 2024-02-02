@@ -92,7 +92,7 @@ export const updateAProduct = async (productId, updatedData) => {
 //             .whereNull('products_price.special_price_end') // special price end is null
 //             .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
 //     }).first()
-        
+
 
 //     if (products) {
 //         // Retrieve bulk options separately since they are aggregated in the query
@@ -108,7 +108,7 @@ export const updateAProduct = async (productId, updatedData) => {
 
 export const getProductById = async (productId) => {
     const currentDateTime = DateTime.local(); // Get the current date and time
-    const products =  await db('products')
+    const products = await db('products')
         .select(
             'products.*',
             'brands.*',
@@ -136,7 +136,7 @@ export const getProductById = async (productId) => {
                 )
             ) as product_img
         `)
-        ,
+            ,
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -173,14 +173,14 @@ export const getProductById = async (productId) => {
             'products_bulks.id'
         )
 
-    // Modify the query to only include products with an active special price based on the current date and time
-    .where(function () {
-        this.whereNull('products_price.special_price_start') // special price start is null
-            .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
-            .whereNull('products_price.special_price_end') // special price end is null
-            .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
-    }).first()
-        
+        // Modify the query to only include products with an active special price based on the current date and time
+        .where(function () {
+            this.whereNull('products_price.special_price_start') // special price start is null
+                .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
+                .whereNull('products_price.special_price_end') // special price end is null
+                .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
+        }).first()
+
 
     if (products) {
         // Retrieve bulk options separately since they are aggregated in the query
@@ -207,7 +207,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        
+
 
         .select(
             'products.*',
@@ -274,19 +274,30 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
     // Apply complex filters
 
     filters.forEach(filter => {
-        console.log("filters", filters);
-        console.log("filter", filter);
-        if (filter.operator === '>') {
-            query.where(filter.column, '>', filter.value);
-        }
-        if (filter.operator === '<') {
-            query.where(filter.column, '<', filter.value);
-        }
-        if (filter.operator === '=') {
-            query.where(filter.column, '=', filter.value);
+        if (filter.column === 'computed_price') {
+            // Check if the filter is applied on the computed price
+            if (filter.operator === '>') {
+                // Apply filter for computed price greater than the filter value
+                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) > ?', [filter.value]);
+            } else if (filter.operator === '<') {
+                // Apply filter for computed price less than the filter value
+                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) < ?', [filter.value]);
+            } else if (filter.operator === '=') {
+                // Apply filter for computed price equal to the filter value
+                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) = ?', [filter.value]);
+            }
+        } else {
+            // Apply other filters normally
+            if (filter.operator === '>') {
+                query.where(filter.column, '>', filter.value);
+            } else if (filter.operator === '<') {
+                query.where(filter.column, '<', filter.value);
+            } else if (filter.operator === '=') {
+                query.where(filter.column, '=', filter.value);
+            }
         }
     });
-
+    
 
     // Sorting by price
     if (sort === 'price_asc') {
