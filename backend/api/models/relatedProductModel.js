@@ -28,7 +28,7 @@ export const getRelatedProductsByProductId = async (productId) => {
 
 export const deleteARelatedProduct = async (relatedProductId) => {
     const deleted = await db('related_products')
-        .where({ id: relatedProductId })
+        .where({ related_product_id: relatedProductId })
         .del();
     return deleted;
 };

@@ -156,16 +156,17 @@ export const deleteRelatedProduct = async (req, res) => {
     try {
 
         let relatedProducts = JSON.parse(relatedProductIds);
-
+        let deletedProducts = []
         for (let i = 0; i < relatedProducts.length; i++) {
-            await deleteARelatedProduct(relatedProducts[i]);
+            let deleted = await deleteARelatedProduct(relatedProducts[i]);
+            deletedProducts.push(deleted);
         };
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Deleted related product successfully",
-            result: deleted
+            result: deletedProducts
         });
     } catch (error) {
         console.log(error);
