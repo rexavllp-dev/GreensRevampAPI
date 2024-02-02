@@ -132,7 +132,7 @@ router.get('/get-related-products/:productId', getRelatedProductsWithProductId);
 
 // ______________________________________________________________________________________________
 // delete related product
-router.delete('/delete-related-product/:relatedProductId', deleteRelatedProduct);
+router.delete('/delete-related-product', deleteRelatedProduct);
 
 // reviews routes
 
