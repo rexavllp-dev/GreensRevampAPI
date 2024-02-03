@@ -15,6 +15,22 @@ export const createAddress = async (req, res) => {
     const addressData = req.body;
 
     try {
+        const userAddress = await getUserAddresses(req.user?.id);
+        console.log(userAddress)
+        if (userAddress.length === 0) {
+            // User has no addresses, set is_default to true
+            addressData.is_default = true;
+        } else {
+            // User has addresses           
+            if (addressData.is_default) {
+                const defaultAddress = userAddress.find(address => address.is_default === true);
+                if (defaultAddress) {
+                    defaultAddress.is_default = false;
+                    await updateOtherUserAddress(req.user?.id, defaultAddress.id);
+                }
+            }
+        }
+
         const address = await createUserAddress(addressData);
 
         res.status(200).json({
@@ -52,8 +68,8 @@ export const updateAddress = async (req, res) => {
             });
         }
 
-        const userAddress = await getUserAddresses(req.user?.id); 
-        if(userAddress.length === 1 && userAddress[0].id == addressId) {
+        const userAddress = await getUserAddresses(req.user?.id);
+        if (userAddress.length === 1 && userAddress[0].id == addressId) {
             // User has only one address, set is_default to true
             addressData.is_default = true;
         }

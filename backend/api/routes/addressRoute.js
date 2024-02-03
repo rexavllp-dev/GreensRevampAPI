@@ -1,11 +1,12 @@
 import express from 'express';
 import { createAddress, deleteAddress, getAddress, getAllAddresses, updateAddress } from '../controllers/addressController.js';
+import validateAuth from '../middleware/validateAuth.js';
 
 const router = express.Router();
 
 
 // create address
-router.post('/create-address', createAddress);
+router.post('/create-address', validateAuth, createAddress);
 
 // update address
 router.put('/update-address/:addressId', updateAddress);

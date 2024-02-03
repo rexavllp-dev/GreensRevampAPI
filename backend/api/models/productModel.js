@@ -1,5 +1,6 @@
 import db from '../../config/dbConfig.js';
 import { DateTime } from 'luxon';
+import { getPrdPrice } from './productPriceModel.js';
 
 // create product
 export const createAProduct = async (productData) => {
@@ -92,7 +93,7 @@ export const updateAProduct = async (productId, updatedData) => {
 //             .whereNull('products_price.special_price_end') // special price end is null
 //             .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
 //     }).first()
-        
+
 
 //     if (products) {
 //         // Retrieve bulk options separately since they are aggregated in the query
@@ -108,7 +109,7 @@ export const updateAProduct = async (productId, updatedData) => {
 
 export const getProductById = async (productId) => {
     const currentDateTime = DateTime.local(); // Get the current date and time
-    const products =  await db('products')
+    const products = await db('products')
         .select(
             'products.*',
             'brands.*',
@@ -136,7 +137,7 @@ export const getProductById = async (productId) => {
                 )
             ) as product_img
         `)
-        ,
+            ,
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -173,14 +174,14 @@ export const getProductById = async (productId) => {
             'products_bulks.id'
         )
 
-    // Modify the query to only include products with an active special price based on the current date and time
-    .where(function () {
-        this.whereNull('products_price.special_price_start') // special price start is null
-            .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
-            .whereNull('products_price.special_price_end') // special price end is null
-            .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
-    }).first()
-        
+        // Modify the query to only include products with an active special price based on the current date and time
+        .where(function () {
+            this.whereNull('products_price.special_price_start') // special price start is null
+                .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
+                .whereNull('products_price.special_price_end') // special price end is null
+                .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
+        }).first()
+
 
     if (products) {
         // Retrieve bulk options separately since they are aggregated in the query
@@ -207,7 +208,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        
+
 
         .select(
             'products.*',
@@ -321,8 +322,15 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
 
     const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
 
+
+    // Integrate getPrdPrice for each product
+    const productsWithPrice = await Promise.all(products.map(async (product) => {
+        const prdPrice = await getPrdPrice(product.products_price_id);
+        return { ...product, prdPrice };
+    }));
+
     return {
-        products: products,
+        products: productsWithPrice,
         totalCount: totalCountResult[0],
         totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
         per_page: per_page,

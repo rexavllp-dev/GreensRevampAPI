@@ -6,11 +6,11 @@ import db from '../../config/dbConfig.js';
 export const createPrdPrice = async (priceData, prdStatus) => {
     const price = await db("products_price").insert(priceData).returning('*');
 
-    if(prdStatus)
-    // Update the products table with prd_status
-    await db("products")
-        .where({ id: priceData.product_id })
-        .update({ prd_status: prdStatus });
+    if (prdStatus)
+        // Update the products table with prd_status
+        await db("products")
+            .where({ id: priceData.product_id })
+            .update({ prd_status: prdStatus });
 
     return price;
 };
@@ -19,14 +19,14 @@ export const createPrdPrice = async (priceData, prdStatus) => {
 
 
 // update price
-export const updatePrdPrice = async (productId,priceData, prdStatus) => {
+export const updatePrdPrice = async (productId, priceData, prdStatus) => {
     const price = await db("products_price").where({ product_id: productId }).update(priceData).returning();
 
-    if(prdStatus !== undefined)
-    // Update the products table with prd_status
-    await db("products")
-        .where({ id: productId })
-        .update({ prd_status: prdStatus });
+    if (prdStatus !== undefined)
+        // Update the products table with prd_status
+        await db("products")
+            .where({ id: productId })
+            .update({ prd_status: prdStatus });
 
     return price;
 };
@@ -35,8 +35,11 @@ export const updatePrdPrice = async (productId,priceData, prdStatus) => {
 
 // get a price
 export const getPrdPrice = async (priceId) => {
+
+    const vat = await db("vat").select('vat').first();
+
     // Select the 'price' and 'discount_type' columns, and calculate the 'special_price'
-    const price = await db.select('product_price', 'special_price_type', 'special_price', "special_price_end")
+    const price = await db.select('product_price', 'special_price_type', 'special_price', "special_price_end", "special_price_start")
         .from("products_price").where({ id: priceId })
         .then((rows) => {
             const result = rows.map((row) => {
@@ -48,24 +51,28 @@ export const getPrdPrice = async (priceId) => {
                 const offerEndDate = new Date(row.special_price_end);
                 const currentDate = new Date();
 
-
                 let specialPrice;
+                // Apply VAT to regular and special prices if within the offer period
+
+                const vatPercentage = vat.vat / 100;
+                const priceWithVat = price + (price * vatPercentage);
 
                 if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
+                    console.log('Within offer period');
                     if (specialPriceType === 'percentage') {
                         const discountPercentage = specialPriceValue;
-                        specialPrice = price - (price * (discountPercentage / 100));
+                        specialPrice = priceWithVat - (priceWithVat * (discountPercentage / 100));
                     } else if (specialPriceType === 'fixed') {
-                        specialPrice = price - specialPriceValue;
+                        specialPrice = priceWithVat - specialPriceValue;
                     } else {
                         console.error('Invalid discount type:', specialPriceType);
                         return null; // Handle invalid discount type
                     }
                 } else {
-                    specialPrice = price; // Use the regular price if not within the offer period
+                    specialPrice = priceWithVat; // Use the regular price if not within the offer period
                 }
 
-                return { ...row, specialPrice };
+                return { ...row, specialPrice, price: priceWithVat };
             });
 
             return result; // Return the calculated result
