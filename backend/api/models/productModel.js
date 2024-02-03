@@ -275,19 +275,30 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
     // Apply complex filters
 
     filters.forEach(filter => {
-        console.log("filters", filters);
-        console.log("filter", filter);
-        if (filter.operator === '>') {
-            query.where(filter.column, '>', filter.value);
-        }
-        if (filter.operator === '<') {
-            query.where(filter.column, '<', filter.value);
-        }
-        if (filter.operator === '=') {
-            query.where(filter.column, '=', filter.value);
+        if (filter.column === 'computed_price') {
+            // Check if the filter is applied on the computed price
+            if (filter.operator === '>') {
+                // Apply filter for computed price greater than the filter value
+                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) > ?', [filter.value]);
+            } else if (filter.operator === '<') {
+                // Apply filter for computed price less than the filter value
+                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) < ?', [filter.value]);
+            } else if (filter.operator === '=') {
+                // Apply filter for computed price equal to the filter value
+                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) = ?', [filter.value]);
+            }
+        } else {
+            // Apply other filters normally
+            if (filter.operator === '>') {
+                query.where(filter.column, '>', filter.value);
+            } else if (filter.operator === '<') {
+                query.where(filter.column, '<', filter.value);
+            } else if (filter.operator === '=') {
+                query.where(filter.column, '=', filter.value);
+            }
         }
     });
-
+    
 
     // Sorting by price
     if (sort === 'price_asc') {

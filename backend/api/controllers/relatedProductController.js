@@ -20,7 +20,7 @@ export const createRelatedProduct = async (req, res) => {
         const existingRelatedProducts = await getRelatedProductsByProductId(product_id);
         const existingRelatedProductIds = existingRelatedProducts.map(product => product.related_product_id);
 
-    
+
         const newData = [];
         const nonExistingProductIds = [];
 
@@ -151,15 +151,22 @@ export const getRelatedProductsWithProductId = async (req, res) => {
 
 
 export const deleteRelatedProduct = async (req, res) => {
-    const relatedProductId = req.params.relatedProductId;
+    const relatedProductIds = req.query.data;
 
     try {
-        const deleted = await deleteARelatedProduct(relatedProductId);
+
+        let relatedProducts = JSON.parse(relatedProductIds);
+        let deletedProducts = []
+        for (let i = 0; i < relatedProducts.length; i++) {
+            let deleted = await deleteARelatedProduct(relatedProducts[i]);
+            deletedProducts.push(deleted);
+        };
+
         res.status(200).json({
             status: 200,
             success: true,
             message: "Deleted related product successfully",
-            result: deleted
+            result: deletedProducts
         });
     } catch (error) {
         console.log(error);
