@@ -35,15 +35,16 @@ export const updatePrdPrice = async (productId, priceData, prdStatus) => {
 
 // get a price
 export const getPrdPrice = async (priceId) => {
-
+    console.log(priceId)
     const vat = await db("vat").select('vat').first();
 
     // Select the 'price' and 'discount_type' columns, and calculate the 'special_price'
-    const price = await db.select('product_price', 'special_price_type', 'special_price', "special_price_end", "special_price_start")
-        .from("products_price").where({ id: priceId })
+    const price = await db
+        .select('product_price', 'special_price_type', 'special_price', "special_price_end", "special_price_start")
+        .from("products_price")
+        .where({ id: priceId })
         .then((rows) => {
             const result = rows.map((row) => {
-                console.log(row);
                 const price = parseFloat(row.product_price);
                 const specialPriceType = row.special_price_type;
                 const specialPriceValue = parseFloat(row.special_price);
@@ -78,7 +79,6 @@ export const getPrdPrice = async (priceId) => {
             return result; // Return the calculated result
         }
         );
-    console.log(price, "price")
     return price;
 }
 

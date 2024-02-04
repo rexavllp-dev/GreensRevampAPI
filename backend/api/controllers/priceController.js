@@ -3,26 +3,26 @@ import { createPrdPrice, deletePrdPrice, getAllPrdPrice, getPrdPrice, getProduct
 
 // create price
 export const createPrice = async (req, res) => {
-  
+
   try {
     const { prd_status, ...priceData } = req.body;
     console.log(req.body)
     const newPrice = await createPrdPrice(priceData, prd_status);
     console.log(newPrice);
-    
+
 
     await updatePriceHistory({
-      product_price_id: newPrice[0].id, 
+      product_price_id: newPrice[0].id,
       product_price: newPrice[0].product_price,
       special_price: newPrice[0].special_price,
       special_price_type: newPrice[0].special_price_type,
-      special_price_start: newPrice[0].special_price_start,   
+      special_price_start: newPrice[0].special_price_start,
       special_price_end: newPrice[0].special_price_end,
       user_id: req?.user?.id
     });
-    
+
     res.status(201).json({
-      status: 201,    
+      status: 201,
       success: true,
       message: "Price added successfully",
       result: newPrice,
@@ -35,16 +35,16 @@ export const createPrice = async (req, res) => {
       message: "Failed something went wrong",
     });
   }
-}; 
+};
 
-                                        
+
 
 
 // update price 
 
 export const updatePrice = async (req, res) => {
   const { productId } = req.params;
-  const  { prd_status, ...priceData } = req.body;
+  const { prd_status, ...priceData } = req.body;
   console.log(prd_status);
   try {
 
@@ -57,10 +57,10 @@ export const updatePrice = async (req, res) => {
         message: 'Product not found',
       });
     };
-    
- 
 
-     // Apply the special price
+
+
+    // Apply the special price
     await updatePrdPrice(productId, priceData, prd_status);
 
     //update the price history
@@ -68,7 +68,7 @@ export const updatePrice = async (req, res) => {
     await updatePriceHistory({
       product_price_id: product.id,
       product_price: product.product_price,
-      special_price: product.special_price, 
+      special_price: product.special_price,
       special_price_type: product.special_price_type,
       special_price_start: product.special_price_start,
       special_price_end: product.special_price_end,
@@ -79,10 +79,10 @@ export const updatePrice = async (req, res) => {
       status: 201,
       success: true,
       message: "update successfully",
-      result: { 
+      result: {
         product_price_id: product.id,
         product_price: product.product_price,
-        special_price: product.special_price, 
+        special_price: product.special_price,
         special_price_type: product.special_price_type,
         special_price_start: product.special_price_start,
         special_price_end: product.special_price_end,
@@ -104,7 +104,7 @@ export const updatePrice = async (req, res) => {
 
 // get price
 export const getPrice = async (req, res) => {
-  const  priceId = req.params.priceId;
+  const priceId = req.params.priceId;
   console.log(priceId)
   try {
     const price = await getPrdPrice(priceId);
@@ -152,7 +152,7 @@ export const getAllPrice = async (req, res) => {
   }
 }
 
- 
+
 // delete price
 
 export const deletePrice = async (req, res) => {

@@ -4,6 +4,7 @@ import { createAProduct, createProductGallery, deleteAProduct, deleteProductImag
 // import getErrorsInArray from '../helpers/getErrors.js';
 import sharp from "sharp";
 import aws from 'aws-sdk';
+import { getPrdPrice } from "../models/productPriceModel.js";
 
 
 
@@ -321,9 +322,8 @@ export const getSingleProduct = async (req, res) => {
         const productId = req.params.productId;
 
 
-        const products = await getProductById(productId);
-        console.log(products);
-        if (!products || products.length === 0) {
+        const product = await getProductById(productId);
+        if (!product) {
             return res.status(404).json({
                 status: 404,
                 success: false,
@@ -331,22 +331,25 @@ export const getSingleProduct = async (req, res) => {
             });
         };
 
+        // Retrieve the product price information using getPrdPrice
+        const priceInfo = await getPrdPrice(product?.products_price_id); // Assuming 'price_id' is the relevant field in the product
 
-        // const productUrls = products.map(product => ({
-        //     id: product.id,
-        //     product_id: product.id,
-        //     url: product.url,
-        //     is_baseimage: product.is_baseimage,
-        // }));
+        if (!priceInfo) {
+            return res.status(500).json({
+                status: 500,
+                success: false,
+                message: 'Failed to fetch product price. Please try again later.',
+            });
+        }
 
+        product.product_price = priceInfo;
 
         res.status(200).json({
             status: 200,
             success: true,
             message: 'Product single fetched successfully',
             data: {
-                product: products,
-                // productUrls: productUrls
+                product: product,
             }
         });
     } catch (error) {
