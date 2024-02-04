@@ -70,7 +70,7 @@ export const getPrdPrice = async (priceId) => {
                         return null; // Handle invalid discount type
                     }
                 } else {
-                    specialPrice = priceWithVat; // Use the regular price if not within the offer period
+                    specialPrice = null; // Use the regular price if not within the offer period
                 }
 
                 return { ...row, specialPrice, price: priceWithVat };
