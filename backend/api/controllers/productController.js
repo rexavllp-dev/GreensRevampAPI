@@ -342,7 +342,7 @@ export const getSingleProduct = async (req, res) => {
             });
         }
 
-        product.product_price = priceInfo;
+        product.productPrice = priceInfo;
 
         res.status(200).json({
             status: 200,
