@@ -40,31 +40,37 @@ export const getPrdPrice = async (priceId) => {
 
     // Select the 'price' and 'discount_type' columns, and calculate the 'special_price'
     const price = await db
-        .select('product_price', 'special_price_type', 'special_price', "special_price_end", "special_price_start")
+        .select('product_price', 'special_price_type', 'special_price', "special_price_end", "special_price_start", "is_discount")
         .from("products_price")
         .where({ id: priceId })
         .then((rows) => {
             const result = rows.map((row) => {
+                console.log(row);
                 const price = parseFloat(row.product_price);
                 const specialPriceType = row.special_price_type;
                 const specialPriceValue = parseFloat(row.special_price);
                 const offerStartDate = new Date(row.special_price_start);
                 const offerEndDate = new Date(row.special_price_end);
                 const currentDate = new Date();
+                const isDiscount = row.is_discount; //  to retrieve is_discount
 
                 let specialPrice;
                 // Apply VAT to regular and special prices if within the offer period
 
                 const vatPercentage = vat.vat / 100;
+                console.log('VAT percentage:', vatPercentage);
                 const priceWithVat = price + (price * vatPercentage);
+                console.log('Price with VAT:', priceWithVat);
 
-                if (currentDate >= offerStartDate && currentDate <= offerEndDate) {
+                if (isDiscount === true && currentDate >= offerStartDate && currentDate <= offerEndDate ) {
                     console.log('Within offer period');
                     if (specialPriceType === 'percentage') {
                         const discountPercentage = specialPriceValue;
-                        specialPrice = priceWithVat - (priceWithVat * (discountPercentage / 100));
+                        specialPrice = price - (price * (discountPercentage / 100));
+                        specialPrice = specialPrice + (specialPrice * vatPercentage);
                     } else if (specialPriceType === 'fixed') {
-                        specialPrice = priceWithVat - specialPriceValue;
+                        specialPrice = price - specialPriceValue;
+                        specialPrice = specialPrice + (specialPrice * vatPercentage);
                     } else {
                         console.error('Invalid discount type:', specialPriceType);
                         return null; // Handle invalid discount type

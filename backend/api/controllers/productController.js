@@ -144,7 +144,7 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            prd_price,
+            
 
 
         } = req.body;
@@ -218,7 +218,7 @@ export const getAllProduct = async (req, res) => {
 
 
 
-        console.log("search", search_query);
+        // console.log("search", search_query);
 
         const filtersParam = req.query.filters;
 
@@ -381,6 +381,7 @@ export const deleteProduct = async (req, res) => {
             message: 'Product deleted successfully',
 
         });
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({

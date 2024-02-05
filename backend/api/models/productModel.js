@@ -226,6 +226,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
+            
 
 
             db.raw(`
