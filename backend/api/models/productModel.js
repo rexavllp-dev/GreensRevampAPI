@@ -165,7 +165,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
     if (search) {
         console.log(search);
         query.where(function () {
-            this.whereRaw(`similarity(products.prd_name, ?) > 0.1`, [search]) // Search similarity in product name
+            this.whereRaw(`similarity(products.prd_name, ?) > 0.02`, [search]) // Search similarity in product name
                 .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
         });
     };
