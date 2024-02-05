@@ -1,7 +1,6 @@
 import { createLanguage, getLanguageById, getLanguages } from "../models/languageModel";
 
 
-
 // create language
 export const createALanguage = async (req, res) => {
     const { languageData } = req.body;

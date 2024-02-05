@@ -156,8 +156,18 @@ export const modifyStock = async (req, res) => {
 
       if (action === 'add') {
         newQuantity = currentQuantity + parseInt(quantity);
+        
       } else if (action === 'reduce') {
         newQuantity = currentQuantity - parseInt(quantity);
+
+        if (newQuantity < 0) {
+          return res.status(400).json({
+            status: 400,
+            success: false,
+            message: "Cannot reduce quantity below 0",
+          });
+        };
+
       } else {
         return res.status(400).json({
           status: 400,

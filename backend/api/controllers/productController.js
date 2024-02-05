@@ -216,8 +216,6 @@ export const getAllProduct = async (req, res) => {
         //     sortFeatured = req.query.sort_featured === 'true';
         // }
 
-
-
         // console.log("search", search_query);
 
         const filtersParam = req.query.filters;
@@ -381,7 +379,7 @@ export const deleteProduct = async (req, res) => {
             message: 'Product deleted successfully',
 
         });
-        
+
     } catch (error) {
         console.error(error);
         res.status(500).json({

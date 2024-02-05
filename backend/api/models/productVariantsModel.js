@@ -64,7 +64,7 @@ export const checkVariantLabelExist = async (variantId, productId) => {
 export const getVariantsByProductId = async (productId) => {
     console.log(productId);
     const variants = await db('product_variants')
-        .leftJoin('products', 'products.id', '=', 'product_variants.variant_id')
+        .leftJoin('products', 'products.id', '=', 'product_variants.product_id')
         .leftJoin('product_gallery', 'products.id', '=', 'product_gallery.product_id')
         .where('product_variants.product_id', productId)
         .select(
@@ -82,7 +82,9 @@ export const getVariantsByProductId = async (productId) => {
             ) as product_img
         `)
 
-        ).distinct('product_variants.variant_id').groupBy(
+        )
+        .distinct('product_variants.variant_id')
+        .groupBy(
             'product_variants.id','products.id')
     return variants;
 };
