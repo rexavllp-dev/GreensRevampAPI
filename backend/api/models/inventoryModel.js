@@ -53,7 +53,7 @@ export const updateProductQuantity = async (productId, newQuantity, comment) => 
   await db('stock_history').insert({
     product_id: productId,
     previous_stock: currentStock,
-    qty: newQuantity,
+    qty: Math.abs(newQuantity - currentStock),
     remaining_stock: newQuantity,
     comment: comment,
     action: action === 'add' ? 'New Stock added to main' : 'New Stock reduced to main',
@@ -61,7 +61,6 @@ export const updateProductQuantity = async (productId, newQuantity, comment) => 
     updated_at: new Date(),
   });
 
-  return updatedQuantity;
 };
 
 

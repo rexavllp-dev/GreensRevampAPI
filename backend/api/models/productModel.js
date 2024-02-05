@@ -1,5 +1,4 @@
 import db from '../../config/dbConfig.js';
-import { DateTime } from 'luxon';
 import { getPrdPrice } from './productPriceModel.js';
 
 // create product
@@ -16,99 +15,10 @@ export const updateAProduct = async (productId, updatedData) => {
         .update(updatedData)
         .returning('*'); // Return the updated product
     return updatedProduct;
-}
+};
 
-// get a product
-// export const getProductById = async (productId) => {
-//     const currentDateTime = DateTime.local(); // Get the current date and time
-//     const products =  db('products')
-//         .select(
-//             'products.*',
-//             'brands.*',
-//             'brands.id as brand_id',
-//             'categories.*',
-//             'categories.id as category_id',
-//             'products_price.*',
-//             'products_price.id as products_price_id',
-//             'product_inventory.*',
-//             'product_inventory.id as product_inventory_id',
-//             'product_seo.*',
-//             'product_seo.id as product_seo_id',
-//             'product_badge.*',
-//             'product_badge.id as product_badge_id',
-//             'product_category.*',
-//             'product_category.id as product_category_id',
-//             "products_bulks.*",
-//             "products_bulks.id as product_bulks_id",
-//             db.raw(`
-//             jsonb_agg(
-//                 jsonb_build_object(
-//                     'url', product_gallery.url,
-//                     'id', product_gallery.id,
-//                     'is_baseimage', product_gallery.is_baseimage
-//                 )
-//             ) as product_img
-//         `)
-//         ,
-//             db.raw(`
-//             jsonb_agg(
-//                 jsonb_build_object(
-//                     'id', products_bulks.id,
-//                     'product_id', products_bulks.product_id,
-//                     'start_range', products_bulks.start_range,
-//                     'end_range', products_bulks.end_range,
-//                     'discounted_price', products_bulks.discounted_price
-//                 )
-//             ) as bulk_options
-//         `)
-//         )
-//         .from('products')
-//         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
-//         .leftJoin('product_category', 'products.id', 'product_category.product_id')
-//         .leftJoin('categories', 'product_category.category_id', 'categories.id')
-//         .leftJoin('products_price', 'products.id', 'products_price.product_id')
-//         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
-//         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
-//         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
-//         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-//         .leftJoin('products_bulks', 'products.id', 'products_bulks.product_id')
-//         .where('products.id', productId)
-//         .whereNull('products.deleted_at')
-//         .groupBy(
-//             'products.id',
-//             'brands.id',
-//             'categories.id',
-//             'products_price.id',
-//             'product_inventory.id',
-//             'product_seo.id',
-//             'product_badge.id',
-//             'product_category.id',
-//             'products_bulks.id'
-//         )
-
-//     // Modify the query to only include products with an active special price based on the current date and time
-//     .where(function () {
-//         this.whereNull('products_price.special_price_start') // special price start is null
-//             .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
-//             .whereNull('products_price.special_price_end') // special price end is null
-//             .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
-//     }).first()
-
-
-//     if (products) {
-//         // Retrieve bulk options separately since they are aggregated in the query
-//         const bulkOptions = await db('products_bulks')
-//             .select('*')
-//             .where('product_id', productId);
-
-//         // Assign bulk options to the product
-//         products.bulk_options = bulkOptions;
-//     }
-//     return products;
-// };
 
 export const getProductById = async (productId) => {
-    const currentDateTime = DateTime.local(); // Get the current date and time
     const products = await db('products')
         .select(
             'products.*',
@@ -174,13 +84,7 @@ export const getProductById = async (productId) => {
             'products_bulks.id'
         )
 
-        // Modify the query to only include products with an active special price based on the current date and time
-        .where(function () {
-            this.whereNull('products_price.special_price_start') // special price start is null
-                .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
-                .whereNull('products_price.special_price_end') // special price end is null
-                .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
-        }).first()
+    .first()
 
 
     if (products) {
@@ -198,7 +102,7 @@ export const getProductById = async (productId) => {
 // get all products
 
 export const getAllProducts = async (page, per_page, search, filters, sort) => {
-    const currentDateTime = DateTime.local(); // Get the current date and time
+
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -256,18 +160,12 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         )
         .whereNull('deleted_at')
 
-    // Modify the query to only include products with an active special price based on the current date and time
-    query.where(function () {
-        this.whereNull('products_price.special_price_start') // special price start is null
-            .orWhere('products_price.special_price_start', '<=', currentDateTime.toISO()) // special price start is in the past or now
-            .whereNull('products_price.special_price_end') // special price end is null
-            .orWhere('products_price.special_price_end', '>=', currentDateTime.toISO()); // special price end is in the future or now
-    });
+  
 
     if (search) {
         console.log(search);
         query.where(function () {
-            this.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]) // Search similarity in product name
+            this.whereRaw(`similarity(products.prd_name, ?) > 0.1`, [search]) // Search similarity in product name
                 .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
         });
     };
@@ -298,7 +196,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             }
         }
     });
-    
+
 
     // Sorting by price
     if (sort === 'price_asc') {
@@ -539,7 +437,7 @@ export const fetchAllOptionProducts = async (page, per_page, search, filters, so
 
     if (search) {
         console.log(search);
-        query.whereRaw(`similarity(products.prd_name, ?) > 0.2`, [search]);
+        query.whereRaw(`similarity(products.prd_name, ?) > 0.1`, [search]);
     };
 
     // Apply complex filters
