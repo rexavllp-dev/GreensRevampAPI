@@ -216,9 +216,7 @@ export const getAllProduct = async (req, res) => {
         //     sortFeatured = req.query.sort_featured === 'true';
         // }
 
-
-
-        console.log("search", search_query);
+        // console.log("search", search_query);
 
         const filtersParam = req.query.filters;
 
