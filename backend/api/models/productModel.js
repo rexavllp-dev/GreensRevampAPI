@@ -298,7 +298,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             }
         }
     });
-    
+
 
     // Sorting by price
     if (sort === 'price_asc') {
