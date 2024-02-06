@@ -226,7 +226,7 @@ export const submitBulkOrderRequest = async (req, res) => {
    
     try {
         const { productId, quantity } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.userId;
         console.log(userId);
 
         // Check if the user has already submitted a bulk order request
@@ -304,6 +304,7 @@ export const rejectBulkAboveMaxOrders = async (req, res) => {
             success: true,
             message: "Bulk order rejected successfully",
         });
+        
     } catch (error) {
         console.log(error);
         res.status(500).json({

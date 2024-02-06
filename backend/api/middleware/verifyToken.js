@@ -12,7 +12,7 @@ const verifyToken = (req, res, next) => {
     }
 
     else {
-        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        jwt.verify(token, process.env.JWT_ACCESS, (err, decoded) => {
             if (err) {
                 res.status(401).json({ status: 401, auth: false, message: "Invalid token" });
             }
