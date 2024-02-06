@@ -14,6 +14,7 @@ import { getStockHistoryByProduct } from '../controllers/stockHistoryController.
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkWithProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
+import verifyToken from '../middleware/verifyToken.js';
 
 
 
@@ -251,7 +252,7 @@ router.post('/create-bulk-above-max-orders', createBulkAboveMaxOrders);
 router.get('/get-bulk-above/:bulkId', getSingleBulkAboveMaxOrder);
 
 // submit user bulk request
-router.post('/submit-bulk-request', submitBulkOrderRequest);
+router.post('/submit-bulk-request', verifyToken, submitBulkOrderRequest);
 // get all bulk request
 router.get('/get-all-bulk-request', getBulkOrderRequestsHandler);
 

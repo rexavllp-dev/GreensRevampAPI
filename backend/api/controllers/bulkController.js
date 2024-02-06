@@ -223,9 +223,11 @@ export const getBulkWithProductId = async (req, res) => {
 
 
 export const submitBulkOrderRequest = async (req, res) => {
-    const { userId, productId, quantity } = req.body;
-
+   
     try {
+        const { productId, quantity } = req.body;
+        const userId = req.user.id;
+        console.log(userId);
 
         // Check if the user has already submitted a bulk order request
         const requestExists = await isBulkOrderRequestExists(userId, productId);
