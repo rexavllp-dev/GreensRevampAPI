@@ -1,4 +1,4 @@
-import { bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, updateBulk } from "../models/bulkModel.js";
+import { bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, isBulkOrderRequestExists, saveBulkOrderRequest, updateBulk, updateBulkRequest } from "../models/bulkModel.js";
 
 
 export const createABulk = async (req, res) => {
@@ -201,8 +201,6 @@ export const getBulkWithProductId = async (req, res) => {
 
         console.log(bulk);
 
-
-
         res.status(200).json({
             status: 200,
             success: true,
@@ -219,3 +217,67 @@ export const getBulkWithProductId = async (req, res) => {
         });
     }
 };
+
+
+export const submitBulkOrderRequest = async (req, res) => {
+    const { userId, productId, quantity } = req.body;
+
+    try {
+
+        // Check if the user has already submitted a bulk order request
+        const requestExists = await isBulkOrderRequestExists(userId);
+        if (requestExists) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "User has already submitted a bulk order request wait for admin response",
+            });
+        }
+
+        await saveBulkOrderRequest(userId, productId, quantity);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Bulk order request submitted successfully",
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to submit bulk order request",
+            error: error.message
+        });
+    }
+};
+
+
+
+export const updateBulkOrderRequest = async (req, res) => {
+    const { bulkId } = req.params.bulkId;
+    const { status } = req.body;
+
+    try {
+        // Update the bulk order request in the database
+        await updateBulkRequest(bulkId, status);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Bulk order request updated successfully",
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to update bulk order request",
+            error: error.message
+        });
+    }
+};
+
+
+
+

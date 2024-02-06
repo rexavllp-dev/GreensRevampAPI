@@ -183,6 +183,7 @@ export const isNotActiveByAdmin = async (req, res) => {
 // approve by admin  
 
 export const approveCompanyByAdmin = async (req, res) => {
+
     const { companyId } = req.params;
     try {
         const companyData = await fetchSingleCompany(companyId);
@@ -252,13 +253,14 @@ export const rejectCompanyByAdmin = async (req, res) => {
 export const approveBulkAboveMaxOrders = async (req, res) => {
     const bulkId = req.params.bulkId;
     try {
+        
 
         await approveBulkMaxOrder(bulkId);
 
         // Get user information for the approved bulk order
         const user = await getUserFromBulkOrder(bulkId);
         console.log(user);
-        
+
         await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
 
         res.status(200).json({

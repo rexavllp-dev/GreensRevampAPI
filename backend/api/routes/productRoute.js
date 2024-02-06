@@ -13,7 +13,7 @@ import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateP
 import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
-import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkWithProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, updateABulk } from '../controllers/bulkController.js';
+import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkWithProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 
 
 
@@ -249,6 +249,9 @@ router.post('/create-bulk-above-max-orders', createBulkAboveMaxOrders);
 
 // get a bulk above
 router.get('/get-bulk-above/:bulkId', getSingleBulkAboveMaxOrder);
+
+// submit user bulk request
+router.post('/submit-bulk-request', submitBulkOrderRequest);
 
 
 export default router;

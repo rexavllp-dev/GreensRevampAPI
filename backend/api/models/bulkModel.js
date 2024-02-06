@@ -10,18 +10,18 @@ export const bulkInsert = async (bulkData) => {
 
 export const existingBulk = async (bulkData) => {
     const bulk = await db('products_bulks')
-    .where('product_id', bulkData.product_id)
-    .where('start_range', '<=', bulkData.end_range)     
-    .andWhere('end_range', '>=', bulkData.start_range)   
-    .first();
-    
+        .where('product_id', bulkData.product_id)
+        .where('start_range', '<=', bulkData.end_range)
+        .andWhere('end_range', '>=', bulkData.start_range)
+        .first();
+
     return bulk;
 }
 
 
 export const updateBulk = async (bulkData, bulkId) => {
     const bulk = await db('products_bulks')
-        .where({ id: bulkId })  
+        .where({ id: bulkId })
         .update(bulkData);
     return bulk;
 };
@@ -71,10 +71,41 @@ export const getBulkAboveOrder = async (bulkId) => {
 };
 
 
+
 export const getBulkByProductId = async (productId) => {
     const bulk = await db('products_bulks')
-    .where({ product_id: productId })
-    .select('*')
-   
+        .where({ product_id: productId })
+        .select('*')
+
     return bulk;
-}
+};
+
+
+
+export const saveBulkOrderRequest = async (userId, productId, quantity) => {
+    const saveBulk = await db('bulk_above_max_orders')
+        .insert({
+            user_id: userId,
+            product_id: productId,
+            quantity: quantity,
+        });
+    return saveBulk;
+};
+
+
+
+export const updateBulkRequest = async (bulkId, status) => {
+    const bulk = await db('bulk_above_max_orders')
+        .where({ id: bulkId })
+        .update({ approved_status: status });
+
+    return bulk
+};
+
+
+// Check if a bulk order request already exists for a user
+export const isBulkOrderRequestExists = async (userId) => {
+    const existingRequest = await db('bulk_above_max_orders').where({ user_id: userId }).first();
+    return !!existingRequest; // Returns true if request exists, false otherwise
+};
+
