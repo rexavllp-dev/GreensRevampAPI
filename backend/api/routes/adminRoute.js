@@ -1,5 +1,6 @@
 import express from 'express';
-import { adminUserRegister, approveBulkAboveMaxOrders, approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin, rejectBulkAboveMaxOrders, rejectCompanyByAdmin } from '../controllers/adminController.js';
+import { adminUserRegister,  approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin,  rejectCompanyByAdmin } from '../controllers/adminController.js';
+import { approveBulkAboveMaxOrders, rejectBulkAboveMaxOrders } from '../controllers/bulkController.js';
 
 
 const router = express.Router();

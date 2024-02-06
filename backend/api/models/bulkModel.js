@@ -109,3 +109,39 @@ export const isBulkOrderRequestExists = async (userId) => {
     return !!existingRequest; // Returns true if request exists, false otherwise
 };
 
+
+
+// approve and reject Bulk Above Max Orders by admin
+export const approveBulkMaxOrder = async (bulkId) => {
+    return db('bulk_above_max_orders')
+        .where({ id: bulkId })
+        .update({ approved_status: true })
+
+
+};
+
+export const rejectBulkMaxOrder = async (bulkId) => {
+    return db('bulk_above_max_orders')
+        .where({ id: bulkId })
+        .update({ approved_status: false })
+
+};
+
+
+
+export const getUserFromBulkOrder = async (bulkId) => {
+    const user = await db('bulk_above_max_orders')
+        .where({ 'bulk_above_max_orders.id': bulkId })
+        .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
+        .join('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
+        .select(
+            'users.*',
+            'bulk_above_max_orders.*',
+            'products.*'
+        )
+        .first();
+
+    console.log(user);
+
+    return user;
+};

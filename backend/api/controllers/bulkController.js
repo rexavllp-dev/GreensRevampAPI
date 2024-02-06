@@ -1,4 +1,5 @@
-import { bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, isBulkOrderRequestExists, saveBulkOrderRequest, updateBulk, updateBulkRequest } from "../models/bulkModel.js";
+import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkRequest } from "../models/bulkModel.js";
+import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
 export const createABulk = async (req, res) => {
@@ -146,7 +147,9 @@ export const deleteABulk = async (req, res) => {
     }
 };
 
+// ___________________________________________________________________________________________________________________________________________________________________________________________________
 
+// bulk max orders
 
 export const createBulkAboveMaxOrders = async (req, res) => {
     const bulkData = req.body;
@@ -254,26 +257,58 @@ export const submitBulkOrderRequest = async (req, res) => {
 
 
 
-export const updateBulkOrderRequest = async (req, res) => {
-    const { bulkId } = req.params.bulkId;
-    const { status } = req.body;
-
+export const approveBulkAboveMaxOrders = async (req, res) => {
+    const bulkId = req.params.bulkId;
     try {
-        // Update the bulk order request in the database
-        await updateBulkRequest(bulkId, status);
+        
+        await approveBulkMaxOrder(bulkId);
+
+        // Get user information for the approved bulk order
+        const user = await getUserFromBulkOrder(bulkId);
+        console.log(user);
+
+        await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Bulk order request updated successfully",
+            message: "Bulk order approved successfully",
+
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to update bulk order request",
-            error: error.message
+            message: "Failed to approve bulk order",
+        });
+    }
+};
+
+
+
+export const rejectBulkAboveMaxOrders = async (req, res) => {
+    const bulkId = req.params.bulkId;
+    try {
+        await rejectBulkMaxOrder(bulkId);
+
+        const user = await getUserFromBulkOrder(bulkId);
+        console.log(user);
+        console.log(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+
+        await sendVerificationBulkRejected(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Bulk order rejected successfully",
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to reject bulk order",
+            error: error
         });
     }
 };
