@@ -1,4 +1,4 @@
-import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkRequest } from "../models/bulkModel.js";
+import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty, updateBulkRequest } from "../models/bulkModel.js";
 import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
@@ -63,6 +63,42 @@ export const updateABulk = async (req, res) => {
     const bulkData = req.body;
     const bulkId = req.params.bulkId;
     try {
+
+         // Parse float for start_range and end_range
+         bulkData.start_range = parseFloat(bulkData.start_range);
+         bulkData.end_range = parseFloat(bulkData.end_range);
+ 
+         // Check if start_range exceeds end_range or if it is not provided
+         if (bulkData.start_range >= bulkData.end_range || isNaN(bulkData.start_range)) {
+             return res.status(400).json({
+                 status: 400,
+                 success: false,
+                 message: "Invalid range values. Start range must be less than end range and should be provided.",
+             });
+         };
+ 
+         // Check if start_range equals end_range and prompt admin to confirm
+         if (bulkData.start_range === bulkData.end_range) {
+             return res.status(400).json({
+                 status: 400,
+                 success: false,
+                 message: "Start range equals end range. Please confirm if this is intended.",
+             });
+         };
+ 
+         const existingRange = await existingBulk(bulkData);
+ 
+         if (existingRange) {
+             return res.status(400).json({
+                 status: 400,
+                 success: false,
+                 message: "Bulk range already exists.",
+             });
+         }
+ 
+ 
+
+
         const bulk = await updateBulk(bulkData, bulkId);
         res.status(200).json({
             status: 200,
@@ -223,7 +259,7 @@ export const getBulkWithProductId = async (req, res) => {
 
 
 export const submitBulkOrderRequest = async (req, res) => {
-   
+
     try {
         const { productId, quantity } = req.body;
         const userId = req.user.userId;
@@ -259,26 +295,59 @@ export const submitBulkOrderRequest = async (req, res) => {
 
 
 
-export const approveBulkAboveMaxOrders = async (req, res) => {
-    const bulkId = req.params.bulkId;
+
+export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
     try {
+        const { bulkId } = req.params;
+        const { newStatus, newQuantity } = req.body;
+
+        // Update the bulk order status and quantity
+        const updates = await updateBulkMaxOrderStatusAndQty(bulkId, newStatus, newQuantity);
+
+        let messages;
         
-        await approveBulkMaxOrder(bulkId);
+        if (newStatus === 'Accept') {
+            // Approve the bulk order
+            await approveBulkMaxOrder(bulkId);
 
-        // Get user information for the approved bulk order
-        const user = await getUserFromBulkOrder(bulkId);
-        console.log(user);
+            // Get user information for the approved bulk order
+            const user = await getUserFromBulkOrder(bulkId);
 
-        await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+            // Send verification for bulk approval
+            await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
 
+            messages = 'Bulk order approved successfully';
+        } else if (newStatus === 'Reject') {
+            // Reject the bulk order
+            await rejectBulkMaxOrder(bulkId);
+
+            // Get user information for the rejected bulk order
+            const user = await getUserFromBulkOrder(bulkId);
+
+            // Send verification for bulk rejection
+            await sendVerificationBulkRejected(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+
+            messages = 'Bulk order rejected successfully';
+        } else {
+            // If an invalid status is provided
+            res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Failed to update bulk order. Invalid status provided"
+            });
+            return;
+        }
+
+        // Respond with success message
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Bulk order approved successfully",
-
+            message: messages
         });
+
     } catch (error) {
         console.log(error);
+        // If an error occurs, respond with an error message
         res.status(500).json({
             status: 500,
             success: false,
@@ -311,6 +380,7 @@ export const rejectBulkAboveMaxOrders = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed to reject bulk order",
+            message: "Failed to update bulk order",
             error: error
         });
     }
@@ -319,28 +389,27 @@ export const rejectBulkAboveMaxOrders = async (req, res) => {
 
 
 
-
 export const getBulkOrderRequestsHandler = async (req, res) => {
     try {
-      // Retrieve bulk order requests from the database
-      const bulkRequests = await getBulkOrderRequests();
-      
-      res.status(200).json({
-        status: 200,
-        success: true,
-        message: "fetched bulk order requests",
-        data: bulkRequests,
-      });
+        // Retrieve bulk order requests from the database
+        const bulkRequests = await getBulkOrderRequests();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "fetched bulk order requests",
+            data: bulkRequests,
+        });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        status: 500,
-        success: false,
-        message: "Failed to fetch bulk order requests",
-        error: error.message
-      });
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch bulk order requests",
+            error: error.message
+        });
     }
-  };
+};
 
 
 
