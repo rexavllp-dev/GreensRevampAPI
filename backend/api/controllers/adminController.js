@@ -1,9 +1,9 @@
 import { joiOptions } from "../helpers/joiOptions.js";
-import { approveBulkMaxOrder, fetchSingleCompany, getUserFromBulkOrder, isActive, isNotActive, rejectBulkMaxOrder, updateCompanyStatus, updateUserVerificationByAdmin } from "../models/adminModel.js";
+import {  fetchSingleCompany,  isActive, isNotActive,  updateCompanyStatus, updateUserVerificationByAdmin } from "../models/adminModel.js";
 import { checkUserExist, createUser } from "../models/userModel.js";
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
-import { sendVerificationApproved, sendVerificationBulkApproved, sendVerificationBulkRejected, sendVerificationRejected } from "../utils/emailer.js";
+import { sendVerificationApproved, sendVerificationRejected } from "../utils/emailer.js";
 
 
 
@@ -183,6 +183,7 @@ export const isNotActiveByAdmin = async (req, res) => {
 // approve by admin  
 
 export const approveCompanyByAdmin = async (req, res) => {
+
     const { companyId } = req.params;
     try {
         const companyData = await fetchSingleCompany(companyId);
@@ -249,59 +250,5 @@ export const rejectCompanyByAdmin = async (req, res) => {
 
 
 
-export const approveBulkAboveMaxOrders = async (req, res) => {
-    const bulkId = req.params.bulkId;
-    try {
-
-        await approveBulkMaxOrder(bulkId);
-
-        // Get user information for the approved bulk order
-        const user = await getUserFromBulkOrder(bulkId);
-        console.log(user);
-        
-        await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
-
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Bulk order approved successfully",
-
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to approve bulk order",
-            result: ""
-        });
-    }
-};
 
 
-
-export const rejectBulkAboveMaxOrders = async (req, res) => {
-    const bulkId = req.params.bulkId;
-    try {
-        await rejectBulkMaxOrder(bulkId);
-
-        const user = await getUserFromBulkOrder(bulkId);
-        console.log(user);
-        console.log(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
-
-        await sendVerificationBulkRejected(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Bulk order rejected successfully",
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to reject bulk order",
-            error: error
-        });
-    }
-};

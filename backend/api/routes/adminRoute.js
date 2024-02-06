@@ -1,5 +1,6 @@
 import express from 'express';
-import { adminUserRegister, approveBulkAboveMaxOrders, approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin, rejectBulkAboveMaxOrders, rejectCompanyByAdmin } from '../controllers/adminController.js';
+import { adminUserRegister,  approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin,  rejectCompanyByAdmin } from '../controllers/adminController.js';
+import {  updateAndApproveOrRejectBulkOrders } from '../controllers/bulkController.js';
 
 
 const router = express.Router();
@@ -16,11 +17,11 @@ router.put('/approve/:companyId', approveCompanyByAdmin);
 router.put('/reject/:companyId', rejectCompanyByAdmin);
 
 
+
 // admin can approve bulk above max orders
-// approve Bulk Max Order
-router.put('/approve-bulk/:bulkId', approveBulkAboveMaxOrders);
-// reject Bulk Max Order
-router.put('/reject-bulk/:bulkId', rejectBulkAboveMaxOrders);
+// approve Bulk Max Order and reject 
+router.put('/update-bulk-request/:bulkId', updateAndApproveOrRejectBulkOrders);
+
 
 
 export default router;
