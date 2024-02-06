@@ -1,4 +1,4 @@
-import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkRequest } from "../models/bulkModel.js";
+import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkRequest } from "../models/bulkModel.js";
 import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
@@ -228,7 +228,7 @@ export const submitBulkOrderRequest = async (req, res) => {
     try {
 
         // Check if the user has already submitted a bulk order request
-        const requestExists = await isBulkOrderRequestExists(userId);
+        const requestExists = await isBulkOrderRequestExists(userId, productId);
         if (requestExists) {
             return res.status(400).json({
                 status: 400,
@@ -312,6 +312,32 @@ export const rejectBulkAboveMaxOrders = async (req, res) => {
         });
     }
 };
+
+
+
+
+
+export const getBulkOrderRequestsHandler = async (req, res) => {
+    try {
+      // Retrieve bulk order requests from the database
+      const bulkRequests = await getBulkOrderRequests();
+      
+      res.status(200).json({
+        status: 200,
+        success: true,
+        message: "fetched bulk order requests",
+        data: bulkRequests,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        status: 500,
+        success: false,
+        message: "Failed to fetch bulk order requests",
+        error: error.message
+      });
+    }
+  };
 
 
 

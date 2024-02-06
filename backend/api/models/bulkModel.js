@@ -104,8 +104,13 @@ export const updateBulkRequest = async (bulkId, status) => {
 
 
 // Check if a bulk order request already exists for a user
-export const isBulkOrderRequestExists = async (userId) => {
-    const existingRequest = await db('bulk_above_max_orders').where({ user_id: userId }).first();
+export const isBulkOrderRequestExists = async (userId, productId) => {
+    const existingRequest = await db('bulk_above_max_orders')
+    .where({ 
+        user_id: userId,
+        product_id: productId
+     })
+    .first();
     return !!existingRequest; // Returns true if request exists, false otherwise
 };
 
@@ -144,4 +149,11 @@ export const getUserFromBulkOrder = async (bulkId) => {
     console.log(user);
 
     return user;
+};
+
+
+
+// get all bulk request 
+export const getBulkOrderRequests = async () => {
+    return await db('bulk_above_max_orders').select('*');
 };
