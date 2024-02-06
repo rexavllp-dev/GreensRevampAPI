@@ -1,6 +1,6 @@
 import express from 'express';
 import { adminUserRegister,  approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin,  rejectCompanyByAdmin } from '../controllers/adminController.js';
-import { approveBulkAboveMaxOrders, rejectBulkAboveMaxOrders, updateAndApproveOrRejectBulkOrders } from '../controllers/bulkController.js';
+import {  updateAndApproveOrRejectBulkOrders } from '../controllers/bulkController.js';
 
 
 const router = express.Router();
@@ -15,6 +15,7 @@ router.put('/deactivate/:userId', isNotActiveByAdmin);
 router.put('/approve/:companyId', approveCompanyByAdmin);
 //  reject company verification  company
 router.put('/reject/:companyId', rejectCompanyByAdmin);
+
 
 
 // admin can approve bulk above max orders
