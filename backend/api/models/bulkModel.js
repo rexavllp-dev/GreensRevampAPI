@@ -1,3 +1,4 @@
+import { join } from "path";
 import db from "../../config/dbConfig.js";
 
 
@@ -106,11 +107,11 @@ export const updateBulkRequest = async (bulkId, status) => {
 // Check if a bulk order request already exists for a user
 export const isBulkOrderRequestExists = async (userId, productId) => {
     const existingRequest = await db('bulk_above_max_orders')
-    .where({ 
-        user_id: userId,
-        product_id: productId
-     })
-    .first();
+        .where({
+            user_id: userId,
+            product_id: productId
+        })
+        .first();
     return !!existingRequest; // Returns true if request exists, false otherwise
 };
 
@@ -155,5 +156,13 @@ export const getUserFromBulkOrder = async (bulkId) => {
 
 // get all bulk request 
 export const getBulkOrderRequests = async () => {
-    return await db('bulk_above_max_orders').select('*');
+    const bulks = await db('bulk_above_max_orders')
+        .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
+        .join('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
+        .select(
+            'users.*',
+            'bulk_above_max_orders.*',
+            'products.*'
+        );
+    return bulks;
 };
