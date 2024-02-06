@@ -33,6 +33,7 @@ export const createProduct = async (req, res) => {
         prd_sales_unit,
         prd_return_type,
         prd_brand_id,
+        search_keywords,
 
 
 
@@ -103,6 +104,7 @@ export const createProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
+            search_keywords,
 
 
         })
@@ -144,6 +146,7 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
+            search_keywords,
             
 
 
@@ -164,6 +167,7 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
+            search_keywords,
 
         });
 
