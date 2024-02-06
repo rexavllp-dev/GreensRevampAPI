@@ -121,7 +121,7 @@ export const isBulkOrderRequestExists = async (userId, productId) => {
 export const approveBulkMaxOrder = async (bulkId) => {
     return db('bulk_above_max_orders')
         .where({ id: bulkId })
-        .update({ approved_status: true })
+        .update({ approved_status: "Accept" })
 
 
 };
@@ -129,23 +129,34 @@ export const approveBulkMaxOrder = async (bulkId) => {
 export const rejectBulkMaxOrder = async (bulkId) => {
     return db('bulk_above_max_orders')
         .where({ id: bulkId })
-        .update({ approved_status: false })
+        .update({ approved_status: "Reject" })
 
 };
 
+// update bulk above max orders
+export const updateBulkMaxOrderStatusAndQty = async (bulkId, newStatus, newQuantity) => {
+    const updates = await db('bulk_above_max_orders')
+        .where({ id: bulkId })
+        .update({
+            approved_status: newStatus,
+            quantity: newQuantity
+        })
+    return updates;
+};
 
 
 export const getUserFromBulkOrder = async (bulkId) => {
     const user = await db('bulk_above_max_orders')
         .where({ 'bulk_above_max_orders.id': bulkId })
-        .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
-        .join('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
+        .leftJoin('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
+        .leftJoin('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
         .select(
             'users.*',
             'bulk_above_max_orders.*',
             'products.*'
         )
         .first();
+        
 
     console.log(user);
 
