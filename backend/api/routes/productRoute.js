@@ -6,7 +6,7 @@ import {  createProductInventory,  modifyStock,  updateProductInventory } from '
 import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
-import { getAllProductPublic, getSingleProductPublic } from '../controllers/publicProductController.js';
+import { getAllProductPublic, getAllRelatedProductPublicByProductId, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getAllOptions, getOptionsByProductId } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
@@ -48,6 +48,9 @@ router.get('/public/getall-products',getAllProductPublic);
 
 // get a single products public
 router.get('/public/get-product/:productId', getSingleProductPublic);
+
+// get all related products public
+router.get('/public/get-related-products/:productId', getAllRelatedProductPublicByProductId);
 
 
 

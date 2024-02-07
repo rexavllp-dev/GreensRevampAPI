@@ -1,4 +1,4 @@
-import { getPublicProductById, getPublicProducts } from "../models/publicProductModel.js";
+import { getAllRelatedProductsByProductId, getPublicProductById, getPublicProducts } from "../models/publicProductModel.js";
 
 
 export const getAllProductPublic = async (req, res) => {
@@ -39,12 +39,12 @@ export const getAllProductPublic = async (req, res) => {
         let filters = [];
 
         // Attempt to parse the filters parameter
-      
-    if (filtersParam) {
-        filters = JSON.parse(filtersParam);
-        // Add filter to check if the discount price is null or not
-        filters.push({ column: 'is_discount', operator: '=', value: true }); 
-    }
+
+        if (filtersParam) {
+            filters = JSON.parse(filtersParam);
+            // Add filter to check if the discount price is null or not
+            filters.push({ column: 'is_discount', operator: '=', value: true });
+        }
         const products = await getPublicProducts(page, per_page, search_query, filters, sort);
 
         res.status(200).json({
@@ -113,3 +113,26 @@ export const getSingleProductPublic = async (req, res) => {
 };
 
 
+export const getAllRelatedProductPublicByProductId = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+      console.log('working',productId )
+
+        const relatedProducts = await getAllRelatedProductsByProductId(productId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched all related products successfully",
+            result: relatedProducts
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch related products",
+            error: error
+        });
+    }
+};
