@@ -62,6 +62,7 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
 
         )
         .whereNull('products.deleted_at')
+        .where('products.prd_status', true);
 
     // Modify the query to only include products with an active special price based on the current date and time
     query.where(function () {
