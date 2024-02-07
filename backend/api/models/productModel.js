@@ -175,7 +175,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
     // Apply complex filters
 
     filters.forEach(filter => {
-        if (filter.column === 'product_price') {
+        if (filter.column === 'computed_price') {
             // Check if the filter is applied on the computed price
             if (filter.operator === '>') {
                 // Apply filter for computed price greater than the filter value

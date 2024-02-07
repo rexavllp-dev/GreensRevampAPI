@@ -5,14 +5,14 @@ import { createPrdPrice, deletePrdPrice, getAllPrdPrice, getPrdPrice, getProduct
 export const createPrice = async (req, res) => {
 
   try {
-    const { prd_status, ...priceData } = req.body;
+    const { prd_status, prd_dashboard_status, ...priceData } = req.body;
     console.log(req.body)
 
     const product = await getProductPriceById(priceData?.product_id);
 
     if (!product) {
 
-      const newPrice = await createPrdPrice(priceData, prd_status);
+      const newPrice = await createPrdPrice(priceData, prd_status, prd_dashboard_status);
 
       await updatePriceHistory({
         product_price_id: newPrice[0].id,
@@ -33,7 +33,7 @@ export const createPrice = async (req, res) => {
     } else {
 
       // Apply the special price
-      await updatePrdPrice(priceData?.product_id, priceData, prd_status);
+      await updatePrdPrice(priceData?.product_id, priceData, prd_status, prd_dashboard_status);
 
       //update the price history
 
@@ -59,7 +59,8 @@ export const createPrice = async (req, res) => {
           special_price_start: product.special_price_start,
           special_price_end: product.special_price_end,
           user_id: req?.user?.id,
-          prd_status
+          prd_status,
+          prd_dashboard_status
         },
       });
     }
@@ -81,7 +82,7 @@ export const createPrice = async (req, res) => {
 
 export const updatePrice = async (req, res) => {
   const { productId } = req.params;
-  const { prd_status, ...priceData } = req.body;
+  const { prd_status, prd_dashboard_status, ...priceData } = req.body;
   console.log(prd_status);
   try {
 
@@ -98,7 +99,7 @@ export const updatePrice = async (req, res) => {
 
 
     // Apply the special price
-    await updatePrdPrice(productId, priceData, prd_status);
+    await updatePrdPrice(productId, priceData, prd_status, prd_dashboard_status);
 
     //update the price history
 
@@ -124,7 +125,8 @@ export const updatePrice = async (req, res) => {
         special_price_start: product.special_price_start,
         special_price_end: product.special_price_end,
         user_id: req?.user?.id,
-        prd_status
+        prd_status,
+        prd_dashboard_status
       },
     });
   } catch (error) {
