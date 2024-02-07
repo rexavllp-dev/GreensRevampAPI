@@ -33,6 +33,12 @@ export const createProduct = async (req, res) => {
         prd_sales_unit,
         prd_return_type,
         prd_brand_id,
+        use_and_care,
+        shipping_and_returns,
+        dimensions_and_more_info,
+        ein_code,
+
+
 
 
 
@@ -103,6 +109,11 @@ export const createProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
+            use_and_care,
+            shipping_and_returns,
+            dimensions_and_more_info,
+            ein_code,
+
 
 
         })
@@ -144,7 +155,12 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
-            
+            use_and_care,
+            shipping_and_returns,
+            dimensions_and_more_info,
+            ein_code,
+
+
 
 
         } = req.body;
@@ -164,6 +180,11 @@ export const updateProduct = async (req, res) => {
             prd_sales_unit,
             prd_return_type,
             prd_brand_id,
+            use_and_care,
+            shipping_and_returns,
+            dimensions_and_more_info,
+            ein_code,
+
 
         });
 

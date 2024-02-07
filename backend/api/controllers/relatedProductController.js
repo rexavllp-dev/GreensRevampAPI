@@ -27,10 +27,12 @@ export const createRelatedProduct = async (req, res) => {
         //  Check each related product ID if it exists in the database
         for (const relatedProduct of relatedProductData) {
             if (!existingRelatedProductIds.includes(relatedProduct.id)) {
-                newData.push({
-                    product_id: product_id,
-                    related_product_id: relatedProduct.id,
-                });
+                if(product_id != relatedProduct.id){
+                    newData.push({
+                        product_id: product_id,
+                        related_product_id: relatedProduct.id,
+                    }); 
+                }
             } else {
                 nonExistingProductIds.push(relatedProduct.id);
             }
