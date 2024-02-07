@@ -39,10 +39,12 @@ export const getAllProductPublic = async (req, res) => {
         let filters = [];
 
         // Attempt to parse the filters parameter
-        if (filtersParam) {
-            filters = JSON.parse(filtersParam);
-        };
-
+      
+    if (filtersParam) {
+        filters = JSON.parse(filtersParam);
+        // Add filter to check if the discount price is null or not
+        filters.push({ column: 'is_discount', operator: '=', value: true }); 
+    }
         const products = await getPublicProducts(page, per_page, search_query, filters, sort);
 
         res.status(200).json({
