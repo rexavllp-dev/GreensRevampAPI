@@ -3,14 +3,17 @@ import db from '../../config/dbConfig.js';
 
 // create price
 
-export const createPrdPrice = async (priceData, prdStatus) => {
+export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) => {
     const price = await db("products_price").insert(priceData).returning('*');
 
     if (prdStatus)
         // Update the products table with prd_status
         await db("products")
             .where({ id: priceData.product_id })
-            .update({ prd_status: prdStatus });
+            .update({
+                prd_status: prdStatus,
+                prd_dashboard_status: prdDashboardStatus
+            });
 
     return price;
 };
@@ -19,14 +22,17 @@ export const createPrdPrice = async (priceData, prdStatus) => {
 
 
 // update price
-export const updatePrdPrice = async (productId, priceData, prdStatus) => {
+export const updatePrdPrice = async (productId, priceData, prdStatus, prdDashboardStatus) => {
     const price = await db("products_price").where({ product_id: productId }).update(priceData).returning();
 
     if (prdStatus !== undefined)
         // Update the products table with prd_status
         await db("products")
             .where({ id: productId })
-            .update({ prd_status: prdStatus });
+            .update({
+                prd_status: prdStatus,
+                prd_dashboard_status: prdDashboardStatus
+            });
 
     return price;
 };
@@ -67,7 +73,7 @@ export const getPrdPrice = async (priceId) => {
                 const priceWithVat = price + (price * vatPercentage);
                 console.log('Price with VAT:', priceWithVat);
 
-                if (isDiscount === true && currentDate >= offerStartDate && currentDate <= offerEndDate ) {
+                if (isDiscount === true && (currentDate >= offerStartDate) && (currentDate <= offerEndDate)) {
                     // console.log('Within offer period');
                     if (specialPriceType === 'percentage') {
                         const discountPercentage = specialPriceValue;

@@ -112,6 +112,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        
 
 
         .select(
@@ -159,7 +160,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
 
 
         )
-        .whereNull('deleted_at')
+        .whereNull('products.deleted_at')
 
   
 
