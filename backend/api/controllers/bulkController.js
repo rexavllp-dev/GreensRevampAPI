@@ -1,4 +1,4 @@
-import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty, updateBulkRequest } from "../models/bulkModel.js";
+import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty, updateBulkRequest } from "../models/bulkModel.js";
 import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
@@ -86,7 +86,7 @@ export const updateABulk = async (req, res) => {
              });
          };
  
-         const existingRange = await existingBulk(bulkData);
+         const existingRange = await existingBulkForUpdate(bulkData, bulkId);
  
          if (existingRange) {
              return res.status(400).json({

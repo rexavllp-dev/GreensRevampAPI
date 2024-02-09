@@ -12,10 +12,14 @@ import {
 // create address
 export const createAddress = async (req, res) => {
 
-    const addressData = req.body;
-
     try {
-        const userAddress = await getUserAddresses(req.user?.id);
+
+        const addressData = req.body;
+        const userId = req.user.userId;
+        console.log(userId);
+
+
+        const userAddress = await getUserAddresses(userId);
         console.log(userAddress)
         if (userAddress.length === 0) {
             // User has no addresses, set is_default to true
@@ -26,7 +30,7 @@ export const createAddress = async (req, res) => {
                 const defaultAddress = userAddress.find(address => address.is_default === true);
                 if (defaultAddress) {
                     defaultAddress.is_default = false;
-                    await updateOtherUserAddress(req.user?.id, defaultAddress.id);
+                    await updateOtherUserAddress(userId, defaultAddress.id);
                 }
             }
         }
