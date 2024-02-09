@@ -1,5 +1,6 @@
 import db from '../../config/dbConfig.js';
 import { DateTime } from 'luxon';
+import { getPrdPrice } from './productPriceModel.js';
 
 // get all products
 export const getPublicProducts = async (page, per_page, search, filters, sort) => {
@@ -14,7 +15,7 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        
+
 
         .select(
             'products.*',
@@ -61,6 +62,7 @@ export const getPublicProducts = async (page, per_page, search, filters, sort) =
 
         )
         .whereNull('products.deleted_at')
+        .where('products.prd_status', true);
 
     // Modify the query to only include products with an active special price based on the current date and time
     query.where(function () {
@@ -194,5 +196,105 @@ export const getPublicProductById = async (productId) => {
         .first();
 
     return products;
+
+};
+
+
+
+export const getAllRelatedProductsByProductId = async (productId) => {
+    let query = db('products')
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .leftJoin('related_products', 'products.id', 'related_products.product_id')
+        .where('related_products.product_id', productId)
+
+
+
+        .select(
+            'products.*',
+            'brands.*',
+            'brands.id as brand_id',
+            'categories.*',
+            "categories.id as category_id",
+            "products_price.*",
+            "products_price.id as products_price_id",
+            "product_inventory.*",
+            "product_inventory.id as product_inventory_id",
+            "product_seo.*",
+            "product_seo.id as product_seo_id",
+            "product_badge.*",
+            "product_badge.id as product_badge_id",
+            "product_category.*",
+            "product_category.id as product_category_id",
+            "related_products.*",
+            "related_products.id as related_product_id",
+
+
+
+            db.raw(`
+        jsonb_agg(
+            jsonb_build_object(
+                'url', product_gallery.url,
+                'id', product_gallery.id,
+                'is_baseimage', product_gallery.is_baseimage
+            )
+        ) as product_img
+    `),
+
+            db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+
+        )
+        .distinct('products.id')
+        .groupBy(
+            'products.id',
+            'brands.id',
+            'categories.id',
+            'products_price.id',
+            'product_inventory.id',
+            'product_seo.id',
+            'product_badge.id',
+            'product_category.id',
+            'related_products.id',
+
+
+        )
+        .whereNull('products.deleted_at')
+
+
+
+    const totalCountQuery = query.clone().clearSelect().countDistinct('products.id as total');
+
+    // // pagination 
+    // if (per_page && page) {
+    //     const limit = per_page;
+    //     const offsetValue = (page - 1) * per_page;
+    //     query.limit(limit)
+    //         .offset(offsetValue)
+    // }
+
+
+
+    const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
+
+
+    // Integrate getPrdPrice for each product
+    const productsWithPrice = await Promise.all(products.map(async (product) => {
+        const prdPrice = await getPrdPrice(product.products_price_id);
+        return { ...product, prdPrice };
+    }));
+
+    return {
+        products: productsWithPrice,
+        totalCount: totalCountResult[0],
+        // totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
+        // per_page: per_page,
+        // page: page
+    }
 
 };
