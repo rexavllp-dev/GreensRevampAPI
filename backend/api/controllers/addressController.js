@@ -48,7 +48,7 @@ export const createAddress = async (req, res) => {
             message: 'Failed to create address. Please try again later.',
         })
     }
-}
+};
 
 // update address
 
@@ -188,7 +188,7 @@ export const deleteAddress = async (req, res) => {
             message: 'Failed to delete address. Please try again later.'
         })
     }
-}
+};
 
 
 
