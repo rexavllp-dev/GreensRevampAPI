@@ -1,5 +1,7 @@
+import { query } from 'express';
 import db from '../../config/dbConfig.js';
 import { getPrdPrice } from './productPriceModel.js';
+import { calculateSpecialPrice } from '../helpers/calculateSpecialPrice.js';
 
 // create product
 export const createAProduct = async (productData) => {
@@ -84,7 +86,7 @@ export const getProductById = async (productId) => {
             'products_bulks.id'
         )
 
-    .first()
+        .first()
 
 
     if (products) {
@@ -101,7 +103,7 @@ export const getProductById = async (productId) => {
 
 // get all products
 
-export const getAllProducts = async (page, per_page, search, filters, sort) => {
+export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice) => {
 
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
@@ -112,7 +114,11 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        
+        .crossJoin('vat')
+
+
+
+
 
 
         .select(
@@ -131,7 +137,26 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
-            
+            "vat.*",
+            "vat.id as vat_id",
+           
+
+
+
+            db.raw(`
+        CASE 
+            WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+            WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                CASE 
+                    WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                    WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                    ELSE 0
+                END
+            ELSE products_price.product_price * (1 + vat.vat / 100)
+        END AS compute_price
+`),
+
+
 
 
             db.raw(`
@@ -144,7 +169,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             ) as product_img
         `),
 
-            db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+            // db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
 
         )
         .distinct('products.id')
@@ -157,62 +182,95 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
+            'vat.id'
+
 
 
         )
         .whereNull('products.deleted_at')
 
-  
+
 
     if (search) {
         console.log(search);
         query.where(function () {
             this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
-            .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
-            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
+                .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+                .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
         });
     };
 
-    // Apply complex filters
-
-    filters.forEach(filter => {
-        if (filter.column === 'computed_price') {
-            // Check if the filter is applied on the computed price
-            if (filter.operator === '>') {
-                // Apply filter for computed price greater than the filter value
-                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) > ?', [filter.value]);
-            } else if (filter.operator === '<') {
-                // Apply filter for computed price less than the filter value
-                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) < ?', [filter.value]);
-            } else if (filter.operator === '=') {
-                // Apply filter for computed price equal to the filter value
-                query.havingRaw('COALESCE(products_price.special_price, products_price.product_price) = ?', [filter.value]);
-            }
-        } else {
-            // Apply other filters normally
-            if (filter.operator === '>') {
-                query.where(filter.column, '>', filter.value);
-            } else if (filter.operator === '<') {
-                query.where(filter.column, '<', filter.value);
-            } else if (filter.operator === '=') {
-                query.where(filter.column, '=', filter.value);
-            }
-        }
-    });
 
 
-    // Sorting by price
-    if (sort === 'price_asc') {
-        query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) ASC');
-    } else if (sort === 'price_desc') {
-        query.orderByRaw('COALESCE(products_price.special_price, products_price.product_price) DESC');
-    } else if (sort === 'newest') {
-        query.orderBy('products.created_at', 'desc'); //  'created_at' is the creation timestamp of products
-    } else if (sort === 'oldest') {
-        query.orderBy('products.created_at', 'asc');
-    } else if (sort === 'featured') {
-        query.orderBy('product_badge.is_featured', 'desc');
+
+    // Apply range  filters
+    if (minPrice !== undefined && maxPrice !== undefined) {
+        query.where(function () {
+            this.whereRaw(`
+                CASE 
+                    WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+                    WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                        CASE 
+                            WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                            WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                            ELSE 0
+                        END
+                    ELSE products_price.product_price * (1 + vat.vat / 100)
+                END
+                BETWEEN :minPrice AND :maxPrice
+            `, { minPrice, maxPrice });
+        }).orderByRaw(`
+            CASE 
+                WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+                WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                    CASE 
+                        WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                        WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                        ELSE 0
+                    END
+                ELSE products_price.product_price * (1 + vat.vat / 100)
+            END
+            ASC
+        `);
     };
+
+
+// apply sort by asc and desc and oldest to newest
+
+    if (sort === 'price_asc') {
+        query.orderByRaw(`
+            CASE 
+                WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+                WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                    CASE 
+                        WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                        WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                        ELSE 0
+                    END
+                ELSE products_price.product_price * (1 + vat.vat / 100)
+            END
+            ASC
+        `);
+    } else if (sort === 'price_desc') {
+        query.orderByRaw(`
+            CASE 
+                WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+                WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                    CASE 
+                        WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                        WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                        ELSE 0
+                    END
+                ELSE products_price.product_price * (1 + vat.vat / 100)
+            END
+            DESC
+        `);
+    }  else if (sort === 'newest') {
+        query.orderBy('products.created_at', 'desc'); // Assuming 'created_at' is the timestamp field for product creation
+    } else if (sort === 'oldest') {
+        query.orderBy('products.created_at', 'asc'); // Assuming 'created_at' is the timestamp field for product creation
+    }
+
 
 
     // Sorting by featured products
@@ -232,6 +290,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
 
 
 
+
     const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
 
 
@@ -240,6 +299,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort) => {
         const prdPrice = await getPrdPrice(product.products_price_id);
         return { ...product, prdPrice };
     }));
+
+
 
     return {
         products: productsWithPrice,
