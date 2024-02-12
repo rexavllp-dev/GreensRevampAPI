@@ -232,7 +232,6 @@ export const getSingleBulkAboveMaxOrder = async (req, res) => {
 
 
 
-
 export const getBulkWithProductId = async (req, res) => {
     const productId = req.params.productId;
     try {
