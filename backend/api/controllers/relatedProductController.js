@@ -32,6 +32,14 @@ export const createRelatedProduct = async (req, res) => {
                         product_id: product_id,
                         related_product_id: relatedProduct.id,
                     }); 
+
+
+                     // Add bidirectional relationship
+                     newData.push({
+                        product_id: relatedProduct.id,
+                        related_product_id: product_id,
+                    }); 
+
                 }
             } else {
                 nonExistingProductIds.push(relatedProduct.id);
