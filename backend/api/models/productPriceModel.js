@@ -23,7 +23,9 @@ export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) =
 
 // update price
 export const updatePrdPrice = async (productId, priceData, prdStatus, prdDashboardStatus) => {
-    const price = await db("products_price").where({ product_id: productId }).update(priceData).returning();
+    const price = await db("products_price")
+        .where({ product_id: productId })
+        .update(priceData).returning();
 
     if (prdStatus !== undefined)
         // Update the products table with prd_status
@@ -120,17 +122,31 @@ export const deletePrdPrice = async (priceId) => {
 // get price by product id
 
 export const getProductPriceById = async (productId) => {
-    const product = await db('products_price')
-        .select('*')
+    const productPrice = await db('products_price')
         .where({ product_id: productId })
-        .first();
+        .select(
+            db.raw(`
+CASE 
+    WHEN products_price.is_discount = 'false' THEN products_price.product_price
+    WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+        CASE 
+            WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100))
+            WHEN products_price.special_price_type = 'fixed' THEN products_price.product_price - products_price.special_price
+            ELSE 0
+        END
+    ELSE products_price.product_price
+END AS computed_price
+`)
 
-    return product;
+        )
+        .first();
+    return productPrice;
 }
 
 
 export const updatePriceHistory = async (priceData) => {
     // console.log(priceData)
+    
     const PriceHistory = db('price_history').insert(priceData).returning('*');
     return PriceHistory;
 }

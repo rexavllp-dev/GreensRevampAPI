@@ -19,21 +19,25 @@ export const createAddress = async (req, res) => {
         console.log(userId);
 
 
-        const userAddress = await getUserAddresses(userId);
-        console.log(userAddress)
-        if (userAddress.length === 0) {
-            // User has no addresses, set is_default to true
+        const userAddresses = await getUserAddresses(userId);
+
+
+        if (userAddresses.length === 0) {
+            // User has no addresses, set is_default to true for the new address
             addressData.is_default = true;
         } else {
-            // User has addresses           
+            // User has existing addresses
             if (addressData.is_default) {
-                const defaultAddress = userAddress.find(address => address.is_default === true);
-                if (defaultAddress) {
-                    defaultAddress.is_default = false;
-                    await updateOtherUserAddress(userId, defaultAddress.id);
+                // Find the current default address
+                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default === true);
+                if (defaultAddressIndex !== -1) {
+                    // Set is_default to false for the current default address
+                    userAddresses[defaultAddressIndex].is_default = false;
+                    // Update the existing default address in the database
+                    await updateOtherUserAddress(userId, userAddresses[defaultAddressIndex].id);
                 }
             }
-        }
+        };
 
         const address = await createUserAddress(addressData);
 
@@ -72,11 +76,24 @@ export const updateAddress = async (req, res) => {
             });
         }
 
-        const userAddress = await getUserAddresses(req.user?.id);
-        if (userAddress.length === 1 && userAddress[0].id == addressId) {
-            // User has only one address, set is_default to true
+        const userAddresses = await getUserAddresses(req.user?.id);
+        
+        if (userAddresses.length === 0) {
+            // User has no addresses, set is_default to true for the new address
             addressData.is_default = true;
-        }
+        } else {
+            // User has existing addresses
+            if (addressData.is_default) {
+                // Find the current default address
+                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default === true);
+                if (defaultAddressIndex !== -1) {
+                    // Set is_default to false for the current default address
+                    userAddresses[defaultAddressIndex].is_default = false;
+                    // Update the existing default address in the database
+                    await updateOtherUserAddress(userId, userAddresses[defaultAddressIndex].id);
+                }
+            }
+        };
 
         const address = await updateUserAddress(addressData, addressId);
 
