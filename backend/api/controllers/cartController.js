@@ -56,19 +56,26 @@ export const addProductToCart = async (req, res) => {
 // update item quantity in express session
 export const updateProductCartQuantity = async (req, res) => {
     const { productId, newQuantity, operator } = req.body;
-    console.log(req.session);
+    // console.log(req.session);
 
     try {
         // await updateCartItemQuantity(req.session, productId, newQuantity);
         if (req.session.cart) {
             req.session.cart = req.session.cart.map(item => {
-                if (item.productId === productId) {
+                if (String(item.productId) === String(productId)) {
+                    
                     if (operator === 'add') {
-                        item.quantity += 1;
-                    } else {
-                        if (item.quantity <= 1) { return item }
-                        item.quantity -= 1;
+                       
+                        item.quantity += newQuantity;
+
+                    } else if (operator === 'reduce') {
+
+                        if (item.quantity <= 1) {
+                            return { ...item };
+                        }
+                        item.quantity -= newQuantity;
                     }
+                    
                 }
                 return item;
             })
@@ -105,7 +112,7 @@ export const getProductFromCart = async (req, res) => {
         if (req.session.cart) {
             data = await calculatePrice({ session: req.session });
 
-          return res.status(200).json({
+            return res.status(200).json({
                 status: 200,
                 success: true,
                 result: data,
@@ -120,8 +127,8 @@ export const getProductFromCart = async (req, res) => {
             })
         }
 
-       
-        
+
+
     } catch (error) {
 
         console.log(error);

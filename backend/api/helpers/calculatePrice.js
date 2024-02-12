@@ -14,7 +14,6 @@ export const calculatePrice = async ({
     let totalProductPrice = 0;
     let totalDiscount = 0; // Track discount for each product
     const vat = await getVat();
-    // let activeProducts = []; // Initialize activeProducts as an array
     let productCount = 0;
     let nonActiveProductsCount = 0;
 
@@ -29,15 +28,7 @@ export const calculatePrice = async ({
         let price = 0;
         let discount = 0; // Initialize discount to 0
 
-        // Check if product is not null
-        if (!product) {
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: 'Product not found',
-            });
-        }
-
+        
         // Check if quantity is less than or equal to stock
 
         if (product) {
@@ -101,31 +92,23 @@ export const calculatePrice = async ({
 
             // Apply VAT to regular and special prices if within the offer period
             const vatPercentage = vat.vat / 100;
-            console.log('VAT percentage:', vatPercentage);
-
-            price = price + (price * vatPercentage);
-
+            price = price
             cart[i].price = price;
             cart[i].totalPrice = price * parseInt(cart[i].quantity);
             totalProductPrice += cart[i].totalPrice;
-
             // Track total discount for all products
-            totalDiscount += discount;
-
-
-            cart[i].subTotal = basePrice;
+            totalDiscount += discount * parseInt(cart[i].quantity);
+            cart[i].subTotal = basePrice * parseInt(cart[i].quantity);
             subTotal += cart[i].subTotal;
 
         }
     }
-
 
     // Add store pickup charge only if isStorePickup is true and totalProductPrice is less than 50
     let storePickupCharge = 0;
     if (isStorePickup && totalProductPrice < 50) {
         nonActiveProductsCount === 0 ? 0 : storePickupCharge = 10;
     }
-
 
     // Add shipping charge only if isStorePickup is false and totalProductPrice is less than 100
     let shippingCharge = 0;
@@ -141,10 +124,13 @@ export const calculatePrice = async ({
 
     // Add 5 % tax to sub total 
     const taxRate = vat.vat / 100;
-    const grandTotal = nonActiveProductsCount === 0 ? 0 : subTotal + storePickupCharge + codCharge + shippingCharge - totalDiscount;
-    const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : grandTotal + (grandTotal * taxRate);
+
+    const taxPrice = (totalProductPrice * taxRate)
     const totalProductCount = productCount;
     const totalProductVAT = (parseFloat(subTotal) - parseFloat(totalDiscount)) * (vat.vat / 100);
+
+    // Grand Total formula =((sub total-Discount)+Service charges+Delivery charge))+vat 5%
+    const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : ((subTotal - totalDiscount) + shippingCharge + codCharge + storePickupCharge) + taxPrice
 
     const totals = {
         subTotal: subTotal.toFixed(2),
