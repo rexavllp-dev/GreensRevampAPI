@@ -67,6 +67,7 @@ export const getRelatedProductsByProductId = async (productId) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
+            'related_products.id',
 
         )
 
