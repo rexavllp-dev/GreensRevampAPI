@@ -217,7 +217,10 @@ export const registerUser = async (req, res) => {
 
 export const loginWithPassword = async (req, res) => {
 
-    const { usr_email, usr_password } = req.body;
+    let { usr_email, usr_password } = req.body;
+
+
+    usr_email = usr_email.trim();
 
     try {
 
@@ -1310,8 +1313,8 @@ export const updateMobileUsingToken = async (req, res) => {
             });
         }
 
-         // Check if the user is changing the country code
-         if (userInfo.usr_mobile_country_code !== usr_mobile_country_code) {
+        // Check if the user is changing the country code
+        if (userInfo.usr_mobile_country_code !== usr_mobile_country_code) {
             // Update the mobile number and country code
             await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
 

@@ -12,12 +12,7 @@ export const addRelatedProduct = async (relatedProductData) => {
 
 export const getRelatedProductsByProductId = async (productId) => {
     const relatedProducts = await db('related_products')
-        .leftJoin(
-            'products',
-            'related_products.related_product_id',
-            '=',
-            'products.id'
-        )
+        .leftJoin('products', 'related_products.related_product_id', 'products.id')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
@@ -27,10 +22,11 @@ export const getRelatedProductsByProductId = async (productId) => {
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .where('related_products.product_id', productId)
-        
+
 
         .select(
             'products.*',
+            'products.id as product_id',
             'brands.*',
             'brands.id as brand_id',
             'categories.*',
@@ -45,6 +41,8 @@ export const getRelatedProductsByProductId = async (productId) => {
             "product_badge.id as product_badge_id",
             "product_category.*",
             "product_category.id as product_category_id",
+            "related_products.*",
+            "related_products.id as related_product_id",
 
 
             db.raw(`
@@ -69,11 +67,11 @@ export const getRelatedProductsByProductId = async (productId) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
-          
+
         )
-    
-        
-   
+
+
+
 
     return relatedProducts;
 };
