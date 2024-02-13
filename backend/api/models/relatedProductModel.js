@@ -73,7 +73,6 @@ export const getRelatedProductsByProductId = async (productId) => {
 
 
 
-
     return relatedProducts;
 };
 
@@ -82,7 +81,7 @@ export const getRelatedProductsByProductId = async (productId) => {
 
 export const deleteARelatedProduct = async (relatedProductId) => {
     const deleted = await db('related_products')
-        .where({ related_product_id: relatedProductId })
+        .where({ id: relatedProductId })
         .del();
     return deleted;
 };
