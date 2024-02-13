@@ -62,20 +62,14 @@ export const updateProductCartQuantity = async (req, res) => {
         // await updateCartItemQuantity(req.session, productId, newQuantity);
         if (req.session.cart) {
             req.session.cart = req.session.cart.map(item => {
-                if (String(item.productId) === String(productId)) {
-                    
+                if (item.productId === productId) {
+
                     if (operator === 'add') {
-                       
-                        item.quantity += newQuantity;
-
-                    } else if (operator === 'reduce') {
-
-                        if (item.quantity <= 1) {
-                            return { ...item };
-                        }
-                        item.quantity -= newQuantity;
+                        item.quantity += 1;
+                    } else {
+                        if (item.quantity <= 1) { return item }
+                        item.quantity -= 1;
                     }
-                    
                 }
                 return item;
             })
