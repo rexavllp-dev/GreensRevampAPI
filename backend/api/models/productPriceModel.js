@@ -77,8 +77,7 @@ export const getPrdPrice = async (priceId) => {
                 console.log('Price with VAT:', priceWithVat);
 
                 if (isDiscount === true &&
-                    (currentDate >= offerStartDate) &&
-                    (currentDate <= offerEndDate || (currentDate.getTime() === offerEndDate.getTime()))) {
+                    (currentDate >= offerStartDate) && (currentDate <= offerEndDate)) {
                     // console.log('Within offer period');
                     if (specialPriceType === 'percentage') {
                         const discountPercentage = specialPriceValue;
@@ -147,9 +146,9 @@ export const getBulkDiscountPriceByProductId = async (productId) => {
     const discountPrices = await db('products_bulks')
         .where({ product_id: productId })
         .select('discounted_price')
-       
 
-        return discountPrices.map(entry => entry.discounted_price);
+
+    return discountPrices.map(entry => entry.discounted_price);
 };
 
 
