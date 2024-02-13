@@ -337,13 +337,15 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
         const updates = await updateBulkMaxOrderStatusAndQty(bulkId, newStatus, newQuantity);
 
         let messages;
+        console.log(bulkId)
+
+        // Get user information for the approved bulk order
+        const user = await getUserFromBulkOrder(bulkId);
+        console.log(user)
 
         if (newStatus === 'Accept') {
             // Approve the bulk order
             await approveBulkMaxOrder(bulkId);
-
-            // Get user information for the approved bulk order
-            const user = await getUserFromBulkOrder(bulkId);
 
             // Send verification for bulk approval
             await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
@@ -352,9 +354,6 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
         } else if (newStatus === 'Reject') {
             // Reject the bulk order
             await rejectBulkMaxOrder(bulkId);
-
-            // Get user information for the rejected bulk order
-            const user = await getUserFromBulkOrder(bulkId);
 
             // Send verification for bulk rejection
             await sendVerificationBulkRejected(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
