@@ -1,6 +1,7 @@
 import db from '../../config/dbConfig.js';
 
 
+
 // create price
 
 export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) => {
@@ -124,21 +125,7 @@ export const deletePrdPrice = async (priceId) => {
 export const getProductPriceById = async (productId) => {
     const productPrice = await db('products_price')
         .where({ product_id: productId })
-        .select(
-            db.raw(`
-CASE 
-    WHEN products_price.is_discount = 'false' THEN products_price.product_price
-    WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
-        CASE 
-            WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100))
-            WHEN products_price.special_price_type = 'fixed' THEN products_price.product_price - products_price.special_price
-            ELSE 0
-        END
-    ELSE products_price.product_price
-END AS computed_price
-`)
-
-        )
+        .select('*')
         .first();
     return productPrice;
 }
@@ -146,10 +133,24 @@ END AS computed_price
 
 export const updatePriceHistory = async (priceData) => {
     // console.log(priceData)
-    
+
     const PriceHistory = db('price_history').insert(priceData).returning('*');
     return PriceHistory;
-}
+};
+
+
+
+
+
+
+export const getBulkDiscountPriceByProductId = async (productId) => {
+    const discountPrices = await db('products_bulks')
+        .where({ product_id: productId })
+        .select('discounted_price')
+       
+
+        return discountPrices.map(entry => entry.discounted_price);
+};
 
 
 

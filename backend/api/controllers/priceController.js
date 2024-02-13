@@ -1,4 +1,5 @@
-import { createPrdPrice, deletePrdPrice, getAllPrdPrice, getPrdPrice, getProductPriceById, updatePrdPrice, updatePriceHistory } from "../models/productPriceModel.js";
+import { getPriceByProductIdAndCalculate } from "../models/bulkModel.js";
+import { createPrdPrice, deletePrdPrice, getAllPrdPrice, getBulkDiscountPriceByProductId, getPrdPrice, getProductPriceById, updatePrdPrice, updatePriceHistory } from "../models/productPriceModel.js";
 
 
 // create price
@@ -87,6 +88,12 @@ export const updatePrice = async (req, res) => {
   try {
 
     const product = await getProductPriceById(productId);
+    const productComputedPrice = await getPriceByProductIdAndCalculate(productId);
+    console.log("product computed  data", productComputedPrice);
+
+      // Retrieve discounted prices array
+    const bulkDiscountedPrices = await getBulkDiscountPriceByProductId(productId);
+    console.log("bulk data", bulkDiscountedPrices);
 
     if (!product) {
       return res.status(404).json({
@@ -97,6 +104,23 @@ export const updatePrice = async (req, res) => {
     };
 
 
+    // Format the computed price to two decimal places
+    const computedPrice = parseFloat(productComputedPrice.computed_price).toFixed(2);
+
+  
+    // Find the maximum discounted price
+    const maxDiscountedPrice = Math.max(...bulkDiscountedPrices);
+    console.log("max discounted price", maxDiscountedPrice);
+
+    // Check if discounted price is greater than product price
+    if (computedPrice <= maxDiscountedPrice) {
+
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "Discounted price cannot be less than or equal to the product price.",
+      });
+    };
 
     // Apply the special price
     await updatePrdPrice(productId, priceData, prd_status, prd_dashboard_status);

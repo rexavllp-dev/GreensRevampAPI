@@ -213,6 +213,3 @@ export const getBulkOrderRequests = async () => {
 };
 
 
-export const getBulkWithProductId = async (productId) => {
-
-}
