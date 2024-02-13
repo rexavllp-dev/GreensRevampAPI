@@ -12,6 +12,7 @@ export const calculatePrice = async ({
     let cart = session.cart || [];
     let subTotal = 0;
     let totalProductPrice = 0;
+    let totalProductPriceVat = 0;
     let totalDiscount = 0; // Track discount for each product
     const vat = await getVat();
     let productCount = 0;
@@ -93,9 +94,11 @@ export const calculatePrice = async ({
             // Apply VAT to regular and special prices if within the offer period
             const vatPercentage = vat.vat / 100;
             price = price
-            cart[i].price = price ;
+            cart[i].price = price  ;
             cart[i].totalPrice = price * parseInt(cart[i].quantity);
+            cart[i].totalPriceWithVat = price * parseInt(cart[i].quantity) + (price * vatPercentage);
             totalProductPrice += cart[i].totalPrice;
+            totalProductPriceVat += cart[i].totalPriceWithVat;
             // Track total discount for all products
             totalDiscount += discount * parseInt(cart[i].quantity);
             cart[i].subTotal = basePrice * parseInt(cart[i].quantity);
