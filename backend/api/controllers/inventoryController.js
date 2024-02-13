@@ -23,7 +23,7 @@ export const createProductInventory = async (req, res) => {
     best_seller,
 
   } = req.body;
-
+    
   try {
 
     const schema = Joi.object({

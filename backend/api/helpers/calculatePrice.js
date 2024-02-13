@@ -52,8 +52,8 @@ export const calculatePrice = async ({
             const basePrice = parseFloat(product.product_price);
 
             // Check if bulk discount is applicable
-            if (product.is_bulk_available === true) {
-                const bulkOption = product.bulk_options.find(option => {
+            if (product.bulk_options) {
+                const bulkOption = product.bulk_options?.find(option => {
                     return option.start_range <= cartProduct.quantity && option.end_range >= cartProduct.quantity;
                 });
 
@@ -93,7 +93,7 @@ export const calculatePrice = async ({
             // Apply VAT to regular and special prices if within the offer period
             const vatPercentage = vat.vat / 100;
             price = price
-            cart[i].price = price;
+            cart[i].price = price ;
             cart[i].totalPrice = price * parseInt(cart[i].quantity);
             totalProductPrice += cart[i].totalPrice;
             // Track total discount for all products
@@ -106,13 +106,13 @@ export const calculatePrice = async ({
 
     // Add store pickup charge only if isStorePickup is true and totalProductPrice is less than 50
     let storePickupCharge = 0;
-    if (isStorePickup && totalProductPrice <= 50) {
+    if (isStorePickup && totalProductPrice < 50) {
         nonActiveProductsCount === 0 ? 0 : storePickupCharge = 10;
     }
 
     // Add shipping charge only if isStorePickup is false and totalProductPrice is less than 100
     let shippingCharge = 0;
-    if (!isStorePickup && totalProductPrice <= 100) {
+    if (!isStorePickup && totalProductPrice < 100) {
         nonActiveProductsCount === 0 ? 0 : shippingCharge = 30;
     }
 
