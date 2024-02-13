@@ -217,6 +217,7 @@ export const getAllProduct = async (req, res) => {
         let sort = null;
         let minPrice = req.query.min_price;
         let maxPrice = req.query.max_price;
+        let bestSellerFilter = null;
         // let sortFeatured = false;
 
         if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
@@ -235,6 +236,11 @@ export const getAllProduct = async (req, res) => {
             sort = req.query.sort;
         }
 
+        // Check if best seller filter is provided in the query
+        if (req.query.best_seller !== null && req.query.best_seller !== undefined && req.query.best_seller !== 'undefined') {
+            bestSellerFilter = req.query.best_seller === 'true'; // Convert the query string to boolean
+        }
+
         // if (req.query.sort_featured !== null && req.query.sort_featured !== undefined && req.query.sort_featured !== 'undefined') {
         //     sortFeatured = req.query.sort_featured === 'true';
         // }
@@ -250,9 +256,9 @@ export const getAllProduct = async (req, res) => {
             filters = JSON.parse(filtersParam);
         };
 
-        const products = await getAllProducts(page, per_page, search_query, filters, sort, minPrice, maxPrice);
+        const products = await getAllProducts(page, per_page, search_query, filters, sort, minPrice, maxPrice, bestSellerFilter);
 
-        res.status(200).json({  
+        res.status(200).json({
             status: 200,
             success: true,
             message: 'Products fetched successfully',

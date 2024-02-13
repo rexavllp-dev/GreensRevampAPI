@@ -103,7 +103,7 @@ export const getProductById = async (productId) => {
 
 // get all products
 
-export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice) => {
+export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice, bestSellerFilter) => {
 
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
@@ -270,7 +270,16 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         query.orderBy('products.created_at', 'desc'); // Assuming 'created_at' is the timestamp field for product creation
     } else if (sort === 'oldest') {
         query.orderBy('products.created_at', 'asc'); // Assuming 'created_at' is the timestamp field for product creation
+    } else if (sort === 'best_sellers') {
+        query.orderBy('product_inventory.best_seller', 'desc'); // Assuming best_seller is a boolean field
+    }  else if (bestSellerFilter) {
+        query.where('product_inventory.best_seller', bestSellerFilter);
     }
+
+      
+
+
+  
 
 
     // Apply complex filters
