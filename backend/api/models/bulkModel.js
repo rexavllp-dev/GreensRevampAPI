@@ -152,12 +152,12 @@ export const isBulkOrderRequestExists = async (userId, productId) => {
 
 export const getBulkApproveStatusByProductId = async (userId, productId) => {
     const bulk = await db('bulk_above_max_orders')
-        .where({
-            user_id: userId,
-            product_id: productId
-        })
-        .first();
-    return bulk;
+    .where({
+        user_id: userId,
+        product_id: productId
+    })
+    .first();
+return bulk;
 }
 
 
@@ -191,18 +191,20 @@ export const updateBulkMaxOrderStatusAndQty = async (bulkId, newStatus, newQuant
 
 
 export const getUserFromBulkOrder = async (bulkId) => {
-    console.log(bulkId)
     const user = await db('bulk_above_max_orders')
-        .leftJoin('users', 'users.id', 'bulk_above_max_orders.user_id')
-        .leftJoin('products', 'products.id', 'bulk_above_max_orders.product_id')
+        .where({ 'bulk_above_max_orders.id': bulkId })
+        .leftJoin('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
+        .leftJoin('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
         .select(
             'users.*',
             'bulk_above_max_orders.*',
             'products.*'
         )
-        .where({ 'bulk_above_max_orders.id': bulkId })
-        .first()
-    // .toSQL();
+        .first();
+
+
+    console.log(user);
+
     return user;
 };
 
@@ -214,12 +216,9 @@ export const getBulkOrderRequests = async () => {
         .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
         .join('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
         .select(
-            'bulk_above_max_orders.*',
-            'bulk_above_max_orders.id as bulkId',
             'users.*',
-            'users.id AS userId',
-            'products.*',
-            'products.id as productId'
+            'bulk_above_max_orders.*',
+            'products.*'
         );
     return bulks;
 };

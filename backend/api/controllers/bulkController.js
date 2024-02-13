@@ -1,4 +1,4 @@
-import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getPriceByProductIdAndCalculate, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty } from "../models/bulkModel.js";
+import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkApproveStatusByProductId, getBulkByProductId, getBulkOrderRequests, getPriceByProductIdAndCalculate, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty } from "../models/bulkModel.js";
 import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
@@ -320,6 +320,35 @@ export const submitBulkOrderRequest = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed to submit bulk order request",
+            error: error.message
+        });
+    }
+};
+
+
+
+// get bulk status with product status 
+
+export const getBulkStatusWithProductStatus = async (req, res) => {
+    const productId = req.params.productId;
+    const userId = req.user.userId;
+    console.log(userId);
+    try {
+        const bulkStatus = await getBulkApproveStatusByProductId(userId, productId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched bulk status successfully",
+            result: bulkStatus
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch bulk status",
             error: error.message
         });
     }
