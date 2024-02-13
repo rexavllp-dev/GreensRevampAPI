@@ -25,7 +25,7 @@ export const createProductInventory = async (req, res) => {
     min_qty
 
   } = req.body;
-
+    
   try {
 
     const schema = Joi.object({
