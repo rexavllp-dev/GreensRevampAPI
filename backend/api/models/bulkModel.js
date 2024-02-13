@@ -150,6 +150,17 @@ export const isBulkOrderRequestExists = async (userId, productId) => {
 };
 
 
+export const getBulkApproveStatusByProductId = async (userId, productId) => {
+    const bulk = await db('bulk_above_max_orders')
+        .where({
+            user_id: userId,
+            product_id: productId
+        })
+        .first();
+    return bulk;
+}
+
+
 
 // approve and reject Bulk Above Max Orders by admin
 export const approveBulkMaxOrder = async (bulkId) => {
