@@ -13,7 +13,7 @@ import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateP
 import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
-import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkWithProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
+import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
 
 
@@ -244,6 +244,9 @@ router.get('/get-all-bulk', getsAllBulks);
 router.get('/get-bulk-product/:productId', getBulkWithProductId);
 // delete bulk
 router.delete('/delete-bulk/:bulkId', deleteABulk);
+
+// get price by product id 
+router.get('/get-price-by-product/:productId', getPriceByProductId);
 
 
 // bulk above route

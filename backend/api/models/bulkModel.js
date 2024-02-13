@@ -1,4 +1,3 @@
-import { join } from "path";
 import db from "../../config/dbConfig.js";
 
 
@@ -9,6 +8,29 @@ export const bulkInsert = async (bulkData) => {
     return bulk;
 };
 
+
+export const getPriceByProductIdAndCalculate = async (productId) => {
+    const productPrice = await db('products_price')
+        .where({ product_id: productId })
+        .select(
+            db.raw(`
+    CASE 
+        WHEN products_price.is_discount = 'false' THEN products_price.product_price
+        WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+            CASE 
+                WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100))
+                WHEN products_price.special_price_type = 'fixed' THEN products_price.product_price - products_price.special_price
+                ELSE 0
+            END
+        ELSE products_price.product_price
+    END AS computed_price
+`)
+
+        )
+        .first();
+    return productPrice;
+};
+
 export const existingBulk = async (bulkData) => {
     const bulk = await db('products_bulks')
         .where('product_id', bulkData.product_id)
@@ -17,7 +39,7 @@ export const existingBulk = async (bulkData) => {
         .first();
 
     return bulk;
-}
+};
 
 
 
@@ -168,7 +190,7 @@ export const getUserFromBulkOrder = async (bulkId) => {
             'products.*'
         )
         .first();
-        
+
 
     console.log(user);
 
@@ -189,3 +211,8 @@ export const getBulkOrderRequests = async () => {
         );
     return bulks;
 };
+
+
+export const getBulkWithProductId = async (productId) => {
+
+}

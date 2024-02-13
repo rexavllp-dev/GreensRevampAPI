@@ -1,4 +1,4 @@
-import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty, updateBulkRequest } from "../models/bulkModel.js";
+import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkByProductId, getBulkOrderRequests, getPriceByProductIdAndCalculate, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty } from "../models/bulkModel.js";
 import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
@@ -29,6 +29,9 @@ export const createABulk = async (req, res) => {
             });
         };
 
+
+
+
         const existingRange = await existingBulk(bulkData);
 
         if (existingRange) {
@@ -37,7 +40,22 @@ export const createABulk = async (req, res) => {
                 success: false,
                 message: "Bulk range already exists.",
             });
-        }
+        };
+
+        const productPrice = await getPriceByProductIdAndCalculate(bulkData.product_id);
+        // Format the computed price to two decimal places
+        const computedPrice = parseFloat(productPrice.computed_price).toFixed(2);
+        console.log("checking_prices", bulkData.discounted_price, computedPrice);
+
+        // Check if discounted price is greater than product price
+        if (bulkData.discounted_price >= computedPrice) {
+
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Discounted price cannot be greater than the product price.",
+            });
+        };
 
 
         const newBulk = await bulkInsert(bulkData);
@@ -64,39 +82,54 @@ export const updateABulk = async (req, res) => {
     const bulkId = req.params.bulkId;
     try {
 
-         // Parse float for start_range and end_range
-         bulkData.start_range = parseFloat(bulkData.start_range);
-         bulkData.end_range = parseFloat(bulkData.end_range);
- 
-         // Check if start_range exceeds end_range or if it is not provided
-         if (bulkData.start_range >= bulkData.end_range || isNaN(bulkData.start_range)) {
-             return res.status(400).json({
-                 status: 400,
-                 success: false,
-                 message: "Invalid range values. Start range must be less than end range and should be provided.",
-             });
-         };
- 
-         // Check if start_range equals end_range and prompt admin to confirm
-         if (bulkData.start_range === bulkData.end_range) {
-             return res.status(400).json({
-                 status: 400,
-                 success: false,
-                 message: "Start range equals end range. Please confirm if this is intended.",
-             });
-         };
- 
-         const existingRange = await existingBulkForUpdate(bulkData, bulkId);
- 
-         if (existingRange) {
-             return res.status(400).json({
-                 status: 400,
-                 success: false,
-                 message: "Bulk range already exists.",
-             });
-         }
- 
- 
+        // Parse float for start_range and end_range
+        bulkData.start_range = parseFloat(bulkData.start_range);
+        bulkData.end_range = parseFloat(bulkData.end_range);
+
+        // Check if start_range exceeds end_range or if it is not provided
+        if (bulkData.start_range >= bulkData.end_range || isNaN(bulkData.start_range)) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Invalid range values. Start range must be less than end range and should be provided.",
+            });
+        };
+
+        // Check if start_range equals end_range and prompt admin to confirm
+        if (bulkData.start_range === bulkData.end_range) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Start range equals end range. Please confirm if this is intended.",
+            });
+        };
+
+        const existingRange = await existingBulkForUpdate(bulkData, bulkId);
+
+        if (existingRange) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Bulk range already exists.",
+            });
+        };
+
+
+        const productPrice = await getPriceByProductIdAndCalculate(bulkData.product_id);
+        // Format the computed price to two decimal places
+        const computedPrice = parseFloat(productPrice.computed_price).toFixed(2);
+        console.log("checking_prices", bulkData.discounted_price, computedPrice);
+
+        // Check if discounted price is greater than product price
+        if (bulkData.discounted_price >= computedPrice) {
+
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Discounted price cannot be greater than the product price.",
+            });
+        };
+
 
 
         const bulk = await updateBulk(bulkData, bulkId);
@@ -304,7 +337,7 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
         const updates = await updateBulkMaxOrderStatusAndQty(bulkId, newStatus, newQuantity);
 
         let messages;
-        
+
         if (newStatus === 'Accept') {
             // Approve the bulk order
             await approveBulkMaxOrder(bulkId);
@@ -372,7 +405,7 @@ export const rejectBulkAboveMaxOrders = async (req, res) => {
             success: true,
             message: "Bulk order rejected successfully",
         });
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -413,3 +446,25 @@ export const getBulkOrderRequestsHandler = async (req, res) => {
 
 
 
+
+export const getPriceByProductId = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+
+        const price = await getPriceByProductIdAndCalculate(productId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Successful",
+            result: price
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed ",
+            error: error
+        });
+    }
+}
