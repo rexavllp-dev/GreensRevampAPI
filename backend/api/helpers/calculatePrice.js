@@ -106,13 +106,13 @@ export const calculatePrice = async ({
 
     // Add store pickup charge only if isStorePickup is true and totalProductPrice is less than 50
     let storePickupCharge = 0;
-    if (isStorePickup && totalProductPrice < 50) {
+    if (isStorePickup && totalProductPrice <= 50) {
         nonActiveProductsCount === 0 ? 0 : storePickupCharge = 10;
     }
 
     // Add shipping charge only if isStorePickup is false and totalProductPrice is less than 100
     let shippingCharge = 0;
-    if (!isStorePickup && totalProductPrice < 100) {
+    if (!isStorePickup && totalProductPrice <= 100) {
         nonActiveProductsCount === 0 ? 0 : shippingCharge = 30;
     }
 
