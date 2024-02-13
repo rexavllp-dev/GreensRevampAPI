@@ -252,7 +252,7 @@ export const getAllProduct = async (req, res) => {
 
         const products = await getAllProducts(page, per_page, search_query, filters, sort, minPrice, maxPrice);
 
-        res.status(200).json({
+        res.status(200).json({  
             status: 200,
             success: true,
             message: 'Products fetched successfully',

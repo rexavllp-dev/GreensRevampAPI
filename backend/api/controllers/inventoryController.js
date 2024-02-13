@@ -2,6 +2,7 @@ import { createInventory, getProductInventoryById, getProductQuantity, updateInv
 import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
+import { updateAProduct } from "../models/productModel.js";
 
 
 
@@ -13,6 +14,7 @@ export const createProductInventory = async (req, res) => {
 
     product_id,
     sku,
+    ein_code,
     inventory_management,
     product_quantity,
     stock_availability,
@@ -79,6 +81,10 @@ export const createProductInventory = async (req, res) => {
 
     })
 
+    const updatedProduct = await updateAProduct(product_id, {
+      ein_code
+    });
+
     res.status(201).json({
       status: 201,
       success: true,
@@ -103,7 +109,18 @@ export const createProductInventory = async (req, res) => {
 export const updateProductInventory = async (req, res) => {
 
   const { productId } = req.params;
-  const inventoryData = req.body;
+
+  const {
+    sku,
+    ein_code,
+    inventory_management,
+    product_quantity,
+    stock_availability,
+    show_out_of_stock_on_dashboard,
+    back_in_stock,
+    best_seller,
+
+  } = req.body;
 
   try {
 
@@ -121,14 +138,26 @@ export const updateProductInventory = async (req, res) => {
 
 
     //  update the inventory
-    await updateInventory(productId, inventoryData);
+    await updateInventory(productId, {
+      sku,
+      inventory_management,
+      product_quantity,
+      stock_availability,
+      show_out_of_stock_on_dashboard,
+      back_in_stock,
+      best_seller,
+    });
+    const updatedProduct = await updateAProduct(productId, {
+      ein_code
+    });
 
     res.status(201).json({
       status: 201,
       success: true,
       message: "update successfully",
-      result: inventoryData,
+      result: [],
     });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -156,7 +185,7 @@ export const modifyStock = async (req, res) => {
 
       if (action === 'add') {
         newQuantity = currentQuantity + parseInt(quantity);
-        
+
       } else if (action === 'reduce') {
         newQuantity = currentQuantity - parseInt(quantity);
 
