@@ -21,6 +21,8 @@ export const createProductInventory = async (req, res) => {
     show_out_of_stock_on_dashboard,
     back_in_stock,
     best_seller,
+    max_qty,
+    min_qty
 
   } = req.body;
 
@@ -78,7 +80,8 @@ export const createProductInventory = async (req, res) => {
       show_out_of_stock_on_dashboard,
       back_in_stock,
       best_seller,
-
+      max_qty,
+      min_qty
     })
 
     const updatedProduct = await updateAProduct(product_id, {
@@ -119,7 +122,8 @@ export const updateProductInventory = async (req, res) => {
     show_out_of_stock_on_dashboard,
     back_in_stock,
     best_seller,
-
+    max_qty,
+    min_qty
   } = req.body;
 
   try {
@@ -146,6 +150,8 @@ export const updateProductInventory = async (req, res) => {
       show_out_of_stock_on_dashboard,
       back_in_stock,
       best_seller,
+      max_qty,
+      min_qty
     });
     const updatedProduct = await updateAProduct(productId, {
       ein_code
