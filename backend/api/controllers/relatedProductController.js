@@ -18,7 +18,9 @@ export const createRelatedProduct = async (req, res) => {
 
         // Check if related product already exists
         const existingRelatedProducts = await getRelatedProductsByProductId(product_id);
-        const existingRelatedProductIds = existingRelatedProducts.map(product => product.related_product_id);
+        console.log("Existing Related Products:", existingRelatedProducts);
+
+        const existingRelatedProductIds = existingRelatedProducts.relatedProducts.map(product => product.related_product_id);
 
 
         const newData = [];

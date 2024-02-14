@@ -49,7 +49,6 @@ export const getVat = async () => {
 
 // get a price
 export const getPrdPrice = async (priceId) => {
-    console.log(priceId)
     const vat = await db("vat").select('vat').first();
 
     // Select the 'price' and 'discount_type' columns, and calculate the 'special_price'
