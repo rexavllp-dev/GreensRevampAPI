@@ -44,7 +44,7 @@ export const getRelatedProductsByProductId = async (productId) => {
             "product_category.*",
             "product_category.id as product_category_id",
             "related_products.*",
-            "related_products.id as related_product_id",
+            "related_products.id as relatedProductId",
 
 
 
