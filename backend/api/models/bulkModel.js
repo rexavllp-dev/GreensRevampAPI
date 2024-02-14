@@ -229,3 +229,33 @@ export const getBulkOrderRequests = async () => {
 };
 
 
+export const getPreviousBulk = async (productId, startRange) => {
+    const previousBulk = await db('products_bulks')
+        .where('product_id', productId)
+        .where('end_range', '<', startRange)
+        .orderBy('end_range', 'desc')
+        .first();
+
+    return previousBulk;
+};
+
+
+
+export const getMaxQuantityByProductId = async (productId) => {
+    const productInventory = await db('product_inventory')
+        .select('max_qty')
+        .where('product_id', productId)
+        .first();
+
+    return productInventory ? productInventory.max_qty : null;
+};
+
+
+export const getMinQuantityByProductId = async (productId) => {
+    const productInventory = await db('product_inventory')
+        .select('min_qty')
+        .where('product_id', productId)
+        .first();
+
+    return productInventory ? productInventory.min_qty : null;
+};
