@@ -7,7 +7,7 @@ import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
 import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getAllRelatedProductPublicByProductId, getSingleProductPublic } from '../controllers/publicProductController.js';
-import { createNewOption, deleteOption, getAllOptions, getOptionsByProductId } from '../controllers/optionController.js';
+import { createNewOption, deleteOption, getAllOptions } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
 import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
@@ -156,9 +156,6 @@ router.get('/get-options/:productId', getAllOptions);
 
 // create option
 router.post('/create-option', createNewOption);
-
-// get option by product id
-router.get('/get-options/:productId', getOptionsByProductId);
 
 // delete option
 router.delete('/delete-option/:optionId', deleteOption);

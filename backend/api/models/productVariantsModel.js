@@ -85,6 +85,9 @@ export const getVariantsByProductId = async (productId) => {
         )
         .distinct('product_variants.variant_id')
         .groupBy(
-            'product_variants.id','products.id')
+            'product_variants.id', 'products.id')
+
+        .orderBy('product_variants.created_at', 'desc')
+
     return variants;
 };

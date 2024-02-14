@@ -32,7 +32,8 @@ export const getAllOptionsByProductId = async (productId) => {
         })
         .select(
             'options.*',
-        );
+        )
+        .orderBy('options.created_at', 'desc');
 
     // Assuming your optionsArray contains rows with option data
 
