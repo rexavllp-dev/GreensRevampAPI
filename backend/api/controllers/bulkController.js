@@ -361,6 +361,7 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
     try {
         const { bulkId } = req.params;
         const { newStatus, newQuantity } = req.body;
+        console.log(newStatus, newQuantity, bulkId)
 
         // Update the bulk order status and quantity
         const updates = await updateBulkMaxOrderStatusAndQty(bulkId, newStatus, newQuantity);

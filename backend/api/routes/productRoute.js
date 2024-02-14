@@ -251,8 +251,6 @@ router.get('/get-price-by-product/:productId', getPriceByProductId);
 // get bulk status with product id and user
 router.get('/get-bulk-status/:productId', verifyToken, getBulkStatusWithProductStatus);
 
-
-
 // bulk above route
 
 // create a bulk above
