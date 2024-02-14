@@ -1,7 +1,7 @@
-import { query } from 'express';
+
 import db from '../../config/dbConfig.js';
 import { getPrdPrice } from './productPriceModel.js';
-import { calculateSpecialPrice } from '../helpers/calculateSpecialPrice.js';
+
 
 // create product
 export const createAProduct = async (productData) => {

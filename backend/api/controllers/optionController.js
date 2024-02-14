@@ -68,29 +68,6 @@ export const deleteOption = async (req, res) => {
 
 
 
-export const getOptionsByProductId = async (req, res) => {
-  const productId = req.params.productId;
-  try {
-    const options = await getOptionsWithProductId(productId);
-
-    res.status(200).json({
-      status: 200,
-      success: true,
-      message: "Options fetched successfully",
-      result: options
-    });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      status: 500,
-      success: false,
-      message: "Failed to fetch options",
-      error: error
-    });
-  }
-};
-
 export const getAllOptions = async (req, res) => {
   const productId = req.params.productId;
   try {

@@ -49,7 +49,10 @@ export const getOptionValuesByOptionId = async (optionId) => {
         )
         .where({
             "product_options.option_id": optionId,
-        });
+        })
+
+        .orderBy('product_options.created_at', 'desc');
+
     console.log(optionId);
     return option;
 };
