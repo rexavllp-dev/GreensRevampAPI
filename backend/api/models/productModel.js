@@ -201,6 +201,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
 
+    //   search query
     if (search) {
         console.log(search);
         query.where(function () {
