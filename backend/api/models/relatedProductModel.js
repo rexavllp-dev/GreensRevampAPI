@@ -1,4 +1,5 @@
 import db from '../../config/dbConfig.js';
+import { getPrdPrice } from './productPriceModel.js';
 
 // related products
 
@@ -21,6 +22,7 @@ export const getRelatedProductsByProductId = async (productId) => {
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .crossJoin('vat')
         .where('related_products.product_id', productId)
 
 
@@ -43,6 +45,21 @@ export const getRelatedProductsByProductId = async (productId) => {
             "product_category.id as product_category_id",
             "related_products.*",
             "related_products.id as related_product_id",
+
+
+
+            db.raw(`
+            CASE 
+                WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+                WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                    CASE 
+                        WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                        WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                        ELSE 0
+                    END
+                ELSE products_price.product_price * (1 + vat.vat / 100)
+            END AS compute_price
+    `),
 
 
             db.raw(`
@@ -68,12 +85,22 @@ export const getRelatedProductsByProductId = async (productId) => {
             'product_badge.id',
             'product_category.id',
             'related_products.id',
+            'vat.id'
 
         )
 
 
+    // Integrate getPrdPrice for each product
+    const productsWithPrice = await Promise.all(relatedProducts.map(async (product) => {
+        const prdPrice = await getPrdPrice(product.products_price_id);
+        return { ...product, prdPrice };
+    }));
 
-    return relatedProducts;
+
+
+    return {
+        relatedProducts: productsWithPrice,
+    }
 };
 
 
