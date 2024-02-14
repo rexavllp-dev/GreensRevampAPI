@@ -16,25 +16,29 @@ export const addProductToCart = async (req, res) => {
         if (!req.session.cart) {
             req.session.cart = [];
         }
+        const existingProduct = req.session.cart.find(item => item.productId === productId);
 
-        if (req.session.cart.find(item => item.productId === productId)) {
+        if (existingProduct) {
+            // If the product already exists, increase the quantity instead of returning an error
+            existingProduct.quantity += quantity;
 
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: 'Product already exists in cart',
-                result: req.session.cart.find(item => item.productId === productId)
-            })
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                message: 'Product quantity updated in cart successfully',
+                result: req.session.cart
+            });
+        } else {
+            // If the product doesn't exist, add it to the cart
+            req.session.cart.push({ productId, quantity });
+
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                message: 'Product added to cart successfully',
+                result: req.session.cart
+            });
         }
-        req.session.cart.push({ productId, quantity });
-
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Product added to cart successfully',
-            result: req.session.cart
-
-        })
 
     } catch (error) {
         console.log(error);
