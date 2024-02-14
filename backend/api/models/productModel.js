@@ -117,10 +117,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .crossJoin('vat')
 
 
-
-
-
-
         .select(
             'products.*',
             'products.created_at as product_created_at',
@@ -286,21 +282,45 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         query.orderBy('products.created_at', 'asc'); // Assuming 'created_at' is the timestamp field for product creation
     } else if (sort === 'bestsellers') {
         query.orderBy('product_inventory.best_seller', 'asc'); // Assuming best_seller is a boolean field
-    } 
-      
+    }
 
 
-  
 
 
-    // Apply complex filters
+
+
+    // Apply availability filters
     filters.forEach(filter => {
-        if (filter.operator === '>') {
-            query.where(filter.column, '>', filter.value);
-        } else if (filter.operator === '<') {
-            query.where(filter.column, '<', filter.value);
-        } else if (filter.operator === '=') {
-            query.where(filter.column, '=', filter.value);
+        if (filter.column === 'product_inventory.stock_availability') {
+            // Handle stock availability filter
+            if (filter.value === 'In stock') {
+                query.where(function () {
+                    // Product is in stock if stock_availability is 'In stock'
+                    this.where('product_inventory.stock_availability', '=', 'In stock');
+                }).orWhere(function () {
+                    // Or, if inventory management is true and product quantity is greater than 0
+                    this.where('inventory_management', true)
+                        .andWhere('product_quantity', '>', 0);
+                });
+            } else if (filter.value === 'Out of stock') {
+                query.where(function () {
+                    // Product is out of stock if stock_availability is 'Out of stock'
+                    this.where('product_inventory.stock_availability', '=', 'Out of stock');
+                }).orWhere(function () {
+                    // Or, if inventory management is true and product quantity is 0
+                    this.where('inventory_management', true)
+                        .andWhere('product_quantity', '=', 0);
+                });
+            }
+        } else {
+            // Handle other types of filters (if any) here
+            if (filter.operator === '>') {
+                query.where(filter.column, '>', filter.value);
+            } else if (filter.operator === '<') {
+                query.where(filter.column, '<', filter.value);
+            } else if (filter.operator === '=') {
+                query.where(filter.column, '=', filter.value);
+            }
         }
     });
 
