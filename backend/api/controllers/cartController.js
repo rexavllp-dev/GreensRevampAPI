@@ -1,5 +1,3 @@
-import { createHmac } from "crypto";
-import { addToCart, getCart, getProductId, removeCartItem, updateCartItemQuantity } from "../models/cartModel.js";
 import { calculatePrice } from "../helpers/calculatePrice.js";
 
 // add product to the session cart and save it in the session
