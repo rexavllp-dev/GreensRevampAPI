@@ -175,7 +175,6 @@ export const rejectBulkMaxOrder = async (bulkId) => {
     return db('bulk_above_max_orders')
         .where({ id: bulkId })
         .update({ approved_status: "Reject" })
-
 };
 
 // update bulk above max orders
@@ -197,8 +196,11 @@ export const getUserFromBulkOrder = async (bulkId) => {
         .leftJoin('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
         .select(
             'users.*',
+            'users.id as userId',
             'bulk_above_max_orders.*',
-            'products.*'
+            'bulk_above_max_orders.id as bulkId',
+            'products.*',
+            'products.id as productId'
         )
         .first();
 
@@ -217,8 +219,11 @@ export const getBulkOrderRequests = async () => {
         .join('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
         .select(
             'users.*',
+            'users.id as userId',
             'bulk_above_max_orders.*',
-            'products.*'
+            'bulk_above_max_orders.id as bulkId',
+            'products.*',
+            'products.id as productId'
         );
     return bulks;
 };

@@ -270,7 +270,13 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         query.orderBy('products.created_at', 'desc'); // Assuming 'created_at' is the timestamp field for product creation
     } else if (sort === 'oldest') {
         query.orderBy('products.created_at', 'asc'); // Assuming 'created_at' is the timestamp field for product creation
-    }
+    } else if (sort === 'bestsellers') {
+        query.orderBy('product_inventory.best_seller', 'asc'); // Assuming best_seller is a boolean field
+    } 
+      
+
+
+  
 
 
     // Apply complex filters
