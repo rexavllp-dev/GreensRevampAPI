@@ -21,7 +21,7 @@ export const addProductToCart = async (req, res) => {
 
         if (existingProduct) {
             // If the product already exists, increase the quantity instead of returning an error
-            existingProduct.quantity += quantity;
+            existingProduct.quantity += parseInt(quantity);
 
             return res.status(200).json({
                 status: 200,
@@ -36,7 +36,7 @@ export const addProductToCart = async (req, res) => {
 
             //  min quantity
 
-            if(product.min_qty >= quantity) {
+            if(product.min_qty >= parseInt(quantity)) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
@@ -47,7 +47,7 @@ export const addProductToCart = async (req, res) => {
 
 
 
-            if(product.max_qty <= quantity) {
+            if(product.max_qty <= parseInt(quantity)) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
@@ -58,7 +58,7 @@ export const addProductToCart = async (req, res) => {
                 
             }
 
-            if(product.product_quantity <= quantity) {
+            if(product.product_quantity <= parseInt(quantity)) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
