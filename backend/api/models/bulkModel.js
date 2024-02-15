@@ -110,7 +110,13 @@ export const getBulkAboveOrder = async (bulkId) => {
 export const getBulkByProductId = async (productId) => {
     const bulk = await db('products_bulks')
         .where({ product_id: productId })
-        .select('*')
+        .crossJoin('vat')
+        .select(
+            
+            'products_bulks.*',
+            "vat.vat",
+            db.raw('(products_bulks.discounted_price + (products_bulks.discounted_price * vat / 100)) as bulkPriceWithVat')
+            )
 
     return bulk;
 };

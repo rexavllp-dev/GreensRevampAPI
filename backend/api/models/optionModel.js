@@ -7,6 +7,15 @@ export const createOption = async (optionData) => {
 };
 
 
+export const updateAOption = async (optionId, optionData) => {
+    const updateOption = await db('options')
+        .where({ id: optionId })
+        .update(optionData)
+
+    return updateOption
+}
+
+
 export const deleteAOption = async (optionId) => {
     const deleteOption = db('options').where({ id: optionId }).del();
     return deleteOption;

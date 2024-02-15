@@ -116,7 +116,7 @@ export const getSingleProductPublic = async (req, res) => {
 export const getAllRelatedProductPublicByProductId = async (req, res) => {
     try {
         const productId = req.params.productId;
-      console.log('working',productId )
+        console.log('working', productId)
 
         const relatedProducts = await getAllRelatedProductsByProductId(productId);
 
@@ -136,3 +136,8 @@ export const getAllRelatedProductPublicByProductId = async (req, res) => {
         });
     }
 };
+
+
+
+
+

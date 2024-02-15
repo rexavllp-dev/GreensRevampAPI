@@ -30,15 +30,17 @@ export const calculatePrice = async ({
         let price = 0;
         let discount = 0; // Initialize discount to 0
 
-        
+
         // Check if quantity is less than or equal to stock
 
         if (product) {
 
+                
             if (
                 product.prd_status === false ||
                 product.stock_availability === 'Out of stock' &&
-                cart[i].quantity <= product.product_quantity
+                cart[i].quantity <= product.product_quantity &&
+                cart[i].max_quantity <= product.max_qty
 
             ) {
                 // If the product is not in the condition, continue to the next iteration

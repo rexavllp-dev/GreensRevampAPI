@@ -22,7 +22,6 @@ export const createRelatedProduct = async (req, res) => {
 
         const existingRelatedProductIds = existingRelatedProducts.relatedProducts.map(product => product.related_product_id);
 
-        // const existingRelatedProductIds = new Set(existingRelatedProducts.relatedProducts.map(product => product.related_product_id));
 
         const newData = [];
         const nonExistingProductIds = [];
