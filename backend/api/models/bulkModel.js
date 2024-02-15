@@ -112,9 +112,9 @@ export const getBulkByProductId = async (productId) => {
         .where({ product_id: productId })
         .crossJoin('vat')
         .select(
+            
             'products_bulks.*',
-            "vat.*",
-            "vat.id as vat_id",
+            "vat.vat",
             db.raw('(products_bulks.discounted_price + (products_bulks.discounted_price * vat / 100)) as bulkPriceWithVat')
             )
 
