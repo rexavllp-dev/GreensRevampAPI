@@ -48,6 +48,7 @@ export const createABulk = async (req, res) => {
         console.log("checking_prices", bulkData.discounted_price, computedPrice);
 
         // Check if discounted price is greater than product price
+        bulkData.discounted_price = parseFloat(bulkData.discounted_price);
         if (bulkData.discounted_price >= computedPrice) {
 
             return res.status(400).json({
@@ -152,6 +153,8 @@ export const updateABulk = async (req, res) => {
         // Format the computed price to two decimal places
         const computedPrice = parseFloat(productPrice.computed_price).toFixed(2);
         console.log("checking_prices", bulkData.discounted_price, computedPrice);
+
+        bulkData.discounted_price = parseFloat(bulkData.discounted_price);
 
         // Check if discounted price is greater than product price
         if (bulkData.discounted_price >= computedPrice) {
