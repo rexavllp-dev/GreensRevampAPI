@@ -54,6 +54,7 @@ export const checkUserExistWithMobileAndCountryCode = async (usr_mobile_country_
 
 export const deleteAUser = async (userId) => {
     // const user = await db('users').where({ id: userId }).del();
+    const bulk = await db('bulk_above_max_orders').del();
     const user = await db('users').del();
     const com = await db('company').del();
     return user;
