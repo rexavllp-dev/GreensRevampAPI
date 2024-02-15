@@ -1,4 +1,5 @@
 import { calculatePrice } from "../helpers/calculatePrice.js";
+import { getProductById } from "../models/productModel.js";
 
 // add product to the session cart and save it in the session
 export const addProductToCart = async (req, res) => {
@@ -29,6 +30,66 @@ export const addProductToCart = async (req, res) => {
                 result: req.session.cart
             });
         } else {
+
+            // Check if the product is active
+             const product = await getProductById(productId);
+
+            //  min quantity
+
+            if(product.min_qty >= quantity) {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Min quantity not met',
+                    result: req.session.cart
+                });
+            }
+
+
+
+            if(product.max_qty <= quantity) {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Max quantity exceeded',
+                    result: req.session.cart
+                });
+
+                
+            }
+
+            if(product.product_quantity <= quantity) {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Product quantity exceeded',
+                    result: req.session.cart
+                });
+            }
+
+            // check product status
+
+            if(product.prd_status === false) {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Product is not active',
+                    result: req.session.cart
+                });
+            }
+
+            // check product stock availability
+
+            if(product.stock_availability === 'Out of stock') {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Product is out of stock',
+                    result: req.session.cart
+                });
+            }
+
+
             // If the product doesn't exist, add it to the cart
             req.session.cart.push({ productId, quantity });
 
