@@ -7,6 +7,15 @@ export const createOption = async (optionData) => {
 };
 
 
+export const updateAOption = async (optionId, optionData) => {
+    const updateOption = await db('options')
+        .where({ id: optionId })
+        .update(optionData)
+
+    return updateOption
+}
+
+
 export const deleteAOption = async (optionId) => {
     const deleteOption = db('options').where({ id: optionId }).del();
     return deleteOption;
@@ -33,7 +42,7 @@ export const getAllOptionsByProductId = async (productId) => {
         .select(
             'options.*',
         )
-        .orderBy('options.created_at', 'desc');
+        .orderBy('options.created_at', 'asc');
 
     // Assuming your optionsArray contains rows with option data
 

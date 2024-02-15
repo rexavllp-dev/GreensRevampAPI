@@ -1,4 +1,4 @@
-import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkApproveStatusByProductId, getBulkByProductId, getBulkOrderRequests, getPriceByProductIdAndCalculate, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty } from "../models/bulkModel.js";
+import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkApproveStatusByProductId, getBulkByProductId, getBulkOrderRequests, getMaxQuantityByProductId, getMinQuantityByProductId, getPreviousBulk, getPriceByProductIdAndCalculate, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty } from "../models/bulkModel.js";
 import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
@@ -56,6 +56,39 @@ export const createABulk = async (req, res) => {
                 message: "Discounted price cannot be greater than the product price.",
             });
         };
+
+        // Fetch max_qty and min_qty from product_inventory
+        const maxQty = await getMaxQuantityByProductId(bulkData.product_id);
+        const minQty = await getMinQuantityByProductId(bulkData.product_id);
+
+        if (minQty !== null && bulkData.end_range < minQty) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: `Start range must be at least ${minQty} units.`,
+            });
+        };
+
+
+        if (maxQty !== null && bulkData.end_range > maxQty) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: `End range exceeds the maximum quantity (${maxQty} units) allowed for the product.`,
+            });
+        };
+
+
+        // Check if the price per quantity of the new bulk range is greater than the previous range
+        const previousBulk = await getPreviousBulk(bulkData.product_id, bulkData.start_range);
+        if (previousBulk && bulkData.discounted_price >= previousBulk.discounted_price) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Price per quantity cannot be lesser than the price of the previous range.",
+            });
+        }
+
 
 
         const newBulk = await bulkInsert(bulkData);
@@ -131,6 +164,38 @@ export const updateABulk = async (req, res) => {
         };
 
 
+        // Fetch max_qty and min_qty from product_inventory
+        const maxQty = await getMaxQuantityByProductId(bulkData.product_id);
+        const minQty = await getMinQuantityByProductId(bulkData.product_id);
+
+        if (minQty !== null && bulkData.end_range < minQty) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: `Start range must be at least ${minQty} units.`,
+            });
+        };
+
+
+        if (maxQty !== null && bulkData.end_range > maxQty) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: `End range exceeds the maximum quantity (${maxQty} units) allowed for the product.`,
+            });
+        };
+
+
+
+        // Check if the price per quantity of the new bulk range is greater than the previous range
+        const previousBulk = await getPreviousBulk(bulkData.product_id, bulkData.start_range);
+        if (previousBulk && bulkData.discounted_price >= previousBulk.discounted_price) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Price per quantity cannot be lesser than the price of the previous range.",
+            });
+        };
 
         const bulk = await updateBulk(bulkData, bulkId);
         res.status(200).json({

@@ -51,7 +51,7 @@ export const getOptionValuesByOptionId = async (optionId) => {
             "product_options.option_id": optionId,
         })
 
-        .orderBy('product_options.created_at', 'desc');
+        .orderBy('product_options.created_at', 'asc');
 
     console.log(optionId);
     return option;
