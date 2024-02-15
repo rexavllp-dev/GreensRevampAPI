@@ -36,7 +36,7 @@ export const addProductToCart = async (req, res) => {
 
             //  min quantity
 
-            if(product.min_qty >= parseInt(quantity)) {
+            if(product.min_qty > parseInt(quantity)) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
