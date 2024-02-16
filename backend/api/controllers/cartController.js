@@ -48,7 +48,7 @@ export const addProductToCart = async (req, res) => {
 
 
 
-                if (product.max_qty <= parseInt(quantity)) {
+                if (product.max_qty <  parseInt(quantity)) {
                     return res.status(400).json({
                         status: 400,
                         success: false,
@@ -91,7 +91,7 @@ export const addProductToCart = async (req, res) => {
                 }
             }
 
-            if (product.max_qty <= parseInt(quantity)) {
+            if (product.max_qty < parseInt(quantity)) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
