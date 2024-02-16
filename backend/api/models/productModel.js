@@ -296,11 +296,14 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                 query.where(function () {
                     // Product is in stock if stock_availability is 'In stock'
                     this.where('product_inventory.stock_availability', '=', 'In stock');
-                }).orWhere(function () {
+                }).andWhere(function () {
                     // Or, if inventory management is true and product quantity is greater than 0
                     this.where('product_inventory.inventory_management', true)
-                        .andWhere('product_inventory.product_quantity', '>', 0);
-                });
+                        .andWhere('product_inventory.product_quantity', '>', 0)
+                }).orWhere(function () {  
+                    // Or, if inventory management is false
+                    this.where('product_inventory.inventory_management', false);
+                })
             } else if (filter.value === 'Out of stock') {
                 query.where(function () {
                     // Product is out of stock if stock_availability is 'Out of stock'
