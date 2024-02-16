@@ -1,5 +1,7 @@
 import express from 'express';
 import { addProductToCart, getProductFromCart, removeProductFromCart, updateProductCartQuantity } from '../controllers/cartController.js';
+import { createDeliveryEstimate, getSingleDeliveryEstimate, getsAllDeliveryEstimate, updateDeliveryEstimate } from '../controllers/deliveryEstimateController.js';
+import { createRegion, getSingleRegion, getsAllRegion, updateRegion } from '../controllers/regionController.js';
 
 
 const router = express.Router();
@@ -19,6 +21,42 @@ router.get('/get-cart', getProductFromCart);
 // delete item from cart
    
  router.delete('/delete-cart-item/:productId', removeProductFromCart);
+
+
+
+//  _________________________________________________________________________________________________________________________________________________
+
+//  estimate delivery
+
+// create estimate delivery
+router.post('/create-estimate-delivery', createDeliveryEstimate);
+
+// update estimate delivery
+router.put('/update-estimate-delivery/:deliveryEstimateId', updateDeliveryEstimate);
+
+// get single estimate delivery
+router.get('/get-estimate-delivery/:deliveryEstimateId', getSingleDeliveryEstimate);
+
+// get all estimate delivery
+router.get('/get-all-estimate-delivery', getsAllDeliveryEstimate);
+
+
+//  _________________________________________________________________________________________________________________________________________________
+
+//  Regions
+
+
+// create Region
+router.post('/create-region', createRegion);
+
+// update Region
+router.put('/update-region/:regionId', updateRegion);
+
+// get Region
+router.get('/get-region/:regionId', getSingleRegion);
+
+// get all Regions
+router.get('/get-all-regions', getsAllRegion);
 
 
 export default router;
