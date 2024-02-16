@@ -32,22 +32,66 @@ export const addProductToCart = async (req, res) => {
         } else {
 
             // Check if the product is active
-             const product = await getProductById(productId);
+            const product = await getProductById(productId);
 
-            //  min quantity
+            if (product.inventory_management === true) {
 
-            if(product.min_qty > parseInt(quantity)) {
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: 'Min quantity not met',
-                    result: req.session.cart
-                });
+                //  min quantity
+                // if(product.min_qty > parseInt(quantity)) {
+                //     return res.status(400).json({
+                //         status: 400,
+                //         success: false,
+                //         message: 'Min quantity not met',
+                //         result: req.session.cart
+                //     });
+                // }
+
+
+
+                if (product.max_qty <= parseInt(quantity)) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Max quantity exceeded',
+                        result: req.session.cart
+                    });
+
+
+                }
+
+                if (product.product_quantity < parseInt(quantity)) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product quantity exceeded',
+                        result: req.session.cart
+                    });
+                }
+
+                // check product status
+
+                if (product.prd_status === false) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product is not active',
+                        result: req.session.cart
+                    });
+                }
+
+                // check product stock availability
+
+                if (product.stock_availability === 'Out of stock') {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product is out of stock',
+                        result: req.session.cart
+                    });
+                }
             }
 
-
-
-            if(product.max_qty <= parseInt(quantity)) {
+            if (product.max_qty <= parseInt(quantity)) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
@@ -55,21 +99,11 @@ export const addProductToCart = async (req, res) => {
                     result: req.session.cart
                 });
 
-                
-            }
 
-            if(product.product_quantity < parseInt(quantity)) {
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: 'Product quantity exceeded',
-                    result: req.session.cart
-                });
             }
 
             // check product status
-
-            if(product.prd_status === false) {
+            if (product.prd_status === false) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
@@ -78,9 +112,9 @@ export const addProductToCart = async (req, res) => {
                 });
             }
 
-            // check product stock availability
+             // check product stock availability
 
-            if(product.stock_availability === 'Out of stock') {
+             if (product.stock_availability === 'Out of stock') {
                 return res.status(400).json({
                     status: 400,
                     success: false,
