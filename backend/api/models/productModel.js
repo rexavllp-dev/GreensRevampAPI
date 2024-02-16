@@ -298,8 +298,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                     this.where('product_inventory.stock_availability', '=', 'In stock');
                 }).orWhere(function () {
                     // Or, if inventory management is true and product quantity is greater than 0
-                    this.where('inventory_management', true)
-                        .andWhere('product_quantity', '>', 0);
+                    this.where('product_inventory.inventory_management', true)
+                        .andWhere('product_inventory.product_quantity', '>', 0);
                 });
             } else if (filter.value === 'Out of stock') {
                 query.where(function () {
