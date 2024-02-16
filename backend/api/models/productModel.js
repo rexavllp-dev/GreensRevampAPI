@@ -288,8 +288,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
 
-
-
     // Apply availability filters
     filters.forEach(filter => {
         if (filter.column === 'product_inventory.stock_availability') {
@@ -309,9 +307,12 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                     this.where('product_inventory.stock_availability', '=', 'Out of stock');
                 }).orWhere(function () {
                     // Or, if inventory management is true and product quantity is 0
-                    this.where('inventory_management', true)
-                        .andWhere('product_quantity', '=', 0);
+                    this.where('product_inventory.inventory_management', true)
+                        .andWhere('product_inventory.product_quantity', '=', 0);
                 });
+
+
+                
             }
         } else {
             // Handle other types of filters (if any) here

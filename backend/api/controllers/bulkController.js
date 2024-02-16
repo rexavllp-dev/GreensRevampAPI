@@ -230,6 +230,7 @@ export const getSingleBulk = async (req, res) => {
             message: "Discounts fetched successfully",
             result: bulk
         });
+        
     } catch (error) {
         console.log(error);
         res.status(500).json({
