@@ -69,14 +69,19 @@ export const getPrdPrice = async (priceId) => {
 
                 let specialPrice;
                 // Apply VAT to regular and special prices if within the offer period
+                let uatOfferStartDate = new Date(offerStartDate);
+                // Get only the date portion
+                uatOfferStartDate = uatOfferStartDate.toISOString().split('T')[0];
+                let uatOfferEndDate = new Date(offerEndDate);
+                // Get only the date portion
+                uatOfferEndDate = uatOfferEndDate.toISOString().split('T')[0];
 
+                let uatCurrentDate = new Date(currentDate);
+                uatCurrentDate = uatCurrentDate.toISOString().split('T')[0];
                 const vatPercentage = vat.vat / 100;
-                console.log('VAT percentage:', vatPercentage);
                 const priceWithVat = price + (price * vatPercentage);
-                console.log('Price with VAT:', priceWithVat);
-
                 if (isDiscount === true &&
-                    (currentDate >= offerStartDate) && (currentDate <= offerEndDate)) {
+                    (uatCurrentDate >= uatOfferStartDate) && (uatCurrentDate <= uatOfferEndDate)) {
                     // console.log('Within offer period');
                     if (specialPriceType === 'percentage') {
                         const discountPercentage = specialPriceValue;

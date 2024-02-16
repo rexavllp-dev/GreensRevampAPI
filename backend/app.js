@@ -10,6 +10,7 @@ import brandRoute from './api/routes/brandRoute.js';
 import categoryRoutes from './api/routes/categoryRoute.js';
 import cartRoutes from './api/routes/cartRoute.js';
 import addressRoutes from './api/routes/addressRoute.js';
+import saveForLaterRoutes from './api/routes/saveForLaterRoute.js';
 import session from 'express-session';
 import passport from 'passport';
 import './api/utils/passport-config.js';
@@ -70,6 +71,7 @@ app.use('/api/v1/brands', brandRoute);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/address', addressRoutes);
+app.use('/api/v1/saveforlater', saveForLaterRoutes);
 
 
 
