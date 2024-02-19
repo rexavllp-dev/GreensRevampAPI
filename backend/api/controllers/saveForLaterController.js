@@ -5,12 +5,12 @@ import { addSaveForLater, getallSaveForLater, removeSaveForLater } from "../mode
 
 export const createSaveForLater = async (req, res) => {
 
-    const saveForLaterData = req.body;
+    const saveforLaterdata = req.body;
 
     try {
 
 
-        const newSaveForLater = await addSaveForLater(saveForLaterData);
+        const newSaveForLater = await addSaveForLater(saveforlaterdata);
         res.status(200).json({
             status: 200,
             success: true,
@@ -54,11 +54,11 @@ export const getAllSaveForLaterProduct = async (req, res) => {
 
 export const removedSaveForLater = async (req, res) => {
 
-    const saveForLaterId = req.params.saveForLaterId;
+    const saveforlaterId = req.params.saveforlaterId;
 
     try {
 
-        const removedSaveForLater = await removeSaveForLater(saveForLaterId);
+        const removedSaveForLater = await removeSaveForLater(saveforlaterId);
 
         res.status(200).json({
             status: 200,

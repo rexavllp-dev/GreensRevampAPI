@@ -2,9 +2,9 @@ import db from '../../config/dbConfig.js';
 
 
 // add save for later
-export const addSaveForLater = async (saveForLaterData) => {
+export const addSaveForLater = async (saveforlaterdata) => {
 
-    const newSaveForLater = await db('save_for_later').insert(saveForLaterData)
+    const newSaveForLater = await db('save_for_later').insert(saveforlaterdata)
     .returning('*')
     return newSaveForLater; 
 }
@@ -19,9 +19,9 @@ export const getallSaveForLater = async () => {
 }
 
 // remove save for later
-export const removeSaveForLater = async (saveForLaterId) => {   
+export const removeSaveForLater = async (saveforlaterId) => {   
     const removedSaveForLater = await db('save_for_later')
-    .where({id: saveForLaterId})
+    .where({id: saveforlaterId})
     .del()
     return removedSaveForLater
 }
