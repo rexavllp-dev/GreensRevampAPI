@@ -1,5 +1,5 @@
 import express from 'express';
-import { createSaveForLater, getAllSaveForLaterProduct } from '../controllers/saveForLaterController.js';
+import { createSaveForLater, getAllSaveForLaterProduct, removedSaveForLater } from '../controllers/saveForLaterController.js';
 
 const router = express.Router();
 
@@ -8,5 +8,9 @@ router.post('/create-save-for-later', createSaveForLater);
 
 // get all save for later 
 router.get('/get-all-save-for-later', getAllSaveForLaterProduct);
+
+// remove save for later
+router.delete('/remove-save-for-later/:saveForLaterId', removedSaveForLater); 
+
 
 export default router;

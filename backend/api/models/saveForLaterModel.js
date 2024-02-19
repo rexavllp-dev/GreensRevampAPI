@@ -18,3 +18,10 @@ export const getallSaveForLater = async () => {
     return allSaveForLater
 }
 
+// remove save for later
+export const removeSaveForLater = async (saveForLaterId) => {   
+    const removedSaveForLater = await db('save_for_later')
+    .where({id: saveForLaterId})
+    .del()
+    return removedSaveForLater
+}
