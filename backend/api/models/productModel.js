@@ -297,7 +297,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             if (filter.value === 'In stock') {
                 query.where(function () {
                     this.where('product_inventory.stock_availability', '=', 'In stock')
-                        .orWhere(function () {
+                        .andWhere(function () {
                             this.where('product_inventory.inventory_management', true)
                                 .andWhere('product_inventory.product_quantity', '>', 0);
                         });
