@@ -112,11 +112,11 @@ export const getBulkByProductId = async (productId) => {
         .where({ product_id: productId })
         .crossJoin('vat')
         .select(
-            
+
             'products_bulks.*',
             "vat.vat",
             db.raw('(products_bulks.discounted_price + (products_bulks.discounted_price * vat / 100)) as bulkPriceWithVat')
-            )
+        )
 
     return bulk;
 };
@@ -158,12 +158,12 @@ export const isBulkOrderRequestExists = async (userId, productId) => {
 
 export const getBulkApproveStatusByProductId = async (userId, productId) => {
     const bulk = await db('bulk_above_max_orders')
-    .where({
-        user_id: userId,
-        product_id: productId
-    })
-    .first();
-return bulk;
+        .where({
+            user_id: userId,
+            product_id: productId
+        })
+        .first();
+    return bulk;
 }
 
 
@@ -264,4 +264,14 @@ export const getMinQuantityByProductId = async (productId) => {
         .first();
 
     return productInventory ? productInventory.min_qty : null;
+};
+
+
+
+export const getBulkDiscountsByProductId = async (productId) => {
+    const bulkDiscounts = await db('products_bulks')
+        .select('*')
+        .where({ product_id: productId });
+
+    return bulkDiscounts;
 };

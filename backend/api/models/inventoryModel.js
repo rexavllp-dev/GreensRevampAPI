@@ -65,6 +65,9 @@ export const updateProductQuantity = async (productId, newQuantity, comment) => 
 
 
 
+// export const getBulk
+
+
 
 
 

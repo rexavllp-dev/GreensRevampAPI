@@ -3,6 +3,7 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
 import { updateAProduct } from "../models/productModel.js";
+import { getBulkDiscountsByProductId } from "../models/bulkModel.js";
 
 
 
@@ -25,7 +26,7 @@ export const createProductInventory = async (req, res) => {
     min_qty
 
   } = req.body;
-    
+
   try {
 
     const schema = Joi.object({
@@ -139,6 +140,25 @@ export const updateProductInventory = async (req, res) => {
         message: 'Product Inventory not found',
       });
     };
+
+    // Fetch all bulk discounts associated with the product
+    const bulkDiscounts = await getBulkDiscountsByProductId(productId);
+    console.log("bulkDiscounts",bulkDiscounts);
+
+     // Check if reducing max_qty affects any bulk discounts
+     const affectedBulkDiscounts = bulkDiscounts.filter(bulk => bulk.end_range > max_qty);
+
+     if (affectedBulkDiscounts.length > 0) {
+         // Generate warning message for affected bulk discounts
+         const warningMessages = affectedBulkDiscounts.map(bulk => `Reducing max quantity may affect bulk discount range from ${bulk.start_range} to ${bulk.end_range}.`);
+
+         return res.status(400).json({
+             status: 400,
+             success: false,
+             message: 'Warning: Changes may affect existing bulk discounts',
+             warnings: warningMessages
+         });
+     }
 
 
     //  update the inventory
