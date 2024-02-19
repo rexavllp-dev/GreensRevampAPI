@@ -268,10 +268,11 @@ export const getMinQuantityByProductId = async (productId) => {
 
 
 
-export const getBulkDiscountsByProductId = async (productId) => {
-    const bulkDiscounts = await db('products_bulks')
+export const getBulkRangesByProductId = async (productId) => {
+    const ranges = await db('products_bulks')
         .select('*')
-        .where({ product_id: productId });
+        .where({ product_id: productId })
+        .orderBy('start_range', 'asc');
 
-    return bulkDiscounts;
+    return ranges;
 };

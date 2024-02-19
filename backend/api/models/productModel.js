@@ -288,34 +288,28 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
 
+
+
+    // Apply availability filters
     // Apply availability filters
     filters.forEach(filter => {
         if (filter.column === 'product_inventory.stock_availability') {
-            // Handle stock availability filter
             if (filter.value === 'In stock') {
                 query.where(function () {
-                    // Product is in stock if stock_availability is 'In stock'
-                    this.where('product_inventory.stock_availability', '=', 'In stock');
-                }).andWhere(function () {
-                    // Or, if inventory management is true and product quantity is greater than 0
-                    this.where('product_inventory.inventory_management', true)
-                        .andWhere('product_inventory.product_quantity', '>', 0)
-                }).orWhere(function () {  
-                    // Or, if inventory management is false
-                    this.where('product_inventory.inventory_management', false);
-                })
+                    this.where('product_inventory.stock_availability', '=', 'In stock')
+                        .orWhere(function () {
+                            this.where('product_inventory.inventory_management', true)
+                                .andWhere('product_inventory.product_quantity', '>', 0);
+                        });
+                });
             } else if (filter.value === 'Out of stock') {
                 query.where(function () {
-                    // Product is out of stock if stock_availability is 'Out of stock'
-                    this.where('product_inventory.stock_availability', '=', 'Out of stock');
-                }).orWhere(function () {
-                    // Or, if inventory management is true and product quantity is 0
-                    this.where('product_inventory.inventory_management', true)
-                        .andWhere('product_inventory.product_quantity', '=', 0);
+                    this.where('product_inventory.stock_availability', '=', 'Out of stock')
+                        .orWhere(function () {
+                            this.where('product_inventory.inventory_management', true)
+                                .andWhere('product_inventory.product_quantity', '=', 0);
+                        });
                 });
-
-
-                
             }
         } else {
             // Handle other types of filters (if any) here
@@ -328,6 +322,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             }
         }
     });
+
+
 
 
 
