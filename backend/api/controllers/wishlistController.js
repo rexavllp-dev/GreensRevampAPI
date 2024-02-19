@@ -1,4 +1,4 @@
-import { addWishlist, getUserWishlist, removeWishlist } from "../models/wishlistModel";
+import { addWishlist, getAllWishlist, getUserWishlist, removeWishlist } from "../models/wishlistModel.js";
 
 
 // create wishlist
@@ -22,6 +22,8 @@ export const createWishlist = async (req, res) => {
 
 
     } catch (error) {
+
+        console.error(error);
         
         res.status(500).json({
             status: 500,
@@ -39,7 +41,7 @@ export const getAllWishlistProduct = async (req, res) => {
     
     try {
         
-        const allWishlist = await getUserWishlist(req.user.userId);
+        const allWishlist = await getAllWishlist();
 
         res.status(200).json({
             status: 200,
@@ -49,6 +51,7 @@ export const getAllWishlistProduct = async (req, res) => {
         })
 
     } catch (error) {
+        console.log(error)
         
         res.status(500).json({
             status: 500,

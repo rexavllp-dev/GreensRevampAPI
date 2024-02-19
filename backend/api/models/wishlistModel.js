@@ -1,4 +1,4 @@
-
+import db from '../../config/dbConfig.js';
 // create wishlist
 export const addWishlist = async (wishlistData) => {
     const wishlist = await db('wishlist').insert(wishlistData).returning('*');
