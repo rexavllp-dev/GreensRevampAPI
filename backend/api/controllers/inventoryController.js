@@ -3,7 +3,8 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
 import { updateAProduct } from "../models/productModel.js";
-import { getBulkDiscountsByProductId } from "../models/bulkModel.js";
+import { getBulkRangesByProductId } from "../models/bulkModel.js";
+
 
 
 
@@ -141,25 +142,18 @@ export const updateProductInventory = async (req, res) => {
       });
     };
 
-    // Fetch all bulk discounts associated with the product
-    const bulkDiscounts = await getBulkDiscountsByProductId(productId);
-    console.log("bulkDiscounts",bulkDiscounts);
 
-     // Check if reducing max_qty affects any bulk discounts
-     const affectedBulkDiscounts = bulkDiscounts.filter(bulk => bulk.end_range > max_qty);
+    // Check if there are bulk discount ranges set for this product
+     // Check if there are existing bulk discount ranges for the product
+     const existingBulks = await getBulkRangesByProductId(productId);
 
-     if (affectedBulkDiscounts.length > 0) {
-         // Generate warning message for affected bulk discounts
-         const warningMessages = affectedBulkDiscounts.map(bulk => `Reducing max quantity may affect bulk discount range from ${bulk.start_range} to ${bulk.end_range}.`);
-
-         return res.status(400).json({
-             status: 400,
-             success: false,
-             message: 'Warning: Changes may affect existing bulk discounts',
-             warnings: warningMessages
-         });
+     if (existingBulks.length > 0 && max_qty < existingBulks[existingBulks.length - 1].end_range) {
+       return res.status(400).json({
+         status: 400,
+         success: false,
+         message: `Warning: Reducing the maximum quantity below the end range of a bulk discount may affect existing discounts. Please consider updating the bulk ranges accordingly.`,
+       });
      }
-
 
     //  update the inventory
     await updateInventory(productId, {
