@@ -1,21 +1,23 @@
-import { addSaveForLater, getallSaveForLater, removeSaveForLater } from "../models/saveForLaterModel.js";
+import { addSaveForLater, getUserSaveForLater, getallSaveForLater, removeSaveForLater } from "../models/saveForLaterModel.js";
 
 
 
 
 export const createSaveForLater = async (req, res) => {
 
-    const saveforLaterdata = req.body;
+    const saveForLaterData = req.body;
+    const userId = req.user.userId;
 
     try {
+        
+        const userSaveForLater = await getUserSaveForLater(userId);
 
-
-        const newSaveForLater = await addSaveForLater(saveforlaterdata);
+        const newSaveForLater = await addSaveForLater(saveForLaterData);
         res.status(200).json({
             status: 200,
             success: true,
             result: newSaveForLater,
-            Message: 'Save for later added successfully'
+            message: 'Save for later added successfully'
         })
 
     } catch (error) {
@@ -33,14 +35,18 @@ export const createSaveForLater = async (req, res) => {
 
 export const getAllSaveForLaterProduct = async (req, res) => {
 
+    const userId = req.user.userId;
+
     try {
-        const allSaveForLater = await getallSaveForLater();
+        const allSaveForLater = await getallSaveForLater(userId);
         res.status(200).json({
             status: 200,
             success: true,
-            result: allSaveForLater
+            result: allSaveForLater,
+            message : 'All save for later products'
         })
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             status: 500,
             success: false,
@@ -54,11 +60,11 @@ export const getAllSaveForLaterProduct = async (req, res) => {
 
 export const removedSaveForLater = async (req, res) => {
 
-    const saveforlaterId = req.params.saveforlaterId;
+    const saveForLaterId = req.params.saveForLaterId;
 
     try {
 
-        const removedSaveForLater = await removeSaveForLater(saveforlaterId);
+        const removedSaveForLater = await removeSaveForLater(saveForLaterId);
 
         res.status(200).json({
             status: 200,
