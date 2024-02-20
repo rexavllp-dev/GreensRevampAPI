@@ -6,14 +6,14 @@ import { createPrdPrice, deletePrdPrice, getAllPrdPrice, getBulkDiscountPriceByP
 export const createPrice = async (req, res) => {
 
   try {
-    const { prd_status, prd_dashboard_status, ...priceData } = req.body;
+    const { prd_status, prd_dashboard_status, item_code, ...priceData } = req.body;
     console.log(req.body)
 
     const product = await getProductPriceById(priceData?.product_id);
 
     if (!product) {
 
-      const newPrice = await createPrdPrice(priceData, prd_status, prd_dashboard_status);
+      const newPrice = await createPrdPrice(priceData, prd_status, prd_dashboard_status, item_code);
 
       await updatePriceHistory({
         product_price_id: newPrice[0].id,
@@ -34,7 +34,7 @@ export const createPrice = async (req, res) => {
     } else {
 
       // Apply the special price
-      await updatePrdPrice(priceData?.product_id, priceData, prd_status, prd_dashboard_status);
+      await updatePrdPrice(priceData?.product_id, priceData, prd_status, prd_dashboard_status, item_code);
 
       //update the price history
 
@@ -61,7 +61,8 @@ export const createPrice = async (req, res) => {
           special_price_end: product.special_price_end,
           user_id: req?.user?.id,
           prd_status,
-          prd_dashboard_status
+          prd_dashboard_status,
+          item_code,
         },
       });
     }
@@ -83,17 +84,17 @@ export const createPrice = async (req, res) => {
 
 export const updatePrice = async (req, res) => {
   const { productId } = req.params;
-  const { prd_status, prd_dashboard_status, ...priceData } = req.body;
-  console.log(prd_status);
+  const { prd_status, prd_dashboard_status, item_code, ...priceData } = req.body;
+
   try {
 
     const product = await getProductPriceById(productId);
     const productComputedPrice = await getPriceByProductIdAndCalculate(productId);
-    console.log("product computed  data", productComputedPrice);
+    // console.log("product computed  data", productComputedPrice);
 
       // Retrieve discounted prices array
     const bulkDiscountedPrices = await getBulkDiscountPriceByProductId(productId);
-    console.log("bulk data", bulkDiscountedPrices);
+    // console.log("bulk data", bulkDiscountedPrices);
 
     if (!product) {
       return res.status(404).json({
@@ -123,7 +124,7 @@ export const updatePrice = async (req, res) => {
     };
 
     // Apply the special price
-    await updatePrdPrice(productId, priceData, prd_status, prd_dashboard_status);
+    await updatePrdPrice(productId, priceData, prd_status, prd_dashboard_status, item_code);
 
     //update the price history
 
@@ -150,7 +151,8 @@ export const updatePrice = async (req, res) => {
         special_price_end: product.special_price_end,
         user_id: req?.user?.id,
         prd_status,
-        prd_dashboard_status
+        prd_dashboard_status,
+        item_code,
       },
     });
   } catch (error) {
