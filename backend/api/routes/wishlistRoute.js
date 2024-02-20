@@ -11,7 +11,7 @@ router.post('/create-wishlist', verifyToken , createWishlist);
 
 // get all save for later 
 
-router.get('/get-all-wishlist', getAllWishlistProduct);
+router.get('/get-all-wishlist',verifyToken, getAllWishlistProduct);
 
 // remove save for later
 

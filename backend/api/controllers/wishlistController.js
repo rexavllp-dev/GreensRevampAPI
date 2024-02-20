@@ -38,10 +38,12 @@ export const createWishlist = async (req, res) => {
 // get all wishlist
 
 export const getAllWishlistProduct = async (req, res) => {
+
+    const userId = req.user.userId;
     
     try {
         
-        const allWishlist = await getAllWishlist();
+        const allWishlist = await getAllWishlist(userId);
 
         res.status(200).json({
             status: 200,
