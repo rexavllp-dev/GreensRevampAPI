@@ -1,8 +1,13 @@
 import db from '../../config/dbConfig.js';
 import { getPrdPrice } from './productPriceModel.js';
 // create wishlist
-export const addWishlist = async (wishlistData) => {
-    const wishlist = await db('wishlist').insert(wishlistData).returning('*');
+export const addWishlist = async (userId, wishlistData) => {
+    const wishlist = await db('wishlist')
+        .insert({
+            user_id: userId,
+            ...wishlistData
+        })
+        .returning('*');
     return wishlist;
 }
 

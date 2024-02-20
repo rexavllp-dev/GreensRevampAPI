@@ -11,7 +11,7 @@ export const createWishlist = async (req, res) => {
 
         const userWishlist = await getUserWishlist(userId);
 
-        const newWishlist = await addWishlist(wishlistData);
+        const newWishlist = await addWishlist(userId, wishlistData);
 
         res.status(200).json({
             status: 200,
