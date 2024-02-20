@@ -37,6 +37,7 @@ export const createProduct = async (req, res) => {
         shipping_and_returns,
         dimensions_and_more_info,
         ein_code,
+        show_expiry_on_dashboard,
 
 
 
@@ -113,6 +114,7 @@ export const createProduct = async (req, res) => {
             shipping_and_returns,
             dimensions_and_more_info,
             ein_code,
+            show_expiry_on_dashboard,
 
 
 
@@ -159,6 +161,7 @@ export const updateProduct = async (req, res) => {
             shipping_and_returns,
             dimensions_and_more_info,
             ein_code,
+            show_expiry_on_dashboard,
 
 
 
@@ -184,6 +187,7 @@ export const updateProduct = async (req, res) => {
             shipping_and_returns,
             dimensions_and_more_info,
             ein_code,
+            show_expiry_on_dashboard,
 
 
         });
