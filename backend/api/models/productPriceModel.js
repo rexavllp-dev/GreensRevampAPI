@@ -4,7 +4,7 @@ import db from '../../config/dbConfig.js';
 
 // create price
 
-export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) => {
+export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus, itemCode) => {
     const price = await db("products_price").insert(priceData).returning('*');
 
     if (prdStatus)
@@ -13,7 +13,8 @@ export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) =
             .where({ id: priceData.product_id })
             .update({
                 prd_status: prdStatus,
-                prd_dashboard_status: prdDashboardStatus
+                prd_dashboard_status: prdDashboardStatus,
+                item_code: itemCode,
             });
 
     return price;
@@ -23,7 +24,7 @@ export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) =
 
 
 // update price
-export const updatePrdPrice = async (productId, priceData, prdStatus, prdDashboardStatus) => {
+export const updatePrdPrice = async (productId, priceData, prdStatus, prdDashboardStatus, itemCode) => {
     const price = await db("products_price")
         .where({ product_id: productId })
         .update(priceData).returning();
@@ -34,7 +35,8 @@ export const updatePrdPrice = async (productId, priceData, prdStatus, prdDashboa
             .where({ id: productId })
             .update({
                 prd_status: prdStatus,
-                prd_dashboard_status: prdDashboardStatus
+                prd_dashboard_status: prdDashboardStatus,
+                item_code: itemCode,
             });
 
     return price;
