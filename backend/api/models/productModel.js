@@ -211,6 +211,14 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         });
     };
 
+    // Get the total product count for the search
+    // const totalCount = await query.clone().clearSelect().clearOrder().count('* as total').first();
+
+    // Log the search query and total product count
+    // console.log('Search:', search);
+    // console.log('Total Product Count:', totalCount.total);
+
+
 
 
 
@@ -332,7 +340,9 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     //     query.orderBy('product_badge.id', 'asc'); // Assuming featured products are identified by the presence of badges
     // };
 
-    const totalCountQuery = query.clone().clearSelect().countDistinct('products.id as total');
+    const totalCountQuery =  query.clone().clearSelect().count('products.id as total');
+
+    console.log(totalCountQuery.toString())
 
     // pagination 
     if (per_page && page) {
@@ -346,7 +356,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
     const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
-
+    console.log("totalCountResult", totalCountResult);
 
     // Integrate getPrdPrice for each product
     const productsWithPrice = await Promise.all(products.map(async (product) => {
@@ -358,8 +368,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
     return {
         products: productsWithPrice,
-        totalCount: totalCountResult[0],
-        totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
+        totalCount: totalCountResult.length > 0 ? totalCountResult?.length : 0,
+        // totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
         per_page: per_page,
         page: page
     }
@@ -595,6 +605,7 @@ export const fetchAllOptionProducts = async (page, per_page, search, filters, so
     // };
 
     const totalCountQuery = query.clone().clearSelect().countDistinct('products.id as total');
+
 
     // pagination 
     if (per_page && page) {

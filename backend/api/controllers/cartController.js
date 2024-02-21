@@ -48,7 +48,7 @@ export const addProductToCart = async (req, res) => {
 
 
 
-                if (product.max_qty <  parseInt(quantity)) {
+                if (product.max_qty < parseInt(quantity)) {
                     return res.status(400).json({
                         status: 400,
                         success: false,
@@ -112,9 +112,9 @@ export const addProductToCart = async (req, res) => {
                 });
             }
 
-             // check product stock availability
+            // check product stock availability
 
-             if (product.stock_availability === 'Out of stock') {
+            if (product.stock_availability === 'Out of stock') {
                 return res.status(400).json({
                     status: 400,
                     success: false,
@@ -150,35 +150,271 @@ export const addProductToCart = async (req, res) => {
 }
 
 
-// update item quantity in express session
+
+// export const updateProductCartQuantity = async (req, res) => {
+//     const { productId, newQuantity, operator } = req.body;
+
+//     try {
+//         // Check if the product is active
+//         const product = await getProductById(productId);
+
+//         if (!product) {
+//             return res.status(404).json({
+//                 status: 404,
+//                 success: false,
+//                 message: 'Product not found',
+//             });
+//         }
+
+//         if (req.session.cart) {
+//             let index = req.session.cart.findIndex(item => item.productId === productId);
+
+//             if (index !== -1) {
+//                 let updatedCart = req.session.cart[index];
+
+//                 let totalQuantity = parseInt(newQuantity) + parseInt(updatedCart.quantity);
+
+//                 if (product.inventory_management === true) {
+
+                    
+
+
+//                     if (product.max_qty < parseInt(totalQuantity)) {
+//                         return res.status(400).json({
+//                             status: 400,
+//                             success: false,
+//                             message: 'Max quantity exceeded',
+//                             result: req.session.cart
+//                         });
+
+
+//                     }
+
+//                     if (product.product_quantity < parseInt(totalQuantity)) {
+//                         return res.status(400).json({
+//                             status: 400,
+//                             success: false,
+//                             message: 'Product quantity exceeded',
+//                             result: req.session.cart
+//                         });
+//                     }
+
+//                     // check product status
+
+//                     if (product.prd_status === false) {
+//                         return res.status(400).json({
+//                             status: 400,
+//                             success: false,
+//                             message: 'Product is not active',
+//                             result: req.session.cart
+//                         });
+//                     }
+
+//                     // check product stock availability
+
+//                     if (product.stock_availability === 'Out of stock') {
+//                         return res.status(400).json({
+//                             status: 400,
+//                             success: false,
+//                             message: 'Product is out of stock',
+//                             result: req.session.cart
+//                         });
+//                     }
+//                 }
+
+
+//                 if (product.max_qty < parseInt(newQuantity)) {
+//                     return res.status(400).json({
+//                         status: 400,
+//                         success: false,
+//                         message: 'Max quantity exceeded',
+//                         result: req.session.cart
+//                     });
+
+
+//                 }
+
+//                 // check product status
+//                 if (product.prd_status === false) {
+//                     return res.status(400).json({
+//                         status: 400,
+//                         success: false,
+//                         message: 'Product is not active',
+//                         result: req.session.cart
+//                     });
+//                 }
+
+//                 // check product stock availability
+
+//                 if (product.stock_availability === 'Out of stock') {
+//                     return res.status(400).json({
+//                         status: 400,
+//                         success: false,
+//                         message: 'Product is out of stock',
+//                         result: req.session.cart
+//                     });
+//                 }
+
+//                 // Update the quantity based on the operator
+//                 if (operator === 'add') {
+
+//                     updatedCart.quantity += parseInt(totalQuantity);
+//                 } else if (operator === 'reduce') {
+//                     // Ensure quantity doesn't go below 1
+//                     updatedCart.quantity = Math.max(1, updatedCart.quantity - parseInt(newQuantity));
+//                 } else {
+//                     // Set the quantity directly to the newQuantity
+//                     updatedCart.quantity = parseInt(newQuantity);
+//                 }
+
+//                 // Update the cart item in the session
+//                 req.session.cart[index] = updatedCart;
+//             }
+//         }
+
+//         res.status(200).json({
+//             status: 200,
+//             success: true,
+//             message: 'Product quantity updated successfully',
+//             result: req.session.cart,
+//         });
+//     } catch (error) {
+//         console.log(error);
+
+//         res.status(500).json({
+//             status: 500,
+//             success: false,
+//             error: error,
+//             message: 'Failed to update product quantity. Please try again later.',
+//         });
+//     }
+// };
+
+
+
+
 export const updateProductCartQuantity = async (req, res) => {
     const { productId, newQuantity, operator } = req.body;
-    // console.log(req.session);
 
     try {
-        // await updateCartItemQuantity(req.session, productId, newQuantity);
-        if (req.session.cart) {
-            req.session.cart = req.session.cart.map(item => {
-                if (item.productId === productId) {
+        // Check if the product is active
+        const product = await getProductById(productId);
 
-                    if (operator === 'add') {
-                        item.quantity += 1;
-                    } else {
-                        if (item.quantity <= 1) { return item }
-                        item.quantity -= 1;
+        if (!product) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: 'Product not found',
+            });
+        }
+
+        if (req.session.cart) {
+            let index = req.session.cart.findIndex(item => item.productId === productId);
+
+            if (index !== -1) {
+                let updatedCart = req.session.cart[index];
+
+                // Calculate total quantity based on the operator
+                let totalQuantity;
+                if (operator === 'add') {
+                    totalQuantity = parseInt(newQuantity) + parseInt(updatedCart.quantity);
+                } else if (operator === 'reduce') {
+                    // Ensure quantity doesn't go below 1
+                    totalQuantity = Math.max(1, updatedCart.quantity - parseInt(newQuantity));
+                } else {
+                    // Set the quantity directly to the newQuantity
+                    totalQuantity = parseInt(newQuantity);
+                }
+
+                if (product.inventory_management === true) {
+
+                    if (product.max_qty < totalQuantity) {
+                        return res.status(400).json({
+                            status: 400,
+                            success: false,
+                            message: 'Max quantity exceeded',
+                            result: req.session.cart
+                        });
+                    }
+
+                    if (product.product_quantity < totalQuantity) {
+                        return res.status(400).json({
+                            status: 400,
+                            success: false,
+                            message: 'Product quantity exceeded',
+                            result: req.session.cart
+                        });
+                    }
+
+                    // check product status
+                    if (product.prd_status === false) {
+                        return res.status(400).json({
+                            status: 400,
+                            success: false,
+                            message: 'Product is not active',
+                            result: req.session.cart
+                        });
+                    }
+
+                    // check product stock availability
+                    if (product.stock_availability === 'Out of stock') {
+                        return res.status(400).json({
+                            status: 400,
+                            success: false,
+                            message: 'Product is out of stock',
+                            result: req.session.cart
+                        });
                     }
                 }
-                return item;
-            })
-        }
+
+                if (product.max_qty < totalQuantity) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Max quantity exceeded',
+                        result: req.session.cart
+                    });
+                }
+
+
+                // check product status
+                if (product.prd_status === false) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product is not active',
+                        result: req.session.cart
+                    });
+                }
+
+                // check product stock availability
+                if (product.stock_availability === 'Out of stock') {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product is out of stock',
+                        result: req.session.cart
+                    });
+                }
+
+
+                // Update the quantity
+                updatedCart.quantity = totalQuantity;
+
+                // Update the cart item in the session
+                req.session.cart[index] = updatedCart;
+            }
+
+                
+            }
+        
 
         res.status(200).json({
             status: 200,
             success: true,
             message: 'Product quantity updated successfully',
-            result: req.session.cart
-        })
-
+            result: req.session.cart,
+        });
     } catch (error) {
         console.log(error);
 
@@ -187,10 +423,9 @@ export const updateProductCartQuantity = async (req, res) => {
             success: false,
             error: error,
             message: 'Failed to update product quantity. Please try again later.',
-        })
+        });
     }
-
-}
+};
 
 
 
@@ -238,7 +473,7 @@ export const removeProductFromCart = async (req, res) => {
 
     const { productId } = req.params;
 
-    console.log(typeof productId)
+    // console.log(typeof productId)
 
     try {
 

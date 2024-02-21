@@ -58,7 +58,7 @@ export const getPrdPrice = async (priceId) => {
         .where({ id: priceId })
         .then((rows) => {
             const result = rows.map((row) => {
-                console.log(row);
+                // console.log(row);
                 const price = parseFloat(row.product_price);
                 const specialPriceType = row.special_price_type;
                 const specialPriceValue = parseFloat(row.special_price);
