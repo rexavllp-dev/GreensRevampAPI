@@ -29,18 +29,18 @@ export const createRelatedProduct = async (req, res) => {
         //  Check each related product ID if it exists in the database
         for (const relatedProduct of relatedProductData) {
             if (!existingRelatedProductIds.includes(relatedProduct.id)) {
-                if(product_id != relatedProduct.id){
+                if (product_id != relatedProduct.id) {
                     newData.push({
                         product_id: product_id,
                         related_product_id: relatedProduct.id,
-                    }); 
+                    });
 
 
-                     // Add bidirectional relationship
-                     newData.push({
+                    // Add bidirectional relationship
+                    newData.push({
                         product_id: relatedProduct.id,
                         related_product_id: product_id,
-                    }); 
+                    });
 
                 }
             } else {

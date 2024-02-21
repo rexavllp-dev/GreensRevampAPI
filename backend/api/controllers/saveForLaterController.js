@@ -12,7 +12,7 @@ export const createSaveForLater = async (req, res) => {
         
         const userSaveForLater = await getUserSaveForLater(userId);
 
-        const newSaveForLater = await addSaveForLater(saveForLaterData);
+        const newSaveForLater = await addSaveForLater(userId, saveForLaterData);
         res.status(200).json({
             status: 200,
             success: true,

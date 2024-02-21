@@ -3,15 +3,15 @@ import { addWishlist, getAllWishlist, getUserWishlist, removeWishlist } from "..
 
 // create wishlist
 export const createWishlist = async (req, res) => {
-    
+
     const wishlistData = req.body;
     const userId = req.user.userId;
 
     try {
-        
+
         const userWishlist = await getUserWishlist(userId);
 
-        const newWishlist = await addWishlist(wishlistData);
+        const newWishlist = await addWishlist(userId, wishlistData);
 
         res.status(200).json({
             status: 200,
@@ -19,7 +19,6 @@ export const createWishlist = async (req, res) => {
             result: newWishlist,
             message: 'Wishlist added successfully'
         })
-
 
     } catch (error) {
 
@@ -49,7 +48,7 @@ export const getAllWishlistProduct = async (req, res) => {
             status: 200,
             success: true,
             result: allWishlist,
-            message : 'All wishlist products'
+            message: 'All wishlist products'
         })
 
     } catch (error) {
@@ -67,11 +66,11 @@ export const getAllWishlistProduct = async (req, res) => {
 // remove wishlist
 
 export const removedWishlist = async (req, res) => {
-    
+
     const wishlistId = req.params.wishlistId;
 
     try {
-        
+
         const removedWishlist = await removeWishlist(wishlistId);
 
         res.status(200).json({
@@ -82,9 +81,9 @@ export const removedWishlist = async (req, res) => {
         })
 
     } catch (error) {
-        
+
         res.status(500).json({
-            
+
             status: 500,
             success: false,
             error: error,

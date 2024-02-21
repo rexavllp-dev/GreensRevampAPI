@@ -24,7 +24,8 @@ export const createProductInventory = async (req, res) => {
     back_in_stock,
     best_seller,
     max_qty,
-    min_qty
+    min_qty,
+    item_code
 
   } = req.body;
 
@@ -83,11 +84,12 @@ export const createProductInventory = async (req, res) => {
       back_in_stock,
       best_seller,
       max_qty,
-      min_qty
+      min_qty,
     })
 
     const updatedProduct = await updateAProduct(product_id, {
-      ein_code
+      ein_code,
+      item_code
     });
 
     res.status(201).json({
@@ -125,7 +127,8 @@ export const updateProductInventory = async (req, res) => {
     back_in_stock,
     best_seller,
     max_qty,
-    min_qty
+    min_qty,
+    item_code,
   } = req.body;
 
   try {
@@ -168,7 +171,8 @@ export const updateProductInventory = async (req, res) => {
       min_qty
     });
     const updatedProduct = await updateAProduct(productId, {
-      ein_code
+      ein_code,
+      item_code
     });
 
     res.status(201).json({

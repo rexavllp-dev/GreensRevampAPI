@@ -28,7 +28,7 @@ export const getRelatedProductsByProductId = async (productId) => {
 
         .select(
             'products.*',
-            'products.id as product_id',
+            'products.id as productId',
             'brands.*',
             'brands.id as brand_id',
             'categories.*',

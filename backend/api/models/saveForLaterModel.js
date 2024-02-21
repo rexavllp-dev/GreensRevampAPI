@@ -3,21 +3,25 @@ import { getPrdPrice } from './productPriceModel.js';
 
 
 // add save for later
-export const addSaveForLater = async (saveForLaterData) => {
+export const addSaveForLater = async (userId, saveForLaterData) => {
 
-    const newSaveForLater = await db('save_for_later').insert(saveForLaterData)
-    .returning('*')
-    return newSaveForLater; 
+    const newSaveForLater = await db('save_for_later')
+        .insert({
+            user_id: userId,
+            ...saveForLaterData
+        })
+        .returning('*')
+    return newSaveForLater;
 }
 
 
 export const getUserSaveForLater = async (userId) => {
     const saveForLaterData = await db('save_for_later')
-    .where({ user_id: userId })
-    .select('*')
-    .first();
+        .where({ user_id: userId })
+        .select('*')
+        .first();
     return saveForLaterData;
-} 
+}
 
 
 // get all save for later
@@ -116,9 +120,9 @@ export const getallSaveForLater = async (userId) => {
 // }
 
 // remove save for later
-export const removeSaveForLater = async (saveForLaterId) => {   
+export const removeSaveForLater = async (saveForLaterId) => {
     const removedSaveForLater = await db('save_for_later')
-    .where({id: saveForLaterId})
-    .del()
+        .where({ id: saveForLaterId })
+        .del()
     return removedSaveForLater;
 }
