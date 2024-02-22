@@ -14,6 +14,7 @@ import addressRoutes from './api/routes/addressRoute.js';
 import saveForLaterRoutes from './api/routes/saveForLaterRoute.js';
 import wishlistRoutes from './api/routes/wishlistRoute.js'; 
 import orderRoutes from './api/routes/orderRoutes.js';
+import paymentRoutes from './api/routes/paymentRoutes.js';
 
 
 import session from 'express-session';
@@ -36,7 +37,7 @@ const app = express();
 // const io = createSocketServer(server);
 // app.set('socketio', io);
 
-const PORT = 5000;
+const PORT = 5002;
 const corsOptions = {
   credentials: true,
   origin: true,
@@ -79,8 +80,7 @@ app.use('/api/v1/address', addressRoutes);
 app.use('/api/v1/saveforlater', saveForLaterRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/orders', orderRoutes);
-
-
+app.use('/api/v1/payment', paymentRoutes);
 
 
 app.get('/', (req, res) => {
