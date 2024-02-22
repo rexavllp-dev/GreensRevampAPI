@@ -135,7 +135,7 @@ export const calculatePrice = async ({
     const taxRate = vat.vat / 100;
 
     // Calculate total product price with VAT
-    
+
 
     const taxPrice = (totalProductPrice * taxRate)
     const totalProductCount = productCount;
@@ -143,7 +143,7 @@ export const calculatePrice = async ({
 
     // Grand Total formula =((sub total-Discount)+Service charges+Delivery charge))+vat 5%
     const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : ((subTotal - totalDiscount) + shippingCharge + codCharge + storePickupCharge) + taxPrice
-    const totalProductPriceWithVAT =  nonActiveProductsCount === 0 ? 0 : (subTotal - totalDiscount) + taxPrice
+    const totalProductPriceWithVAT = nonActiveProductsCount === 0 ? 0 : (subTotal - totalDiscount) + taxPrice
     const totals = {
         subTotal: subTotal.toFixed(2),
         grandTotal: grandTotalWithVAT.toFixed(2),
@@ -156,6 +156,8 @@ export const calculatePrice = async ({
         totalProductCount: totalProductCount,
         totalProductPriceWithVAT: totalProductPriceWithVAT.toFixed(2),
     }
+
+    session.totals = totals;
 
     return {
         products: cart,

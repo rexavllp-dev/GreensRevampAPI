@@ -19,12 +19,15 @@ export const addProductToCart = async (req, res) => {
             req.session.cart = [];
         }
         const existingProduct = req.session.cart.find(item => item.productId === productId);
+        
 
         if (existingProduct) {
+            const productPrice = parseFloat(product.product_price);
+
+            existingProduct.quantity += parseInt(quantity);
+            existingProduct.price = product.product_price;
 
             // Check if the product is active
-
-
             if (product.inventory_management === true) {
 
                 if (product.max_qty < (parseInt(quantity) + parseInt(existingProduct.quantity))) {
@@ -101,7 +104,7 @@ export const addProductToCart = async (req, res) => {
             }
 
             // If the product already exists, increase the quantity instead of returning an error
-            existingProduct.quantity += parseInt(quantity);
+            // existingProduct.quantity += parseInt(quantity);
 
             return res.status(200).json({
                 status: 200,
@@ -192,7 +195,11 @@ export const addProductToCart = async (req, res) => {
 
 
             // If the product doesn't exist, add it to the cart
-            req.session.cart.push({ productId, quantity });
+            req.session.cart.push({ 
+                productId,
+                 quantity,
+                 price: product.product_price, // Set the price 
+                 });
 
             return res.status(200).json({
                 status: 200,
@@ -203,6 +210,7 @@ export const addProductToCart = async (req, res) => {
         }
 
     } catch (error) {
+        console.log(error);
 
         res.status(500).json({
             status: 500,

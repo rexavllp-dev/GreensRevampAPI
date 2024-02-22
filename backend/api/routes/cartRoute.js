@@ -3,6 +3,7 @@ import { addProductToCart, getProductFromCart, removeProductFromCart, updateFlag
 import { createDeliveryEstimate, getSingleDeliveryEstimate, getsAllDeliveryEstimate, updateDeliveryEstimate } from '../controllers/deliveryEstimateController.js';
 import { createRegion, getSingleRegion, getsAllRegion, updateRegion } from '../controllers/regionController.js'
 import priceVerificationMiddleware from '../middleware/productStockPriceMiddleware.js';
+import verifyProductPrice from '../middleware/verifyProductPrice.js';
 
 
 
@@ -18,17 +19,21 @@ router.put('/update-cart-quantity', updateProductCartQuantity);
 
 // get cart
 
-router.get('/get-cart',priceVerificationMiddleware, getProductFromCart);
+router.get('/get-cart', getProductFromCart);
 
 // delete item from cart
-   
- router.delete('/delete-cart-item/:productId', removeProductFromCart);
+
+router.delete('/delete-cart-item/:productId', removeProductFromCart);
 
 //  update flags
 
-router.put('/update-flags',updateFlags );
+router.put('/update-flags', updateFlags);
 
 //test router
+
+router.get('/checkout', verifyProductPrice, (req, res) => {
+    res.json({ message: 'Hello from Express!' })
+})
 
 
 
