@@ -37,7 +37,7 @@ const app = express();
 // const io = createSocketServer(server);
 // app.set('socketio', io);
 
-const PORT = 5002;
+const PORT = 5000;
 const corsOptions = {
   credentials: true,
   origin: true,

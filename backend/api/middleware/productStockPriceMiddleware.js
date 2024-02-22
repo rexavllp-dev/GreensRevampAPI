@@ -6,7 +6,7 @@ const calculateTotalCharges = async (cart, isStorePickup, isCod) => {
 
     try {
 
-        
+
         let totalCharge = 0;
 
         // add shipping charge only if totalProduct price is less than 100
@@ -43,7 +43,7 @@ const calculateTotalCharges = async (cart, isStorePickup, isCod) => {
 }
 
 
- const priceVerificationMiddleware = async (req, res, next) => {
+const priceVerificationMiddleware = async (req, res, next) => {
     try {
         const cart = req.session.cart || [];
 
@@ -69,13 +69,16 @@ const calculateTotalCharges = async (cart, isStorePickup, isCod) => {
 
             // Additional conditions for verification
             if (productDetails.productPrice !== parseFloat(cartProduct.price)) {
-                console.log(cartProduct.price, productDetails.productPrice);
+
+                console.log("Cart Product Price:", cartProduct.price);
+                console.log("Product Details Price:", productDetails.productPrice);
+                
                 return {
                     status: 400,
                     success: false,
                     message: 'Product price verification failed. Please check product details and try again.',
                 };
-                
+
             }
 
             if (productDetails.productStatus !== true) {
@@ -123,11 +126,11 @@ const calculateTotalCharges = async (cart, isStorePickup, isCod) => {
 
             const totalCharges = await calculateTotalCharges(cart, req.session.isStorePickup, req.session.isCod);
 
-            console.log("Total Charges Calculated:", totalCharges);
+            // console.log("Total Charges Calculated:", totalCharges);
 
-            if (totalCharges !== parseFloat(req.session.totalCharges )) {
+            if (totalCharges !== parseFloat(req.session.totalCharges)) {
 
-                console.log(req.session.totalCharges, totalCharges);
+                // console.log(req.session.totalCharges, totalCharges);
 
                 res.status(400).json({
                     status: 400,
