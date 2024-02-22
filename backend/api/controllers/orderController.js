@@ -15,7 +15,7 @@ export const createOrder = async (req, res) => {
         customer_email,
         customer_phone_country_code,
         customer_phone,
-        address_line,
+        address_line_1,
         address_line_2,
         flat_villa,
         is_new_address,
@@ -33,6 +33,7 @@ export const createOrder = async (req, res) => {
     // console.log(req.body);
 
     const customerId = req.user.userId;
+    // const customerId = 85;
 
     try {
 
@@ -41,7 +42,7 @@ export const createOrder = async (req, res) => {
             customer_email: Joi.string().email().required().label("Customer Email"),
             customer_phone_country_code: Joi.number().required().label("Country Code"),
             customer_phone: Joi.string().required().label("Customer Phone"),
-            address_line: Joi.string().required().label("Address Line"),
+            address_line_1: Joi.string().required().label("Address Line"),
             flat_villa: Joi.string().required().label("Flat/Villa"),
             zip_code: Joi.string().required().label("Zip Code"),
             payment_method: Joi.string().required().label("Payment Method"),
@@ -53,7 +54,7 @@ export const createOrder = async (req, res) => {
             customer_email,
             customer_phone_country_code,
             customer_phone,
-            address_line,
+            address_line_1,
             flat_villa,
             zip_code,
             payment_method,
@@ -78,7 +79,7 @@ export const createOrder = async (req, res) => {
             customer_email,
             customer_phone_country_code,
             customer_phone,
-            address_line,
+            address_line_1,
             address_line_2,
             flat_villa,
             is_new_address,
@@ -95,7 +96,7 @@ export const createOrder = async (req, res) => {
             // Insert the new address into the database
             const insertedAddressId = await insertNewAddressIntoDatabase(
                 customerId,
-                address_line,
+                address_line_1,
                 address_line_2,
                 flat_villa,
                 customer_name,
