@@ -24,7 +24,7 @@ import {
     updateUserVerificationStatus,
 } from "../models/userModel.js";
 
-
+import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 import jwt from 'jsonwebtoken';
@@ -33,7 +33,7 @@ import sendVerificationCode from '../utils/mobileOtp.js';
 import validateAuth from '../middleware/validateAuth.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 import { iSCompanyStatusVerified } from '../models/companyModel.js';
-import Joi from 'joi';
+
 
 
 // gmail and facebook authentication 
