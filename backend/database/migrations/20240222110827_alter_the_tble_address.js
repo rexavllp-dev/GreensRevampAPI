@@ -4,9 +4,9 @@
  */
 export const up = async (knex) => {
     await knex.schema.alterTable('address', (table) => {
-        table.integer('zip_code').nullable();
+        table.string('zip_code').nullable();
         table.string('contactless_delivery').nullable();
-        table.string('address_line_2').nullable();
+        table.text('address_line_2').nullable();
     });
 };
 
