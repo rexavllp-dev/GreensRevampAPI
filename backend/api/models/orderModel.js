@@ -4,7 +4,12 @@ import db from '../../config/dbConfig.js';
 
 // Function to create a user order
 export const createUserOrder = async (userId, orderData) => {
-    const addressId = orderData.address_id ? parseInt(orderData.address_id) : null;
+    let addressId = null;
+    if (typeof orderData.address_id === 'number') {
+        addressId = orderData.address_id;
+    } else if (typeof orderData.address_id === 'string' && !isNaN(parseInt(orderData.address_id))) {
+        addressId = parseInt(orderData.address_id);
+    }
 
     console.log(orderData);
     const trx = await db.transaction(); // Start a transaction
