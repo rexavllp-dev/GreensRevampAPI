@@ -1,7 +1,6 @@
 import db from '../../config/dbConfig.js';
 
 
-
 // Function to create a user order
 export const createUserOrder = async (userId, orderData) => {
 
@@ -23,7 +22,7 @@ export const createUserOrder = async (userId, orderData) => {
                 address_id: addressId,
                 ord_customer_name: orderData.customer_name,
                 ord_customer_email: orderData.customer_email,
-                ord_customer_country_code: orderData.customer_country_code,
+                ord_customer_country_code: orderData.customer_phone_country_code,
                 ord_customer_phone: orderData.customer_phone,
                 ord_flat_villa: orderData.flat_villa,
                 ord_zip_code: orderData.zip_code,
@@ -70,6 +69,7 @@ export const createOrderItems = async (orderId, orderItems) => {
 export const insertNewAddressIntoDatabase = async (
     customerId,
     addressLine,
+    addressLine2,
     flatVilla,
     customerName,
     customerCountryCode,
@@ -87,17 +87,16 @@ export const insertNewAddressIntoDatabase = async (
         const [insertedAddressId] = await trx("address")
             .insert({
 
-
                 user_id: customerId,
                 full_name: customerName,
                 mobile_country_code: customerCountryCode,
                 mobile_number: customerPhone,
                 address_line_1: addressLine,
+                address_line_2: addressLine2,
                 flat_villa: flatVilla,
                 contactless_delivery: contactlessDelivery,
                 delivery_remark: deliveryRemark,
                 zip_code: zipCode,
-
 
             })
             .returning('id');

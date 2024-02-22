@@ -16,6 +16,7 @@ export const createOrder = async (req, res) => {
         customer_phone_country_code,
         customer_phone,
         address_line,
+        address_line_2,
         flat_villa,
         is_new_address,
         zip_code,
@@ -78,6 +79,7 @@ export const createOrder = async (req, res) => {
             customer_phone_country_code,
             customer_phone,
             address_line,
+            address_line_2,
             flat_villa,
             is_new_address,
             zip_code,
@@ -94,6 +96,7 @@ export const createOrder = async (req, res) => {
             const insertedAddressId = await insertNewAddressIntoDatabase(
                 customerId,
                 address_line,
+                address_line_2,
                 flat_villa,
                 customer_name,
                 customer_phone_country_code,
@@ -213,6 +216,9 @@ export const getAllOrders = async (req, res) => {
         });
     }
 };
+
+
+
 
 
 export const cancelOrder = async (req, res) => {
