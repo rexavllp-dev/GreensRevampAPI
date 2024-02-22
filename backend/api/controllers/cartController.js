@@ -13,6 +13,7 @@ export const addProductToCart = async (req, res) => {
     try {
 
         // await addToCart(req.session, productId, quantity);
+        const product = await getProductById(productId);
 
         if (!req.session.cart) {
             req.session.cart = [];
@@ -20,6 +21,85 @@ export const addProductToCart = async (req, res) => {
         const existingProduct = req.session.cart.find(item => item.productId === productId);
 
         if (existingProduct) {
+
+            // Check if the product is active
+
+
+            if (product.inventory_management === true) {
+
+                if (product.max_qty < (parseInt(quantity) + parseInt(existingProduct.quantity))) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Max quantity exceeded',
+                        result: req.session.cart
+                    });
+                }
+
+                if (product.product_quantity < (parseInt(quantity) + parseInt(existingProduct.quantity))) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product quantity exceeded',
+                        result: req.session.cart
+                    });
+                }
+
+                // check product status
+
+                if (product.prd_status === false) {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product is not active',
+                        result: req.session.cart
+                    });
+                }
+
+                // check product stock availability
+
+                if (product.stock_availability === 'Out of stock') {
+                    return res.status(400).json({
+                        status: 400,
+                        success: false,
+                        message: 'Product is out of stock',
+                        result: req.session.cart
+                    });
+                }
+            }
+
+            if (product.max_qty < (parseInt(quantity) + parseInt(existingProduct.quantity))) {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Max quantity exceeded',
+                    result: req.session.cart
+                });
+
+
+            }
+
+            // check product status
+            if (product.prd_status === false) {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Product is not active',
+                    result: req.session.cart
+                });
+            }
+
+            // check product stock availability
+
+            if (product.stock_availability === 'Out of stock') {
+                return res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Product is out of stock',
+                    result: req.session.cart
+                });
+            }
+
             // If the product already exists, increase the quantity instead of returning an error
             existingProduct.quantity += parseInt(quantity);
 
@@ -32,7 +112,7 @@ export const addProductToCart = async (req, res) => {
         } else {
 
             // Check if the product is active
-            const product = await getProductById(productId);
+
 
             if (product.inventory_management === true) {
 
@@ -44,8 +124,6 @@ export const addProductToCart = async (req, res) => {
                         message: 'Max quantity exceeded',
                         result: req.session.cart
                     });
-
-
                 }
 
                 if (product.product_quantity < parseInt(quantity)) {
@@ -125,7 +203,6 @@ export const addProductToCart = async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error);
 
         res.status(500).json({
             status: 500,
@@ -134,8 +211,6 @@ export const addProductToCart = async (req, res) => {
             message: 'Failed to add product to cart. Please try again later.',
         })
     }
-
-
 }
 
 // update product quantity
@@ -251,9 +326,9 @@ export const updateProductCartQuantity = async (req, res) => {
                 req.session.cart[index] = updatedCart;
             }
 
-                
-            }
-        
+
+        }
+
 
         res.status(200).json({
             status: 200,
