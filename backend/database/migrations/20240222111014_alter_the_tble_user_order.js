@@ -4,7 +4,7 @@
  */
 export const up = async (knex) => {
     await knex.schema.alterTable('user_orders', (table) => {
-        table.integer('ord_zip_code').nullable();
+        table.string('ord_zip_code').nullable();
         table.integer('ord_customer_country_code').unsigned().references('id').inTable('countries');
     });
 };

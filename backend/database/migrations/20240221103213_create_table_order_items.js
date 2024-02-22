@@ -6,6 +6,7 @@
 
 export const up = async (knex) => {
     await knex.schema.createTable('order_items', (table) => {
+        table.increments('id').primary();
         table.integer('order_id').unsigned().references('id').inTable('user_orders');
         table.integer('product_id').unsigned().references('id').inTable('products');
         table.decimal('op_actual_price');

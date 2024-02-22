@@ -124,17 +124,42 @@ export const updateAnOrder = async (orderId, updatedData) => {
 
 
 export const getAOrder = async (orderId) => {
-    const order = await db("orders")
-        .where({ id: orderId })
-        .select('*')
+    const order = await db("user_orders")
+        .where({ 'user_orders.id': orderId })
+        .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+    
+            .select(
+    
+                'user_orders.*',
+                'user_orders.id as orderId',
+                'order_items.*',
+                'order_items.id as orderItemId',
+                'products.*',
+                'products.id as productId',  
+    
+            );
 
     return order;
 };
 
 
-export const getOrders = async () => {
-    const orders = await db("orders")
-        .select('*');
+export const getAllUserOrders = async () => {
+    const orders = await db("user_orders")
+    .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
+    .leftJoin('products', 'order_items.product_id', 'products.id')
+
+        .select(
+
+            'user_orders.*',
+            'user_orders.id as orderId',
+            'order_items.*',
+            'order_items.id as orderItemId',
+            'products.*',
+            'products.id as productId',  
+
+        );
+
     return orders;
 };
 
