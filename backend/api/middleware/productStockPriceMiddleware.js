@@ -1,6 +1,49 @@
-import { getProductById } from "../models/productModel";
+import { getProductById } from "../models/productModel.js";
+import { getVat } from "../models/productPriceModel.js";
 
-export const priceVerificationMiddleware = async (req, res, next) => {
+
+const calculateTotalCharges = async (cart, isStorePickup, isCod) => {
+
+    try {
+
+
+        let totalCharge = 0;
+
+        // add shipping charge only if totalProduct price is less than 100
+
+        const totalProductPrice = cart.reduce((total, cartItem) => {
+            return total + parseFloat(cartItem.totalPrice);
+        }, 0);
+
+        const vat = await getVat();
+        const taxRate = vat.vat / 100;
+
+        const totalProductPriceWithVat = totalProductPrice + (totalProductPrice * taxRate);
+
+        if (!isStorePickup && totalProductPriceWithVat < 100) {
+            totalCharge += 30;
+        }
+
+        // Add the total charge only if isStorePickup is true and totalProductPrice is less than 50
+
+        if (isStorePickup && totalProductPriceWithVat < 50) {
+            totalCharge += 10;
+        }
+
+        // Add cod charge 
+
+        if (isCod) {
+            totalCharge += 15;
+        }
+
+        return totalCharge;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+const priceVerificationMiddleware = async (req, res, next) => {
     try {
         const cart = req.session.cart || [];
 
@@ -26,11 +69,16 @@ export const priceVerificationMiddleware = async (req, res, next) => {
 
             // Additional conditions for verification
             if (productDetails.productPrice !== parseFloat(cartProduct.price)) {
+
+                console.log("Cart Product Price:", cartProduct.price);
+                console.log("Product Details Price:", productDetails.productPrice);
+                
                 return {
                     status: 400,
                     success: false,
                     message: 'Product price verification failed. Please check product details and try again.',
                 };
+
             }
 
             if (productDetails.productStatus !== true) {
@@ -73,10 +121,31 @@ export const priceVerificationMiddleware = async (req, res, next) => {
         if (firstFailedVerification) {
             res.status(firstFailedVerification.status).json(firstFailedVerification);
         } else {
+
+            // verify total price
+
+            const totalCharges = await calculateTotalCharges(cart, req.session.isStorePickup, req.session.isCod);
+
+            // console.log("Total Charges Calculated:", totalCharges);
+
+            if (totalCharges !== parseFloat(req.session.totalCharges)) {
+
+                // console.log(req.session.totalCharges, totalCharges);
+
+                res.status(400).json({
+                    status: 400,
+                    success: false,
+                    message: 'Charges verification failed. Please check charges and try again.',
+                });
+                return; // Return to avoid proceeding to the next middleware
+
+            }
+
+
             res.status(200).json({
                 status: 200,
                 success: true,
-                message: 'Price verPrice verification successful. Proceed to checkout.',
+                message: 'Price verification successful. Proceed to checkout.',
             });
 
             next(); // Proceed to the next middleware or route handler
@@ -91,3 +160,7 @@ export const priceVerificationMiddleware = async (req, res, next) => {
         });
     }
 };
+
+
+export default priceVerificationMiddleware;
+

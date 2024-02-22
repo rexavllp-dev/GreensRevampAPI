@@ -430,6 +430,45 @@ export const removeProductFromCart = async (req, res) => {
 
 
 
+// API route to update isStorePickup
+export const updateFlags = async (req, res) => {
+    const { isStorePickup , isCod } = req.body;
+
+    try {
+            // Update session values
+            if (isStorePickup !== undefined) {
+                req.session.isStorePickup = isStorePickup;
+            }
+    
+            if (isCod !== undefined) {
+                req.session.isCod = isCod;
+            }
+
+            console.log('Updated flags:', req.session.isStorePickup, req.session.isCod);
+
+        // Calculate price with updated isStorePickup
+        const data = await calculatePrice({
+            session: req.session,
+            isStorePickup: req.session.isStorePickup,
+            isCod: req.session.isCod,
+        });
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            result: data,
+            message: 'Cart options updated successfully',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            error: error,
+            message: 'Failed to update . Please try again later.',
+        });
+    }
+};
 
 
 
