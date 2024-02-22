@@ -1,7 +1,6 @@
 import {
     createUserAddress,
     deleteUserAddress,
-    getAllUserAddresses,
     getUserAddress,
     getUserAddresses,
     updateOtherUserAddress,
@@ -20,6 +19,7 @@ export const createAddress = async (req, res) => {
 
 
         const userAddresses = await getUserAddresses(userId);
+
 
 
         if (userAddresses.length === 0) {
@@ -121,11 +121,11 @@ export const updateAddress = async (req, res) => {
 
 export const getAddress = async (req, res) => {
 
-    const addressId = req.params.addressId;
+    const userId = req.params.userId;
 
     try {
 
-        const address = await getUserAddress(addressId);
+        const address = await getUserAddress(userId);
 
         if (!address) {
             return res.status(400).json({
@@ -158,8 +158,10 @@ export const getAddress = async (req, res) => {
 
 export const getAllAddresses = async (req, res) => {
 
+    const userId = req.params.userId;
+
     try {
-        const addresses = await getAllUserAddresses();
+        const addresses = await getUserAddresses(userId)
         res.status(200).json({
             status: 200,
             success: true,

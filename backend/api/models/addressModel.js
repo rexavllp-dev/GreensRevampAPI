@@ -27,11 +27,7 @@ export const getUserAddress = async (addressId) => {
     return address;
 }
 
-export const getAllUserAddresses = async () => {
 
-    const addresses = await db('address');
-    return addresses;
-}
 
 // delete address
 
@@ -52,7 +48,7 @@ export const getUserAddresses = async (userId) => {
         .select('*')
         .first();
     return address;
-}
+};
 
 // update other address 
 

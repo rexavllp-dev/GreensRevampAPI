@@ -8,6 +8,7 @@ const router = express.Router();
 
 // create orders
 router.post('/create_order', verifyToken, createOrder);
+// router.post('/create_order', createOrder);
 
 // update orders
 router.put('/update-order/:orderId', updateOrder);

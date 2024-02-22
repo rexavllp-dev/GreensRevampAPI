@@ -17,7 +17,7 @@ router.put('/update-address/:addressId', updateAddress);
 router.get('/get-address/:addressId', getAddress);
 
 // get all addresses
-router.get('/get-all-addresses', getAllAddresses);
+router.get('/get-all-addresses/:userId', getAllAddresses);
 
 // delete address
 

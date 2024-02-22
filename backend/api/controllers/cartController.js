@@ -18,8 +18,7 @@ export const addProductToCart = async (req, res) => {
         if (!req.session.cart) {
             req.session.cart = [];
         }
-        const existingProduct = req.session.cart.find(item => item.productId === productId);
-        
+        const existingProduct = req.session.cart.find(item => parseInt(item.productId) === parseInt(productId));
 
         if (existingProduct) {
             const productPrice = parseFloat(product.product_price);
@@ -238,7 +237,8 @@ export const updateProductCartQuantity = async (req, res) => {
         }
 
         if (req.session.cart) {
-            let index = req.session.cart.findIndex(item => item.productId === productId);
+            let index = req.session.cart.findIndex(item => parseInt(item.productId) === parseInt(productId));
+
 
             if (index !== -1) {
                 let updatedCart = req.session.cart[index];
