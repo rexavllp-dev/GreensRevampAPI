@@ -143,7 +143,7 @@ export const calculatePrice = async ({
 
     // Grand Total formula =((sub total-Discount)+Service charges+Delivery charge))+vat 5%
     const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : ((subTotal - totalDiscount) + shippingCharge + codCharge + storePickupCharge) + taxPrice
-    const totalProductPriceWithVAT =  totalProductPriceVat 
+    const totalProductPriceWithVAT =  nonActiveProductsCount === 0 ? 0 : (subTotal - totalDiscount) + taxPrice
     const totals = {
         subTotal: subTotal.toFixed(2),
         grandTotal: grandTotalWithVAT.toFixed(2),
