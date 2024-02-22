@@ -48,8 +48,11 @@ export const getProductById = async (productId) => {
                     'is_baseimage', product_gallery.is_baseimage
                 )
             ) as product_img
-        `)
-            ,
+        `),
+
+            db.raw(`COALESCE(product_inventory.stock_availability, 'Out of stock') as stock_availability`),
+
+            
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -165,6 +168,9 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             ELSE products_price.product_price * (1 + vat.vat / 100)
         END AS compute_price
 `),
+
+
+            db.raw(`COALESCE(product_inventory.stock_availability, 'Out of stock') as stock_availability`),
 
 
 
@@ -473,6 +479,10 @@ export const getProductsByCategory = async (page, per_page, search, filters, cat
         console.log(search)
         query.where("products.prd_name", "ilike", `%${search}%`);
     }
+
+
+
+
 
     // Apply complex filters
 

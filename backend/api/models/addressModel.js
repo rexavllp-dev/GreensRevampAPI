@@ -10,9 +10,9 @@ export const createUserAddress = async (addressData) => {
 export const updateUserAddress = async (addressData, addressId) => {
 
     const address = await db('address')
-    .where({ id:addressId })
-    .update(addressData)
-    .returning('*');
+        .where({ id: addressId })
+        .update(addressData)
+        .returning('*');
 
     return address;
 }
@@ -22,8 +22,8 @@ export const updateUserAddress = async (addressData, addressId) => {
 export const getUserAddress = async (addressId) => {
 
     const address = await db('address')
-    .where({ id:addressId })
-    .first();
+        .where({ id: addressId })
+        .first();
     return address;
 }
 
@@ -38,8 +38,8 @@ export const getAllUserAddresses = async () => {
 export const deleteUserAddress = async (addressId) => {
 
     const address = await db('address')
-    .where({ id:addressId })
-    .del();
+        .where({ id: addressId })
+        .del();
 
     return address;
 }
@@ -48,22 +48,23 @@ export const deleteUserAddress = async (addressId) => {
 
 export const getUserAddresses = async (userId) => {
     const address = await db('address')
-    .where({ user_id: userId })
-    .select('*')
-    .first();
+        .where({ user_id: userId })
+        .select('*')
+        .first();
     return address;
-} 
+}
 
 // update other address 
 
 export const updateOtherUserAddress = async (userId, addressId) => {
-    
+
     const addresses = await getUserAddresses(userId);
     for (let i = 0; i < addresses.length; i++) {
-        if(addresses[i].id !== addressId) {
-            const updatedAddress = {...addresses[i], is_default: false};
+        if (addresses[i].id !== addressId) {
+            const updatedAddress = { ...addresses[i], is_default: false };
             await updateUserAddress(updatedAddress, addresses[i].id);
-        } 
+        }
     }
-   
-}
+
+};
+
