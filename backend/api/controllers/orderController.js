@@ -3,7 +3,7 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
 
-import { createOrderItems, createUserOrder, getAOrder, getOrders, insertNewAddressIntoDatabase, updateAnOrder } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder } from "../models/orderModel.js";
 
 
 
@@ -198,7 +198,7 @@ export const getASingleOrder = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
     try {
-        const orders = await getOrders();
+        const orders = await getAllUserOrders();
 
         res.status(200).json({
             status: 200,

@@ -18,6 +18,6 @@ export const down = async (knex) => {
     await knex.schema.alterTable('address', (table) => {
         table.dropColumn('zip_code');
         table.dropColumn('contactless_delivery');
-        table.dropColumn('address_line_2').nullable();
+        table.dropColumn('address_line_2')
     });
 };
