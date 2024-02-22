@@ -36,17 +36,6 @@ export const addProductToCart = async (req, res) => {
 
             if (product.inventory_management === true) {
 
-                //  min quantity
-                // if(product.min_qty > parseInt(quantity)) {
-                //     return res.status(400).json({
-                //         status: 400,
-                //         success: false,
-                //         message: 'Min quantity not met',
-                //         result: req.session.cart
-                //     });
-                // }
-
-
 
                 if (product.max_qty < parseInt(quantity)) {
                     return res.status(400).json({

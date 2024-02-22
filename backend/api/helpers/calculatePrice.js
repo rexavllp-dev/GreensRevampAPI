@@ -35,8 +35,9 @@ export const calculatePrice = async ({
 
         if (product) {
 
-                
+
             if (
+
                 product.prd_status === false ||
                 product.stock_availability === 'Out of stock' &&
                 cart[i].quantity <= product.product_quantity &&
@@ -103,6 +104,7 @@ export const calculatePrice = async ({
             cart[i].totalPriceWithVat = price * parseInt(cart[i].quantity) + (price * vatPercentage);
             totalProductPrice += cart[i].totalPrice;
             totalProductPriceVat += cart[i].totalPriceWithVat;
+
             // Track total discount for all products
             totalDiscount += discount * parseInt(cart[i].quantity);
             cart[i].subTotal = basePrice * parseInt(cart[i].quantity);
@@ -132,13 +134,16 @@ export const calculatePrice = async ({
     // Add 5 % tax to sub total 
     const taxRate = vat.vat / 100;
 
+    // Calculate total product price with VAT
+    
+
     const taxPrice = (totalProductPrice * taxRate)
     const totalProductCount = productCount;
     const totalProductVAT = (parseFloat(subTotal) - parseFloat(totalDiscount)) * (vat.vat / 100);
 
     // Grand Total formula =((sub total-Discount)+Service charges+Delivery charge))+vat 5%
     const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : ((subTotal - totalDiscount) + shippingCharge + codCharge + storePickupCharge) + taxPrice
-
+    const totalProductPriceWithVAT =  totalProductPriceVat 
     const totals = {
         subTotal: subTotal.toFixed(2),
         grandTotal: grandTotalWithVAT.toFixed(2),
@@ -149,6 +154,7 @@ export const calculatePrice = async ({
         storePickupCharge: storePickupCharge,
         codCharge: codCharge,
         totalProductCount: totalProductCount,
+        totalProductPriceWithVAT: totalProductPriceWithVAT.toFixed(2),
     }
 
     return {
