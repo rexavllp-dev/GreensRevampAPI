@@ -1,7 +1,9 @@
 import express from 'express';
-import { addProductToCart, getProductFromCart, removeProductFromCart, updateProductCartQuantity } from '../controllers/cartController.js';
+import { addProductToCart, getProductFromCart, removeProductFromCart, updateFlags, updateProductCartQuantity } from '../controllers/cartController.js';
 import { createDeliveryEstimate, getSingleDeliveryEstimate, getsAllDeliveryEstimate, updateDeliveryEstimate } from '../controllers/deliveryEstimateController.js';
-import { createRegion, getSingleRegion, getsAllRegion, updateRegion } from '../controllers/regionController.js';
+import { createRegion, getSingleRegion, getsAllRegion, updateRegion } from '../controllers/regionController.js'
+import priceVerificationMiddleware from '../middleware/productStockPriceMiddleware.js';
+
 
 
 const router = express.Router();
@@ -21,6 +23,10 @@ router.get('/get-cart', getProductFromCart);
 // delete item from cart
    
  router.delete('/delete-cart-item/:productId', removeProductFromCart);
+
+//  update flags
+
+router.put('/update-flags',updateFlags );
 
 //test router
 
