@@ -128,26 +128,6 @@ export const getAOrder = async (orderId) => {
         .where({ 'user_orders.id': orderId })
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
-    
-            .select(
-    
-                'user_orders.*',
-                'user_orders.id as orderId',
-                'order_items.*',
-                'order_items.id as orderItemId',
-                'products.*',
-                'products.id as productId',  
-    
-            );
-
-    return order;
-};
-
-
-export const getAllUserOrders = async () => {
-    const orders = await db("user_orders")
-    .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
-    .leftJoin('products', 'order_items.product_id', 'products.id')
 
         .select(
 
@@ -160,6 +140,47 @@ export const getAllUserOrders = async () => {
             
 
         );
+
+    return order;
+};
+
+
+export const getAllUserOrders = async (order_status_id, search_query,order_date) => {
+    const orders = await db("user_orders")
+        .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .select(
+
+            'user_orders.*',
+            'user_orders.id as orderId',
+            'order_items.*',
+            'order_items.id as orderItemId',
+            'products.*',
+            'products.id as productId',
+
+        );
+
+    if (order_status_id !== null) {
+        orders.where({ 'user_orders.ord_order_status': order_status_id })
+
+    }
+
+    if (search_query !== null) {
+        orders.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
+        .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
+        .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`)
+        .orWhere('user_orders.ord_status', 'ilike', `%${search_query}%`)
+        
+    }
+
+    if(order_date!==null){
+
+        orders.where({ 'user_orders.created_at': order_date })
+
+    }
+
+
+
 
     return orders;
 };

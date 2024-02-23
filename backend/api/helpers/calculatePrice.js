@@ -3,10 +3,8 @@ import { getVat } from "../models/productPriceModel.js";
 
 export const calculatePrice = async ({
     session,
-    isStorePickup = false,
     couponCodes = [],
     rewardPoints = 0,
-    isCod = false,
 }) => {
 
     let cart = session.cart || [];
@@ -18,6 +16,10 @@ export const calculatePrice = async ({
     const vat = await getVat();
     let productCount = 0;
     let nonActiveProductsCount = 0;
+
+     // Retrieve flags directly from the session
+     const isStorePickup = session.isStorePickup || false;
+     const isCod = session.isCod || false;
 
 
     for (let i = 0; i < cart?.length; i++) {

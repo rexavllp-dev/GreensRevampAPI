@@ -7,6 +7,9 @@ export const addProductToCart = async (req, res) => {
     const { productId, quantity } = req.body;
 
     // console.log(req.session);
+    req.session.isStorePickup = false;
+    req.session.isCod = false;
+
 
     // console.log(productId, quantity);
 
@@ -466,6 +469,7 @@ export const updateFlags = async (req, res) => {
             result: data,
             message: 'Cart options updated successfully',
         });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({
