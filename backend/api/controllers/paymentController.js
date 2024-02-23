@@ -3,6 +3,7 @@ import stripe from 'stripe';
 import { createTransaction } from './transactionController.js';
 import { calculatePrice } from '../helpers/calculatePrice.js';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
+import { updateAnOrder } from "../models/orderModel.js";
 
 export const handlePaymentRequest = async (req, res) => {
 
@@ -41,11 +42,10 @@ export const handlePaymentRequest = async (req, res) => {
 
         const session = await stripeInstance.checkout.sessions.create({
 
-            success_url: 'http://localhost:5002/payment_success?od=' + orderID,
+            success_url: 'http://localhost:3000/payment_success?od=' + orderID,
             cancel_url: 'http://localhost:5002/payment_cancel?od=' + orderID,
             customer_email: 'test@test.com',
             line_items: [
-
                 {
                     price: price.id,
                     quantity: 1,
@@ -59,7 +59,14 @@ export const handlePaymentRequest = async (req, res) => {
             currency: 'AED'
         });
 
-        res.json({ url: session.url });
+        const updateSessionId = await updateAnOrder(orderID, { session_id: session.id });
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Success',
+            url: session.url, id: session.id
+        });
 
     } catch (error) {
 
