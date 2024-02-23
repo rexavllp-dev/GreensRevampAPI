@@ -46,7 +46,6 @@ export const getUserAddresses = async (userId) => {
     const address = await db('address')
         .where({ user_id: userId })
         .select('*')
-        .first();
     return address;
 };
 
