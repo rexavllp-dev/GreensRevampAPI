@@ -11,6 +11,7 @@ export const createOrder = async (req, res) => {
     const {
 
         address_id,
+        address_title,
         customer_name,
         customer_email,
         customer_phone_country_code,
@@ -49,50 +50,50 @@ export const createOrder = async (req, res) => {
             shipping_method: Joi.string().required().label("Shipping Method"),
         });
 
-        const validate_data = {
-            customer_name,
-            customer_email,
-            customer_phone_country_code,
-            customer_phone,
-            address_line_1,
-            flat_villa,
-            zip_code,
-            payment_method,
-            shipping_method,
-        };
-
-        const { error } = schema.validate(validate_data, joiOptions);
-        if (error) {
-            return res.status(500).json({
-                status: 500,
-                success: false,
-                message: "Validation Error",
-                error: getErrorsInArray(error?.details),
-            });
-        };
-
-
-        const orderData = {
-
-            address_id: null,
-            customer_name,
-            customer_email,
-            customer_phone_country_code,
-            customer_phone,
-            address_line_1,
-            address_line_2,
-            flat_villa,
-            is_new_address,
-            zip_code,
-            payment_method,
-            shipping_method,
-            orderItems,
-
-        };
-
+        let orderData = {}
 
         // If it's a new address, insert the new address into the database
         if (is_new_address) {
+
+            const validate_data = {
+                customer_name,
+                customer_email,
+                customer_phone_country_code,
+                customer_phone,
+                address_line_1,
+                flat_villa,
+                zip_code,
+                payment_method,
+                shipping_method,
+            };
+
+            orderData = {
+                address_id: null,
+                address_title,
+                customer_name,
+                customer_email,
+                customer_phone_country_code,
+                customer_phone,
+                address_line_1,
+                address_line_2,
+                flat_villa,
+                is_new_address,
+                zip_code,
+                payment_method,
+                shipping_method,
+                orderItems,
+            }
+
+            const { error } = schema.validate(validate_data, joiOptions);
+            if (error) {
+                return res.status(500).json({
+                    status: 500,
+                    success: false,
+                    message: "Validation Error",
+                    error: getErrorsInArray(error?.details),
+                });
+            };
+
             // Insert the new address into the database
             const insertedAddressId = await insertNewAddressIntoDatabase(
                 customerId,
@@ -108,11 +109,25 @@ export const createOrder = async (req, res) => {
             );
             orderData.address_id = insertedAddressId; // Assign the new address ID
         } else {
+
+            if (!address_id) {
+                return res.status(500).json({
+                    status: 500,
+                    success: false,
+                    message: "Please choose an address",
+                });
+            }
+
+            orderData = {
+                address_id: address_id,
+                is_new_address,
+                payment_method,
+                shipping_method,
+                orderItems,
+            }
             // Use the selected existing address ID
-            orderData.address_id = address_id;
+            // orderData.address_id = address_id;
         }
-
-
 
 
         // Create order data

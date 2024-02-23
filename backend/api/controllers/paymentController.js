@@ -8,15 +8,21 @@ import { createATransaction } from '../models/transactionModel.js';
 
 export const handlePaymentRequest = async (req, res) => {
 
-
-    const currentTime = Math.floor(Date.now() / 1000); // Current time in Unix timestamp (seconds since epoch)
-    const expirationTimestamp = currentTime + (30 * 60); // 30 minutes from now
-    // const collectable_amount = 1000; // Amount need to be collected
-    const orderID = req.body.order_id;
-
-    let data = null;
-
     try {
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in Unix timestamp (seconds since epoch)
+        const expirationTimestamp = currentTime + (30 * 60); // 30 minutes from now
+        // const collectable_amount = 1000; // Amount need to be collected
+        const orderID = req.body.order_id;
+
+        if(!orderID) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Order ID is required',
+            })
+        }
+    
+        let data = null;
 
         if (!req.session.cart) {
             return res.status(400).json({
