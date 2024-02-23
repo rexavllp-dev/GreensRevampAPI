@@ -1,6 +1,7 @@
 import express from "express";
 import { createOrder, getASingleOrder, getAllOrders, updateOrder } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
+import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
 
 
 
@@ -18,6 +19,13 @@ router.get('/get-order/:orderId', getASingleOrder);
 
 // get all orders
 router.get('/get-all-orders', getAllOrders);
+
+
+// user order details
+router.get('/get-order-details/:orderId', verifyToken, getOrderDetails);
+
+// get all orders of a user
+router.get('/get-user-orders/:userId', verifyToken, getUserOrders);
 
 
 

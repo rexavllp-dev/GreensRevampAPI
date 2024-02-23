@@ -2,7 +2,6 @@ import express from 'express';
 import { addProductToCart, getProductFromCart, removeProductFromCart, updateFlags, updateProductCartQuantity } from '../controllers/cartController.js';
 import { createDeliveryEstimate, getSingleDeliveryEstimate, getsAllDeliveryEstimate, updateDeliveryEstimate } from '../controllers/deliveryEstimateController.js';
 import { createRegion, getSingleRegion, getsAllRegion, updateRegion } from '../controllers/regionController.js'
-import priceVerificationMiddleware from '../middleware/productStockPriceMiddleware.js';
 import verifyProductPrice from '../middleware/verifyProductPrice.js';
 
 
