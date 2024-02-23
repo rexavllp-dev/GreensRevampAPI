@@ -158,7 +158,7 @@ export const getAddress = async (req, res) => {
 
 export const getAllAddresses = async (req, res) => {
 
-    const userId = req.params.userId;
+    const userId = req.user.userId;
 
     try {
         const addresses = await getUserAddresses(userId)

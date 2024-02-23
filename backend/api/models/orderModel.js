@@ -157,6 +157,7 @@ export const getAllUserOrders = async () => {
             'order_items.id as orderItemId',
             'products.*',
             'products.id as productId',  
+            
 
         );
 
