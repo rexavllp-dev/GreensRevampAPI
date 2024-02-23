@@ -115,7 +115,7 @@ export const insertNewAddressIntoDatabase = async (
 
 
 export const updateAnOrder = async (orderId, updatedData) => {
-    const updatedOrder = await db("orders")
+    const updatedOrder = await db("user_orders")
         .where({ id: orderId })
         .update(updatedData)
         .returning('*');
