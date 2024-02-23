@@ -4,6 +4,7 @@ import { createTransaction } from './transactionController.js';
 import { calculatePrice } from '../helpers/calculatePrice.js';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import { updateAnOrder } from "../models/orderModel.js";
+import { createATransaction } from '../models/transactionModel.js';
 
 export const handlePaymentRequest = async (req, res) => {
 
@@ -79,18 +80,17 @@ export const handlePaymentRequest = async (req, res) => {
 
 export const handlePaymentRequestCompletion = async (req, res) => {
 
-    const sessionId = req.body.stripe_session_id;
-    const { orderId, transactionId } = req.body;
-
-
-    console.log(sessionId);
-
     try {
+
+        const sessionId = req.body.stripe_session_id;
+        const orderId = req.body.order_id;
+
 
         const lineItems = await stripeInstance.checkout.sessions.listLineItems(sessionId);
         console.log(lineItems.data[0].price.id);
+        const stripeTransactionId = lineItems.data[0].price.id;
 
-        const transaction = await createTransaction({ orderId, transactionId });
+        const transaction = await createATransaction({ order_id: orderId, stripe_transaction_id: stripeTransactionId });
 
 
         res.status(200).json({
