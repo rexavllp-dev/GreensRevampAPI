@@ -4,7 +4,7 @@
  */
 export const up = async (knex) => {
     await knex.schema.alterTable('user_orders', (table) => {
-        table.integer('session_id');
+        table.string('session_id');
     });
 };
 

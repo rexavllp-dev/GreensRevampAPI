@@ -42,8 +42,8 @@ export const handlePaymentRequest = async (req, res) => {
 
         const session = await stripeInstance.checkout.sessions.create({
 
-            success_url: 'http://localhost:3000/payment_success?od=' + orderID,
-            cancel_url: 'http://localhost:5002/payment_cancel?od=' + orderID,
+            success_url: 'http://localhost:3000/checkout/success?od=' + orderID,
+            cancel_url: 'http://localhost:3000/checkout/failed?od=' + orderID,
             customer_email: 'test@test.com',
             line_items: [
                 {
