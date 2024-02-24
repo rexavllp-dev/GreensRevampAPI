@@ -185,7 +185,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             ) as product_img
         `),
 
-            // db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+          
 
         )
         .distinct('products.id')
@@ -209,7 +209,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
     //   search query
     if (search) {
-        console.log(search);
+      
         query.where(function () {
             this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
                 .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
