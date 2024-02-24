@@ -3,7 +3,7 @@ import { getAllUserOrders, getUserOrderDetails } from "../models/userOrderDashbo
 // get all order of a user
 export const getUserOrders = async (req, res) => {
 
-    const userId = req.params.userId;
+    const userId = req.user?.userId;
 
     try {
 
