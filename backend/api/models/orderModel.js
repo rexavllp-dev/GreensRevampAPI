@@ -77,6 +77,7 @@ export const insertNewAddressIntoDatabase = async (
     contactlessDelivery,
     deliveryRemark,
     zipCode,
+    addressTitle
 
 ) => {
     const trx = await db.transaction(); // Start a transaction
@@ -97,6 +98,7 @@ export const insertNewAddressIntoDatabase = async (
                 contactless_delivery: contactlessDelivery,
                 delivery_remark: deliveryRemark,
                 zip_code: zipCode,
+                address_title: addressTitle
 
             })
             .returning('id');

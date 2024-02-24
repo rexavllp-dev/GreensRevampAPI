@@ -4,6 +4,7 @@ import getErrorsInArray from '../helpers/getErrors.js';
 
 
 import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder } from "../models/orderModel.js";
+import { getUserAddress } from '../models/addressModel.js';
 
 
 
@@ -26,9 +27,6 @@ export const createOrder = async (req, res) => {
         payment_method,
         shipping_method,
         orderItems,
-
-
-
     } = req.body;
 
     // console.log(req.body);
@@ -50,7 +48,18 @@ export const createOrder = async (req, res) => {
             shipping_method: Joi.string().required().label("Shipping Method"),
         });
 
-        let orderData = {}
+
+        if (!req.session.cart) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Cart is empty',
+            })
+        }
+
+        let orderData = {
+
+        }
 
         // If it's a new address, insert the new address into the database
         if (is_new_address) {
@@ -77,7 +86,6 @@ export const createOrder = async (req, res) => {
                 address_line_1,
                 address_line_2,
                 flat_villa,
-                is_new_address,
                 zip_code,
                 payment_method,
                 shipping_method,
@@ -105,7 +113,8 @@ export const createOrder = async (req, res) => {
                 customer_phone,
                 contactless_delivery,
                 delivery_remark,
-
+                zip_code,
+                address_title,
             );
             orderData.address_id = insertedAddressId; // Assign the new address ID
         } else {
@@ -118,13 +127,34 @@ export const createOrder = async (req, res) => {
                 });
             }
 
+            const existingAddress = await getUserAddress(address_id);
+
+            if (!existingAddress) {
+                return res.status(500).json({
+                    status: 500,
+                    success: false,
+                    message: "Invalid address ID",
+                })
+            }
+
+
             orderData = {
                 address_id: address_id,
-                is_new_address,
+                address_title: existingAddress.address_title,
+                customer_name: existingAddress.full_name,
+                customer_email: existingAddress.customer_email,
+                customer_phone_country_code: existingAddress.mobile_country_code,
+                customer_phone: existingAddress.mobile_number,
+                address_line_1: existingAddress.address_line_1,
+                address_line_2: existingAddress.address_line_2,
+                flat_villa: existingAddress.flat_villa,
+                zip_code: existingAddress.zip_code,
                 payment_method,
                 shipping_method,
                 orderItems,
             }
+
+
             // Use the selected existing address ID
             // orderData.address_id = address_id;
         }
@@ -219,7 +249,7 @@ export const getAllOrders = async (req, res) => {
         const search_query = req.query.search_query === "null" ? null : req.query.search_query;
         let order_date = req.query.order_date === "null" ? null : req.query.order_date;
 
-        if(order_date!==null){
+        if (order_date !== null) {
             order_date = new Date(order_date);
         }
 
