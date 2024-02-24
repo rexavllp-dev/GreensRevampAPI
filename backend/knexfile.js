@@ -11,8 +11,17 @@ export default {
       database: 'greens_international_server',
       user:     'postgres',
       password: '12345'
-    }
+    },
+
+
+    beforeCreate: (connection, callback) => {
+      connection.query('CREATE EXTENSION IF NOT EXISTS pg_trgm', (err) => {
+        callback(err, connection);
+      });
+    },
   },
+
+  
   // development: {
   //   client: 'postgresql',
   //   connection: {

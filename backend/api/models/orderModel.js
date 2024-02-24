@@ -146,39 +146,41 @@ export const getAOrder = async (orderId) => {
 
 
 export const getAllUserOrders = async (order_status_id, search_query, order_date) => {
-
-    let orders = db("user_orders")
-        .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
-        .leftJoin('products', 'order_items.product_id', 'products.id')
+    let orders = await db("user_orders")
         .select(
-
             'user_orders.*',
-            'user_orders.id as orderId',
-            'order_items.*',
-            'order_items.id as orderItemId',
-            'products.*',
-            'products.id as productId',
-
+            'user_orders.id as orderId'
         );
 
     if (order_status_id !== null) {
         orders.where({ 'user_orders.ord_order_status': order_status_id });
     };
 
-
-
     if (search_query !== null) {
-        orders.andWhere(function() {
+        orders.where(function() {
             this.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
                 .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
                 .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`);
         });
-    }
-
+    };
 
     if (order_date !== null) {
-        orders.where({ 'user_orders.created_at': order_date })
+        orders.where({ 'user_orders.created_at': order_date });
     };
+
+    for (let order of orders) {
+        let products = await db("order_items")
+            .leftJoin('products', 'order_items.product_id', 'products.id')
+            .select(
+                'order_items.*',
+                'order_items.id as orderItemId',
+                'products.*',
+                'products.id as productId',
+            )
+            .where('order_items.order_id', order.id);
+
+        order.products = products;
+    }
 
     return orders;
 };
