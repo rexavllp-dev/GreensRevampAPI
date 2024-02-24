@@ -127,6 +127,7 @@ export const getAOrder = async (orderId) => {
         .where({ 'user_orders.id': orderId })
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('address', 'user_orders.address_id', 'address.id')
 
         .select(
 
@@ -136,7 +137,8 @@ export const getAOrder = async (orderId) => {
             'order_items.id as orderItemId',
             'products.*',
             'products.id as productId',
-
+            'address.*',
+            'address.id as addressId'
         );
 
     return order;
