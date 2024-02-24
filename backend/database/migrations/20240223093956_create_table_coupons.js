@@ -10,7 +10,7 @@ export const up = async (knex) => {
         table.string('coupon_code');
         table.text('coupon_notes');
         table.decimal('coupon_value');
-        table.enum('coupon_discount_type', ['percentage', 'fixed', 'none']).defaultTo('none');
+        table.enum('coupon_discount_type', ['percentage', 'fixed']).defaultTo('fixed');
         table.enum('coupon_type', ['normal', 'refund',]).defaultTo('normal');
         table.dateTime('coupon_start_date');
         table.dateTime('coupon_end_date');
