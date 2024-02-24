@@ -9,11 +9,11 @@ export const createACoupon = async (couponData) => {
 
 export const updateACoupon = async (couponId, couponData) => {
     const coupon = await db("coupons")
-        .where({ id: couponId })
+        .where({ id: couponId }) 
         .update(couponData)
-        .returning('*')
+        .returning('*');
     return coupon;
-}
+};
 
 
 export const getACoupon = async (couponId) => {

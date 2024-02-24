@@ -1,6 +1,7 @@
 import db from '../../config/dbConfig.js';
 
 
+
 // Function to create a user order
 export const createUserOrder = async (userId, orderData) => {
 
@@ -29,7 +30,7 @@ export const createUserOrder = async (userId, orderData) => {
                 ord_payment_method: orderData.payment_method,
                 ord_shipping_method: orderData.shipping_method,
             })
-            .returning('id');
+            .returning('*');
 
 
 
@@ -115,7 +116,6 @@ export const insertNewAddressIntoDatabase = async (
 };
 
 
-
 export const updateAnOrder = async (orderId, updatedData) => {
     const updatedOrder = await db("user_orders")
         .where({ id: orderId })
@@ -138,13 +138,14 @@ export const getAOrder = async (orderId) => {
             'order_items.*',
             'order_items.id as orderItemId',
             'products.*',
-            'products.id as productId',  
-            
+            'products.id as productId',
 
         );
 
     return order;
 };
+
+
 
 
 export const getAllUserOrders = async (order_status_id, search_query,order_date) => {
