@@ -7,9 +7,8 @@ import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbord
 
 const router = express.Router();
 
-// create orders
+// create orders with all the order items, email queue
 router.post('/create_order', verifyToken, createOrder);
-// router.post('/create_order', createOrder);
 
 // update orders
 router.put('/update-order/:orderId', updateOrder);

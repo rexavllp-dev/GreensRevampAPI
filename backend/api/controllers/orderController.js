@@ -1,9 +1,12 @@
 import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
+import fs from 'fs';
 
 
 import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder } from "../models/orderModel.js";
+import { sendEmailQueueManager } from '../utils/queueManager.js';
+
 
 
 
@@ -132,11 +135,17 @@ export const createOrder = async (req, res) => {
 
         // Create order data
         const newOrder = await createUserOrder(customerId, orderData);
-
         // Create order items
         await createOrderItems(newOrder[0].id, orderItems);
 
-        //   console.log( orderData, orderItems);
+
+        // send email queue
+        await sendEmailQueueManager(newOrder);
+
+
+
+
+
 
         res.status(200).json({
             status: 200,
@@ -159,6 +168,9 @@ export const createOrder = async (req, res) => {
 
 
 };
+
+
+
 
 
 
@@ -190,6 +202,7 @@ export const updateOrder = async (req, res) => {
 
 export const getASingleOrder = async (req, res) => {
     const orderId = req.params.orderId;
+
 
     try {
         const order = await getAOrder(orderId);

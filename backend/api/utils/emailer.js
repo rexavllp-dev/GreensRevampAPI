@@ -56,7 +56,7 @@ export const sendVerificationEmail = async (usr_email, usr_firstname, token, fro
 
 // user registration successful
 export const sendUserRegistrationEmail = async (usr_email, usr_firstname) => {
-  
+
   const emailData = {
     email: usr_email,
     subject: `Registration Complete`,
@@ -200,13 +200,13 @@ export const sendVerificationApproved = async (usr_email, usr_firstname) => {
         </div>
     </body>
     </html>`,
-    
-    
-  //   `<p> Dear ${usr_firstname} </p>
-  //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
-  //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
-  //   <p>Thank you</p>
-  // `,
+
+
+    //   `<p> Dear ${usr_firstname} </p>
+    //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
+    //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
+    //   <p>Thank you</p>
+    // `,
   };
 
   try {
@@ -246,7 +246,7 @@ export const sendBlockVerification = async (usr_email, usr_firstname) => {
     from: process.env.FROM_GMAIL,
     email: usr_email,
     subject: 'User Blocked ',
-    html:`<!DOCTYPE html>
+    html: `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -277,13 +277,13 @@ export const sendBlockVerification = async (usr_email, usr_firstname) => {
         </div>
     </body>
     </html>`,
-    
-    
-  //   `<p> Dear ${usr_firstname} </p>
-  //   <p>You are blocked temporary due to repeated incorrect attempts.Please Contact admin for assistance.</p>
-  //   <a href="https://react.greens-intl.ae/auth/login/">Try again</a>
-  //   <p>Thank you</p>
-  // `
+
+
+    //   `<p> Dear ${usr_firstname} </p>
+    //   <p>You are blocked temporary due to repeated incorrect attempts.Please Contact admin for assistance.</p>
+    //   <a href="https://react.greens-intl.ae/auth/login/">Try again</a>
+    //   <p>Thank you</p>
+    // `
 
   };
   try {
@@ -329,13 +329,13 @@ export const sendVerificationBulkApproved = async (usr_email, usr_firstname, pro
         </div>
     </body>
     </html>`,
-    
-    
-  //   `<p> Dear ${usr_firstname} </p>
-  //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
-  //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
-  //   <p>Thank you</p>
-  // `,
+
+
+    //   `<p> Dear ${usr_firstname} </p>
+    //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
+    //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
+    //   <p>Thank you</p>
+    // `,
   };
 
   try {
@@ -390,3 +390,56 @@ export const sendVerificationBulkRejected = async (usr_email, usr_firstname, pro
   }
 };
 
+
+
+
+export const sendOrderInvoices = async (orderData, pdfData) => {
+
+  console.log(pdfData);
+
+  const emailData = {
+    from: process.env.FROM_GMAIL,
+    email: orderData[0].ord_customer_email,
+    subject: 'Your Order Invoice',
+    html: `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bulk order verification </title>
+    </head>
+    <body>
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+
+        <!-- Logo -->
+        <div style="text-align: center;">
+            <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+        </div>
+    
+            <h2> Your Order Invoice  </h2>
+    
+            
+  
+          
+            <p>Best regards,<br> <b>Greens International </b> </p>
+    
+        </div>
+    </body>
+    </html>`,
+   
+    attachments: [
+      {
+        filename: 'invoice.pdf',
+        content: Buffer.from(pdfData.pdfData, 'base64'),
+        encoding: 'base64' // Ensure the correct encoding for the attachment content
+      }
+    ]
+    
+  };
+
+  try {
+    await sendEmail(emailData);
+  } catch (error) {
+    throw error
+  }
+};
