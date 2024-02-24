@@ -3,7 +3,7 @@ import db from '../../config/dbConfig.js';
 
 
 // Function to create a user order
-export const createUserOrder = async (userId, orderData) => {
+export const createUserOrder = async (trx, userId, orderData) => {
     let addressId = null;
     if (typeof orderData.address_id === 'number') {
         addressId = orderData.address_id;
@@ -11,9 +11,6 @@ export const createUserOrder = async (userId, orderData) => {
         addressId = parseInt(orderData.address_id);
     }
 
-    console.log(orderData);
-
-    const trx = await db.transaction(); // Start a transaction
 
     try {
         const newOrder = await trx("user_orders")
@@ -32,34 +29,25 @@ export const createUserOrder = async (userId, orderData) => {
             })
             .returning('*');
 
-        // Call createOrderItems with the transaction object
-        await createOrderItems(trx, newOrder[0].order_id, orderData.orderItems);
-
-        // Commit the transaction if everything is successful
-        await trx.commit();
-
         return newOrder;
     } catch (error) {
-        // Rollback the transaction if there's an error
         await trx.rollback();
-        throw error; // Rethrow the error for the caller to handle
+        throw error;
     }
 };
 
 
 
 // Function to create order items
-export const createOrderItems = async (orderId, orderItems) => {
-    const trx = await db.transaction(); // Start a transaction
+export const createOrderItems = async (trx, orderId, orderItems) => {
 
     try {
         for (const item of orderItems) {
             item.order_id = orderId;
-            await db('order_items').transacting(trx).insert(item);
+            await await trx('order_items').insert(item);
         }
 
         // Commit the transaction if everything is successful
-        await trx.commit();
     } catch (error) {
         // Rollback the transaction if there's an error
         await trx.rollback();
@@ -71,6 +59,7 @@ export const createOrderItems = async (orderId, orderItems) => {
 
 // Function to insert a new address into the database
 export const insertNewAddressIntoDatabase = async (
+    trx,
     customerId,
     addressLine,
     addressLine2,
@@ -82,16 +71,11 @@ export const insertNewAddressIntoDatabase = async (
     deliveryRemark,
     zipCode,
     addressTitle
-
 ) => {
-    const trx = await db.transaction(); // Start a transaction
-
-    console.log(addressLine);
     try {
-        // Insert the new address into the database
+
         const [insertedAddressId] = await trx("address")
             .insert({
-
                 user_id: customerId,
                 full_name: customerName,
                 mobile_country_code: customerCountryCode,
@@ -103,20 +87,22 @@ export const insertNewAddressIntoDatabase = async (
                 delivery_remark: deliveryRemark,
                 zip_code: zipCode,
                 address_title: addressTitle
-
             })
+
             .returning('id');
 
-        // Commit the transaction if everything is successful
-        await trx.commit();
-
         return insertedAddressId;
+
     } catch (error) {
-        // Rollback the transaction if there's an error
+
         await trx.rollback();
-        throw error; // Rethrow the error for the caller to handle
+
+        throw error;
     }
 };
+
+
+
 
 
 export const updateAnOrder = async (orderId, updatedData) => {
@@ -152,7 +138,8 @@ export const getAOrder = async (orderId) => {
 
 
 export const getAllUserOrders = async (order_status_id, search_query, order_date) => {
-    let orders =  db("user_orders")
+
+    let orders = db("user_orders")
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .select(
@@ -167,8 +154,8 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
         );
 
     if (order_status_id !== null) {
-         orders.where({ 'user_orders.ord_order_status': order_status_id });
-    }
+        orders.where({ 'user_orders.ord_order_status': order_status_id });
+    };
 
 
 
@@ -176,14 +163,11 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
         orders.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
             .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
             .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`)
-    }
+    };
 
     if (order_date !== null) {
-
         orders.where({ 'user_orders.created_at': order_date })
-
-    }
-
+    };
 
     return orders;
 };
