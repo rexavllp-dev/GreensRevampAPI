@@ -16,7 +16,7 @@ import wishlistRoutes from './api/routes/wishlistRoute.js';
 import orderRoutes from './api/routes/orderRoutes.js';
 import paymentRoutes from './api/routes/paymentRoutes.js';
 import cancelReasonsRoutes from './api/routes/cancelReasonsRoutes.js';
-
+import couponRoutes from './api/routes/couponRoutes.js';
 
 
 import session from 'express-session';
@@ -84,6 +84,8 @@ app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/cancelReasons', cancelReasonsRoutes);
+app.use('/api/v1/coupons', couponRoutes);
+
 
 
 app.get('/', (req, res) => {
