@@ -228,15 +228,19 @@ export const getASingleOrder = async (req, res) => {
 export const getAllOrders = async (req, res) => {
     try {
 
-        const order_status_id = req.query.order_status_id === "null" ? null : req.query.order_status_id;
-        const search_query = req.query.search_query === "null" ? null : req.query.search_query;
-        let order_date = req.query.order_date === "null" ? null : req.query.order_date;
+        let order_status_id = req.query.order_status_id || null;
+        let search_query = req.query.search_query || null;
+        let order_date = req.query.order_date || null;
 
-        if(order_date!==null){
+        order_status_id = order_status_id === "null" ? null : order_status_id;
+        search_query = search_query === "null" ? null : search_query;
+        order_date = order_date === "null" ? null : order_date;
+
+        if (order_date !== null) {
             order_date = new Date(order_date);
         }
 
-        const orders = await getAllUserOrders(order_status_id, search_query);
+        const orders = await getAllUserOrders(order_status_id, search_query, order_date);
 
         res.status(200).json({
             status: 200,

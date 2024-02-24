@@ -4,7 +4,6 @@ import db from '../../config/dbConfig.js';
 
 // Function to create a user order
 export const createUserOrder = async (userId, orderData) => {
-
     let addressId = null;
     if (typeof orderData.address_id === 'number') {
         addressId = orderData.address_id;
@@ -13,6 +12,7 @@ export const createUserOrder = async (userId, orderData) => {
     }
 
     console.log(orderData);
+
     const trx = await db.transaction(); // Start a transaction
 
     try {
@@ -32,7 +32,8 @@ export const createUserOrder = async (userId, orderData) => {
             })
             .returning('*');
 
-
+        // Call createOrderItems with the transaction object
+        await createOrderItems(trx, newOrder[0].order_id, orderData.orderItems);
 
         // Commit the transaction if everything is successful
         await trx.commit();
@@ -44,6 +45,8 @@ export const createUserOrder = async (userId, orderData) => {
         throw error; // Rethrow the error for the caller to handle
     }
 };
+
+
 
 // Function to create order items
 export const createOrderItems = async (orderId, orderItems) => {
@@ -146,8 +149,8 @@ export const getAOrder = async (orderId) => {
 
 
 
-export const getAllUserOrders = async (order_status_id, search_query,order_date) => {
-    const orders = await db("user_orders")
+export const getAllUserOrders = async (order_status_id, search_query, order_date) => {
+    let orders =  db("user_orders")
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .select(
@@ -162,25 +165,22 @@ export const getAllUserOrders = async (order_status_id, search_query,order_date)
         );
 
     if (order_status_id !== null) {
-        orders.where({ 'user_orders.ord_order_status': order_status_id })
-
+         orders.where({ 'user_orders.ord_order_status': order_status_id });
     }
+
+
 
     if (search_query !== null) {
         orders.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
-        .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
-        .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`)
-        .orWhere('user_orders.ord_status', 'ilike', `%${search_query}%`)
-        
+            .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
+            .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`)
     }
 
-    if(order_date!==null){
+    if (order_date !== null) {
 
         orders.where({ 'user_orders.created_at': order_date })
 
     }
-
-
 
 
     return orders;
