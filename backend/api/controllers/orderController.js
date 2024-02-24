@@ -3,13 +3,9 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-
-
 import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
-
-
 
 
 export const createOrder = async (req, res) => {
@@ -174,10 +170,11 @@ export const createOrder = async (req, res) => {
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 
-            newOrder[0].orderItems = newOrderItems;
-            console.log("orderItems",orderItems);
 
-            
+            newOrder[0].orderItems = newOrderItems;
+
+
+
 
             // Commit the transaction if everything is successful
             await trx.commit();

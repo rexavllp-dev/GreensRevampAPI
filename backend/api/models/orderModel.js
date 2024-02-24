@@ -42,10 +42,18 @@ export const createUserOrder = async (trx, userId, orderData) => {
 export const createOrderItems = async (trx, orderId, orderItems) => {
 
     try {
+
+        const insertedOrderItems = [];
+
         for (const item of orderItems) {
             item.order_id = orderId;
-            await await trx('order_items').insert(item);
+            const insertedItem = await trx('order_items')
+                .insert(item)
+                .returning('*');
+            insertedOrderItems.push(insertedItem);
         }
+
+        return insertedOrderItems;
 
         // Commit the transaction if everything is successful
     } catch (error) {
@@ -160,10 +168,13 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
 
 
     if (search_query !== null) {
-        orders.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
-            .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
-            .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`)
-    };
+        orders.andWhere(function() {
+            this.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
+                .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
+                .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`);
+        });
+    }
+
 
     if (order_date !== null) {
         orders.where({ 'user_orders.created_at': order_date })
