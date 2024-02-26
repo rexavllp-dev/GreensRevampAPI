@@ -163,6 +163,7 @@ export const calculatePrice = async ({
 
     return {
         products: cart,
-        totals
+        totals,
+        isStorePickup
     };
 };

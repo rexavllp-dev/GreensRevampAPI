@@ -3,9 +3,10 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
+import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
 
 
 export const createOrder = async (req, res) => {
@@ -177,8 +178,18 @@ export const createOrder = async (req, res) => {
 
             newOrder[0].orderItems = newOrderItems;
 
-
-
+            orderItems.map(async (item) => {
+                const productId = item.product_id;
+                const Inventory = await getProductInventoryById(productId);
+                const isTrackInventory = Inventory.inventory_management === true;
+                if (isTrackInventory) {
+                    let newQuantity = parseInt(Inventory.product_quantity) - parseInt(item.op_qty)
+                    await updateInventoryQty(trx, productId, { product_quantity: newQuantity });
+                    const comment = "Order placed"
+                    const action = "reduce"
+                    await updateStockHistoryWhenOrder(trx, productId,Inventory.product_quantity, item.op_qty, newQuantity, comment, action )
+                }
+            })
 
             // Commit the transaction if everything is successful
             await trx.commit();

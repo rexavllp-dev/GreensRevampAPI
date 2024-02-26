@@ -63,6 +63,44 @@ export const createOrderItems = async (trx, orderId, orderItems) => {
     }
 };
 
+// Update product inventory
+export const updateInventoryQty = async (trx, productId, data) => {
+
+    try {
+
+        const updatedInventory = await db('product_inventory').where({ product_id: productId })
+            .update(data).returning('*')
+
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        await trx.rollback();
+        throw error; // Rethrow the error for the caller to handle
+    }
+};
+
+// Update stock history table
+export const updateStockHistoryWhenOrder = async (trx, productId, currentStock, qty, newQuantity, comment, action) => {
+
+    try {
+        await db('stock_history').insert({
+            product_id: productId,
+            previous_stock: currentStock,
+            qty: qty,
+            remaining_stock: newQuantity,
+            comment: comment,
+            action: action === 'add' ? 'Stock Returned' : 'Stock Sold',
+            created_at: new Date(),
+            updated_at: new Date(),
+        });
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        await trx.rollback();
+        throw error; // Rethrow the error for the caller to handle
+    }
+};
+
 
 
 // Function to insert a new address into the database
@@ -161,7 +199,7 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
     };
 
     if (search_query !== null) {
-        orders.where(function() {
+        orders.where(function () {
             this.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
                 .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
                 .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`);
