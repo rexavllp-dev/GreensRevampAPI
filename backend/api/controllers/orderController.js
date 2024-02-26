@@ -51,13 +51,13 @@ export const createOrder = async (req, res) => {
         });
 
 
-        // if (!req.session.cart) {
-        //     return res.status(400).json({
-        //         status: 400,
-        //         success: false,
-        //         message: 'Cart is empty',
-        //     })
-        // }
+        if (!req.session.cart) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Cart is empty',
+            })
+        };
 
         let orderData = {}
 
@@ -114,6 +114,7 @@ export const createOrder = async (req, res) => {
                     address_line_2,
                     flat_villa,
                     customer_name,
+                    customer_email,
                     customer_phone_country_code,
                     customer_phone,
                     contactless_delivery,
@@ -121,7 +122,9 @@ export const createOrder = async (req, res) => {
                     zip_code,
                     address_title,
                 );
+
                 orderData.address_id = insertedAddressId; // Assign the new address ID
+
             } else {
 
                 if (!address_id) {
@@ -147,7 +150,7 @@ export const createOrder = async (req, res) => {
                     address_id: address_id,
                     address_title: existingAddress.address_title,
                     customer_name: existingAddress.full_name,
-                    customer_email: existingAddress.customer_email,
+                    customer_email: existingAddress.usr_email,
                     customer_phone_country_code: existingAddress.mobile_country_code,
                     customer_phone: existingAddress.mobile_number,
                     address_line_1: existingAddress.address_line_1,

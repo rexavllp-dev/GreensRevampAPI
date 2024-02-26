@@ -28,7 +28,7 @@ router.get('/get-all-orders', getAllOrders);
 router.get('/get-order-details/:orderId', verifyToken, getOrderDetails);
 
 // get all orders of a user
-router.get('/get-user-orders', verifyToken, getUserOrders);
+router.get('/get-user-orders', getUserOrders);
 
 
 

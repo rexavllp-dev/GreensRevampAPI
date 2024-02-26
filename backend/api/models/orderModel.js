@@ -73,6 +73,7 @@ export const insertNewAddressIntoDatabase = async (
     addressLine2,
     flatVilla,
     customerName,
+    customerEmail,
     customerCountryCode,
     customerPhone,
     contactlessDelivery,
@@ -86,6 +87,7 @@ export const insertNewAddressIntoDatabase = async (
             .insert({
                 user_id: customerId,
                 full_name: customerName,
+                usr_email: customerEmail,
                 mobile_country_code: customerCountryCode,
                 mobile_number: customerPhone,
                 address_line_1: addressLine,

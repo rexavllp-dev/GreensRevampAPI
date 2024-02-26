@@ -20,20 +20,19 @@ export const getAllUserOrders = async (userId) => {
         );
 
         for (let order of orders) {
-            let products = await db("order_items")
-                .leftJoin('products', 'order_items.product_id', 'products.id')
-                .select(
-                    'order_items.*',
-                    'order_items.id as orderItemId',
-                    'products.*',
-                    'products.id as productId',
-                )
-                .where('order_items.order_id', order.id);
-    
-            order.products = products;
-        }
-        
+        let products = await db("order_items")
+            .leftJoin('products', 'order_items.product_id', 'products.id')
+            .select(
+                'order_items.*',
+                'order_items.id as orderItemId',
+                'products.*',
+                'products.id as productId',
+            )
+            .where('order_items.order_id', order.id);
 
+        order.products = products;
+    }
+        
     return orders;
 };
 
@@ -56,11 +55,9 @@ export const getUserOrderDetails = async (orderId) => {
             'products.*',
             'products.id as productId',
 
-
         )
 
         return order;
 
-        
-}
+};
 

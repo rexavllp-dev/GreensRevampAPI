@@ -176,7 +176,7 @@ export const getAllAddresses = async (req, res) => {
             message: 'Failed to get addresses. Please try again later.'
         })
     }
-}
+};
 
 // delete address
 

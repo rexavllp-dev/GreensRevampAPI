@@ -200,12 +200,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             'product_category.id',
             'vat.id'
 
-
-
         )
         .whereNull('products.deleted_at')
-
-
 
     //   search query
     if (search) {
@@ -223,9 +219,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     // Log the search query and total product count
     // console.log('Search:', search);
     // console.log('Total Product Count:', totalCount.total);
-
-
-
 
 
     // Apply range  filters
