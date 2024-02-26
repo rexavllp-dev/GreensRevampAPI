@@ -1,44 +1,41 @@
-import PDFDocument from 'pdfkit';
+import pdf from 'html-pdf';
 
-
-// Function to generate PDF
+// Function to generate PDF from HTML
 export const generatePDF = async (orderDetails) => {
-    // Create a new PDF document
-    const doc = new PDFDocument();
+    // Define the HTML content
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Invoice for Order ID: ${orderDetails[0].id}</title>
+    </head>
+    <body>
+        <h1>Invoice for Order ID: ${orderDetails[0].id}</h1>
+        <p>Customer Name: ${orderDetails[0].ord_customer_name}</p>
+        <p>Customer Email: ${orderDetails[0].ord_customer_email}</p>
+    </body>
+    </html>
+    `;
 
-    // Buffer to store PDF
-    let buffers = [];
-
-    // Pipe PDF output to buffer
-    doc.on('data', buffer => {
-        buffers.push(buffer);
-    });
-
-    // Build PDF content
-    doc.text(`Invoice for Order ID: ${orderDetails[0].id}`);
-    doc.text(`Customer Name: ${orderDetails[0].ord_customer_name}`);
-    doc.text(`Customer Email: ${orderDetails[0].ord_customer_email}`);
-
-    // Add other invoice details as needed
-
-    // Finalize PDF
-    doc.end();
+    // Options for PDF generation
+    const options = {
+        format: 'Letter',
+        // Add other options as needed
+    };
 
     // Return promise to resolve with the PDF buffer
     return new Promise((resolve, reject) => {
-        // Collect PDF buffers
-        doc.on('end', () => {
-            const pdfData = Buffer.concat(buffers);
-            const responseHeaders = {
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="invoice-${orderDetails[0].id}.pdf"`
-            };
-            resolve({ pdfData, responseHeaders });
-        });
-
-        // Handle errors
-        doc.on('error', (err) => {
-            reject(err);
+        // Generate PDF from HTML
+        pdf.create(htmlContent, options).toBuffer((err, buffer) => {
+            if (err) {
+                reject(err);
+            } else {
+                const responseHeaders = {
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': `attachment; filename="invoice-${orderDetails[0].id}.pdf"`
+                };
+                resolve({ pdfData: buffer, responseHeaders });
+            }
         });
     });
 };
