@@ -52,13 +52,13 @@ export const createOrder = async (req, res) => {
         });
 
 
-        if (!req.session.cart) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: 'Cart is empty',
-            })
-        };
+        // if (!req.session.cart) {
+        //     return res.status(400).json({
+        //         status: 400,
+        //         success: false,
+        //         message: 'Cart is empty',
+        //     })
+        // };
 
         let orderData = {}
 
@@ -82,7 +82,7 @@ export const createOrder = async (req, res) => {
                 };
 
                 orderData = {
-                    address_id: null,
+                    address_id: is_new_address ? null : address_id,
                     address_title,
                     customer_name,
                     customer_email,
@@ -126,6 +126,8 @@ export const createOrder = async (req, res) => {
                 console.log(insertedAddressId);
 
                 orderData.address_id = insertedAddressId?.id; // Assign the new address ID
+
+                console.log(insertedAddressId);
 
             } else {
 
