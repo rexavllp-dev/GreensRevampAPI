@@ -1,4 +1,4 @@
-import { createACoupon, deleteACoupon, getACoupon, getCoupons, updateACoupon } from "../models/couponModel";
+import { createACoupon, deleteACoupon, getACoupon, getCoupons, updateACoupon } from "../models/couponModel.js";
 
 
 
@@ -13,7 +13,6 @@ export const createCoupon = async (req, res) => {
             status: 200,
             success: true,
             message: "Successfully created coupon",
-            result: newCoupon
         });
     } catch (error) {
         console.log(error);
@@ -30,8 +29,10 @@ export const createCoupon = async (req, res) => {
 
 
 export const updateCoupon = async (req, res) => {
-    const couponId = req.params.couponId;
+    
     const couponData = req.body;
+    const couponId = req.params.couponId;
+ 
 
     try {
         const coupon = await updateACoupon(couponId, couponData);

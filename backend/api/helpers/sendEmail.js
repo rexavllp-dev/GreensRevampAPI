@@ -1,12 +1,12 @@
 
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 
 
-export const sendEmail = async ({ email, subject, html }) => {
+export const sendEmail = async ({ email, subject, html, attachments }) => {
     try {
         let transporter = nodemailer.createTransport({
             host: "athena.indiandns.net",
@@ -23,6 +23,7 @@ export const sendEmail = async ({ email, subject, html }) => {
             to: email,
             subject: subject,
             html: html,
+            attachments: attachments,
 
         };
         await transporter.sendMail(mailOptions);

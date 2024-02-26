@@ -3,11 +3,11 @@ import { getAllUserOrders, getUserOrderDetails } from "../models/userOrderDashbo
 // get all order of a user
 export const getUserOrders = async (req, res) => {
 
-    const userId = req.params.userId;
+    const userId = req.user?.userId;
 
     try {
 
-        const orders = await getAllUserOrders(userId);
+        const orders = await getAllUserOrders(1);
 
 
         res.status(200).json({
@@ -18,6 +18,7 @@ export const getUserOrders = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error);
 
         res.status(500).json({
             status: 500,

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import { sendEmail } from '../helpers/sendEmail.js';
+import { emailTemplateData } from '../helpers/emailTemplate.js';
 
 
 dotenv.config();
@@ -7,11 +8,11 @@ dotenv.config();
 
 // verify email
 export const sendVerificationEmail = async (usr_email, usr_firstname, token, from) => {
-  const verificationLink = `${process.env.BASE_URL}/auth/verify-email?token=${token}&orgin=${from}`;
-  const emailData = {
-    email: usr_email,
-    subject: `Email verification`,
-    html: `<!DOCTYPE html>
+    const verificationLink = `${process.env.BASE_URL}/auth/verify-email?token=${token}&orgin=${from}`;
+    const emailData = {
+        email: usr_email,
+        subject: `Email verification`,
+        html: `<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -43,24 +44,24 @@ export const sendVerificationEmail = async (usr_email, usr_firstname, token, fro
       </div>
   </body>
   </html>`,
-  };
+    };
 
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 
 };
 
 
 // user registration successful
 export const sendUserRegistrationEmail = async (usr_email, usr_firstname) => {
-  
-  const emailData = {
-    email: usr_email,
-    subject: `Registration Complete`,
-    html: `<!DOCTYPE html>
+
+    const emailData = {
+        email: usr_email,
+        subject: `Registration Complete`,
+        html: `<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -91,13 +92,13 @@ export const sendUserRegistrationEmail = async (usr_email, usr_firstname) => {
       </div>
   </body>
   </html>`,
-  };
+    };
 
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 
 };
 
@@ -106,14 +107,14 @@ export const sendUserRegistrationEmail = async (usr_email, usr_firstname) => {
 
 // send reset password to email
 export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) => {
-  console.log(usr_email);
+    console.log(usr_email);
 
-  const resetPassLink = `${process.env.BASE_URL}/auth/reset?token=${token}`;
-  const emailData = {
-    from: process.env.FROM_GMAIL,
-    email: usr_email,
-    subject: 'Reset Password',
-    html: `<!DOCTYPE html>
+    const resetPassLink = `${process.env.BASE_URL}/auth/reset?token=${token}`;
+    const emailData = {
+        from: process.env.FROM_GMAIL,
+        email: usr_email,
+        subject: 'Reset Password',
+        html: `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -151,13 +152,13 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
     </html>`,
 
 
-  };
+    };
 
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 
 
 }
@@ -167,11 +168,11 @@ export const sendPasswordResetEmail = async (usr_email, usr_firstname, token) =>
 // send email for company verification 
 export const sendVerificationApproved = async (usr_email, usr_firstname) => {
 
-  const emailData = {
-    from: process.env.FROM_GMAIL,
-    email: usr_email,
-    subject: 'Company Verification Approved',
-    html: `<!DOCTYPE html>
+    const emailData = {
+        from: process.env.FROM_GMAIL,
+        email: usr_email,
+        subject: 'Company Verification Approved',
+        html: `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -200,53 +201,53 @@ export const sendVerificationApproved = async (usr_email, usr_firstname) => {
         </div>
     </body>
     </html>`,
-    
-    
-  //   `<p> Dear ${usr_firstname} </p>
-  //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
-  //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
-  //   <p>Thank you</p>
-  // `,
-  };
 
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+
+        //   `<p> Dear ${usr_firstname} </p>
+        //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
+        //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
+        //   <p>Thank you</p>
+        // `,
+    };
+
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 };
 
 
 // send email for company verification 
 export const sendVerificationRejected = async (usr_email, usr_firstname) => {
 
-  const emailData = {
-    from: process.env.FROM_GMAIL,
-    email: usr_email,
-    subject: 'Company Verification Successfully',
-    html: `<p> Dear ${usr_firstname} </p>
+    const emailData = {
+        from: process.env.FROM_GMAIL,
+        email: usr_email,
+        subject: 'Company Verification Successfully',
+        html: `<p> Dear ${usr_firstname} </p>
     <p>Thank you for signing up!.Your company has been rejected,reason...</p>
     <a href="https://react.greens-intl.ae/auth/register/">Try again</a>
     <p>Thank you</p>
   `,
 
-  };
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+    };
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 };
 
 
 // send email for company verification 
 export const sendBlockVerification = async (usr_email, usr_firstname) => {
 
-  const emailData = {
-    from: process.env.FROM_GMAIL,
-    email: usr_email,
-    subject: 'User Blocked ',
-    html:`<!DOCTYPE html>
+    const emailData = {
+        from: process.env.FROM_GMAIL,
+        email: usr_email,
+        subject: 'User Blocked ',
+        html: `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -277,31 +278,31 @@ export const sendBlockVerification = async (usr_email, usr_firstname) => {
         </div>
     </body>
     </html>`,
-    
-    
-  //   `<p> Dear ${usr_firstname} </p>
-  //   <p>You are blocked temporary due to repeated incorrect attempts.Please Contact admin for assistance.</p>
-  //   <a href="https://react.greens-intl.ae/auth/login/">Try again</a>
-  //   <p>Thank you</p>
-  // `
 
-  };
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+
+        //   `<p> Dear ${usr_firstname} </p>
+        //   <p>You are blocked temporary due to repeated incorrect attempts.Please Contact admin for assistance.</p>
+        //   <a href="https://react.greens-intl.ae/auth/login/">Try again</a>
+        //   <p>Thank you</p>
+        // `
+
+    };
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 };
 
 // bulk orders
 
 export const sendVerificationBulkApproved = async (usr_email, usr_firstname, productName, quantity) => {
 
-  const emailData = {
-    from: process.env.FROM_GMAIL,
-    email: usr_email,
-    subject: 'Your Bulk Order Request Approved',
-    html: `<!DOCTYPE html>
+    const emailData = {
+        from: process.env.FROM_GMAIL,
+        email: usr_email,
+        subject: 'Your Bulk Order Request Approved',
+        html: `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -329,31 +330,31 @@ export const sendVerificationBulkApproved = async (usr_email, usr_firstname, pro
         </div>
     </body>
     </html>`,
-    
-    
-  //   `<p> Dear ${usr_firstname} </p>
-  //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
-  //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
-  //   <p>Thank you</p>
-  // `,
-  };
 
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+
+        //   `<p> Dear ${usr_firstname} </p>
+        //   <p>Thank you for signing up!.Your company is verified successfully, Now you can login </p>
+        //   <a href="https://react.greens-intl.ae/auth/login/">Login Account</a>
+        //   <p>Thank you</p>
+        // `,
+    };
+
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 };
 
 
 
 export const sendVerificationBulkRejected = async (usr_email, usr_firstname, productName, quantity) => {
 
-  const emailData = {
-    from: process.env.FROM_GMAIL,
-    email: usr_email,
-    subject: 'Your Bulk Order Request Rejected',
-    html: `<!DOCTYPE html>
+    const emailData = {
+        from: process.env.FROM_GMAIL,
+        email: usr_email,
+        subject: 'Your Bulk Order Request Rejected',
+        html: `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -382,11 +383,40 @@ export const sendVerificationBulkRejected = async (usr_email, usr_firstname, pro
     </body>
     </html>`,
 
-  };
-  try {
-    await sendEmail(emailData);
-  } catch (error) {
-    throw error
-  }
+    };
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
 };
 
+
+
+
+export const sendOrderInvoices = async (orderData, pdfData) => {
+
+    console.log(pdfData);
+
+    const emailData = {
+        from: process.env.FROM_GMAIL,
+        email: orderData[0].ord_customer_email,
+        subject: 'Your Order Invoice',
+        html: emailTemplateData(orderData),
+
+        attachments: [
+            {
+                filename: 'invoice.pdf',
+                content: Buffer.from(pdfData.pdfData, 'base64'),
+                encoding: 'base64' // Ensure the correct encoding for the attachment content
+            }
+        ]
+
+    };
+
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
+};
