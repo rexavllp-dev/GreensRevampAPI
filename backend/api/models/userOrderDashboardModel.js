@@ -7,7 +7,6 @@ export const getAllUserOrders = async (userId) => {
     const orders = await db("user_orders")
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
-        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .where({ 'user_orders.customer_id': userId })
         .select(
 
@@ -18,49 +17,46 @@ export const getAllUserOrders = async (userId) => {
             'order_items.product_id as orderProductId',
             'products.*',
             'products.id as productId',
-            'product_gallery.*',
-            'product_gallery.id as productGalleryId'
-
         );
 
-     // Group orders by orderId
-const groupedOrders = {};
-orders.forEach(order => {
-    if (!groupedOrders[order.orderId]) {
-        groupedOrders[order.orderId] = {
-            ...order,
-            products: [],
-        };
-    }
-    if (order.productId) {
-        groupedOrders[order.orderId].products.push({
-            ...order,
-            // Remove unnecessary order-level properties from product objects
-            orderId: undefined,
-            orderItemId: undefined,
-            productId: undefined,
-        });
-    }
-});
+    // Group orders by orderId
+    const groupedOrders = {};
+    orders.forEach(order => {
+        if (!groupedOrders[order.orderId]) {
+            groupedOrders[order.orderId] = {
+                ...order,
+                products: [],
+            };
+        }
+        if (order.productId) {
+            groupedOrders[order.orderId].products.push({
+                ...order,
+                // Remove unnecessary order-level properties from product objects
+                orderId: undefined,
+                orderItemId: undefined,
+                productId: undefined,
+            });
+        }
+    });
 
-// Convert the object back to an array of orders
-const resultOrders = Object.values(groupedOrders);
+    // Convert the object back to an array of orders
+    const resultOrders = Object.values(groupedOrders);
 
-return resultOrders;
+    return resultOrders;
 };
 
 
 // user order details 
 
 export const getUserOrderDetails = async (orderId) => {
-    
+
     const order = await db("user_orders")
         .where({ 'user_orders.id': orderId })
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
 
         .select(
-            
+
             'user_orders.*',
             'user_orders.id as orderId',
             'order_items.*',
@@ -70,7 +66,7 @@ export const getUserOrderDetails = async (orderId) => {
 
         )
 
-        return order;
+    return order;
 
 };
 
