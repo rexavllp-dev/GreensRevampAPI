@@ -17,7 +17,11 @@ export const getAllUserOrders = async (userId) => {
             'order_items.product_id as orderProductId',
             'products.*',
             'products.id as productId',
-        );
+
+
+        )
+        .groupBy('user_orders.id', 'order_items.id', 'products.id');
+
 
     // Group orders by orderId
     const groupedOrders = {};
@@ -26,16 +30,17 @@ export const getAllUserOrders = async (userId) => {
             groupedOrders[order.orderId] = {
                 ...order,
                 products: [],
+                productTotalQty: 0,
             };
         }
         if (order.productId) {
+            const opQty = parseInt(order.op_qty, 10) || 0;
             groupedOrders[order.orderId].products.push({
                 ...order,
-                // Remove unnecessary order-level properties from product objects
-                orderId: undefined,
-                orderItemId: undefined,
-                productId: undefined,
             });
+
+            // Summing up the op_qty for each product
+            groupedOrders[order.orderId].productTotalQty += opQty;
         }
     });
 
