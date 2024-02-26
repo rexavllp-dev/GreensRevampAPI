@@ -7,7 +7,7 @@ export const getUserOrders = async (req, res) => {
 
     try {
 
-        const orders = await getAllUserOrders(1);
+        const orders = await getAllUserOrders(userId);
 
 
         res.status(200).json({

@@ -122,8 +122,9 @@ export const createOrder = async (req, res) => {
                     zip_code,
                     address_title,
                 );
+                console.log(insertedAddressId);
 
-                orderData.address_id = insertedAddressId; // Assign the new address ID
+                orderData.address_id = insertedAddressId?.id; // Assign the new address ID
 
             } else {
 
