@@ -139,9 +139,12 @@ router.get('/get-related-products/:productId', getRelatedProductsWithProductId);
 // delete related product
 router.delete('/delete-related-product', deleteRelatedProduct);
 
+
+
+
 // reviews routes
 
-router.post('/create-review', addProductReview);
+router.post('/create-review', verifyToken, addProductReview);
 
 // approve review by admin 
 router.put('/approve-review', approveReviewByAdmin);

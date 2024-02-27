@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
@@ -127,7 +127,7 @@ export const createOrder = async (req, res) => {
 
                 orderData.address_id = insertedAddressId?.id; // Assign the new address ID
 
-                console.log(insertedAddressId);
+                console.log(insertedAddressId?.id);
 
             } else {
 
@@ -196,9 +196,11 @@ export const createOrder = async (req, res) => {
             // Commit the transaction if everything is successful
             await trx.commit();
 
+            const getOrderData = await getAOrderData(newOrder[0].id);
+
 
             // send email queue
-            await sendEmailQueueManager(newOrder);
+            await sendEmailQueueManager(getOrderData);
 
             res.status(200).json({
                 status: 200,

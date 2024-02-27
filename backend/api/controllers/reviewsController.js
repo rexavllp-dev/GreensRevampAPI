@@ -1,11 +1,24 @@
-import { approveReview } from "../models/reviewsModel.js";
+import { addReview, approveReview } from "../models/reviewsModel.js";
 
 
 export const addProductReview = async (req, res) => {
 
     const reviewData = req.body;
+    const userId = req.user.userId;
 
     try {
+
+        const userPurchases = await getUserPurchase(userId, reviewData.productId);
+
+        if (!userPurchases || userPurchases.length === 0) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "You must purchase the product to write a review",
+            });
+        };
+
+
         const newReview = await addReview(reviewData);
 
         res.status(200).json({
@@ -23,7 +36,7 @@ export const addProductReview = async (req, res) => {
             error: error
         });
     }
-}
+};
 
 
 
