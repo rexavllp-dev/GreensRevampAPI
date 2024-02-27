@@ -173,7 +173,7 @@ export const createOrder = async (req, res) => {
 
 
             // Create order data
-            const newOrder = await createUserOrder(trx, customerId, orderData);
+            const newOrder = await createUserOrder(trx, 2, orderData);
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 
@@ -189,7 +189,8 @@ export const createOrder = async (req, res) => {
                     await updateInventoryQty(trx, productId, { product_quantity: newQuantity });
                     const comment = "Order placed"
                     const action = "reduce"
-                    await updateStockHistoryWhenOrder(trx, productId,Inventory.product_quantity, item.op_qty, newQuantity, comment, action )
+                    await updateStockHistoryWhenOrder(trx, productId, Inventory.product_quantity, item.op_qty, newQuantity, comment, action)
+
                 }
             })
 
