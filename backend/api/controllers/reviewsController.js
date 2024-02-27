@@ -1,4 +1,4 @@
-import { addReview, approveReview, getAllReviewsAdmin, getUserPurchases, getsAllReviewsByProductId } from "../models/reviewsModel.js";
+import { addReview, approveReview, getAllReviewsAdmin, getUserPurchases, getsAllReviewsByProductId, likeOrDislikeReview } from "../models/reviewsModel.js";
 
 
 export const addProductReview = async (req, res) => {
@@ -67,7 +67,34 @@ export const getAllProductReviews = async (req, res) => {
         });
     }
 
-}
+};
+
+// like dislike for product reviews
+export const reviewLikeAndDislike = async (req, res) => {
+
+    const userId = req.user.userId;
+    const { reviewId, action } = req.body;
+
+    try {
+        const actions = await likeOrDislikeReview(2, reviewId, action);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: `Review ${action}d successfully`,
+
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to like or dislike review",
+            error: error
+        });
+    }
+};
 
 
 
@@ -125,5 +152,7 @@ export const getAllReviewsForAdmin = async (req, res) => {
 
     }
 };
+
+
 
 

@@ -47,6 +47,7 @@ export const getsAllReviewsByProductId = async (productId) => {
 
         .leftJoin('product_reviews', 'products.id', 'product_reviews.product_id')
         .leftJoin('users', 'product_reviews.user_id', 'users.id')
+        .leftJoin('review_likes_dislikes', 'product_reviews.id', 'review_likes_dislikes.review_id')
 
         .where({ 'products.id': productId })
         .where({ 'product_reviews.is_approved': true })
@@ -59,7 +60,23 @@ export const getsAllReviewsByProductId = async (productId) => {
             'product_reviews.rating',
             'product_reviews.created_at',
 
+            db.raw('COUNT(CASE WHEN review_likes_dislikes.action = \'like\' THEN 1 ELSE NULL END) AS likes'),
+            db.raw('COUNT(CASE WHEN review_likes_dislikes.action = \'dislike\' THEN 1 ELSE NULL END) AS dislikes')
+
+
+        )
+
+        .groupBy(
+            'product_reviews.id',
+
+            'users.usr_firstname',
+            'users.usr_lastname',
+
+            'product_reviews.review',
+            'product_reviews.rating',
+            'product_reviews.created_at'
         );
+
     return reviews;
 };
 
@@ -108,4 +125,16 @@ export const getAllReviewsAdmin = async () => {
 
     return reviews;
 
+};
+
+
+export const likeOrDislikeReview = async (userId, reviewId, action) => {
+    const actions = await db('review_likes_dislikes')
+        .insert({
+            user_id: userId,
+            review_id: reviewId,
+            action: action
+        });
+
+    return actions
 };

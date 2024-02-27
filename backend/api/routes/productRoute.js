@@ -5,7 +5,7 @@ import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../contro
 import {  createProductInventory,  modifyStock,  updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
-import { addProductReview, approveReviewByAdmin, getAllProductReviews,  getAllReviewsForAdmin } from '../controllers/reviewsController.js';
+import { addProductReview, approveReviewByAdmin, getAllProductReviews,  getAllReviewsForAdmin, reviewLikeAndDislike } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getAllRelatedProductPublicByProductId, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getAllOptions, updateOption } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
@@ -149,10 +149,14 @@ router.post('/review/create-review', verifyToken, addProductReview);
 // get all reviews 
 router.get('/review/get-reviews/:productId', getAllProductReviews);
 
+// like and dislike for product reviews
+router.post('/review/like-dislike', verifyToken, reviewLikeAndDislike);
 
 // admin reviews
+
 // approve review by admin 
 router.put('/review/approve-review/:reviewId', approveReviewByAdmin);
+
 // get all reviews for admin
 router.get('/review/get-all-reviews', getAllReviewsForAdmin);
 
