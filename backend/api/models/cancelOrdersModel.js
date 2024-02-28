@@ -34,18 +34,77 @@ export const updateCancelType = async (orderId, trx) => {
 
 
 // update order status
+
+// export const updateOrderStatus = async (orderId, trx) => {
+//     console.log(orderId)
+
+//     try {
+
+//         const updatedOrder = await trx('user_orders')
+//             .where({ id: orderId })
+//             .select('ord_order_status')
+//             .update({ ord_order_status: 6 }) // id of cancel in seeds 
+//             .returning('*');
+
+
+
+//         // Update op_is_cancel in order_items table
+//         const updatedOrderItems = await trx('order_items')
+//             .where({ order_id: orderId })
+//             .update({ op_is_cancel: true }) // Assuming op_is_cancel is a boolean field
+//             .returning('*');
+
+
+//         //  update cancel type in user_orders table based on order status and cancel type
+
+//         const orderItems = await trx('order_items')
+//             .where({ order_id: orderId })
+//             .select( 'op_is_cancel');
+
+//         let cancelType;
+
+//         if (orderItems && orderItems.length > 0) {
+
+//             const canceledAllItems = orderItems.every(item => item.op_is_cancel === true);
+//             const canceledAnyItem = orderItems.some(item => item.op_is_cancel === true);
+
+//             if (canceledAllItems) {
+//                 cancelType = "full";
+//             } else if (canceledAnyItem) {
+//                 cancelType = "partial";
+//             } else {
+//                 cancelType = null;
+//             }
+
+//         } else {
+//             cancelType = null;
+//         }
+
+//         // update cancel type in user_orders table 
+//         await trx('user_orders')
+//             .where({ id: orderId })
+//             .update({ ord_cancel_type: cancelType })
+//             .returning('*');
+
+//         return { updatedOrder, updatedOrderItems };
+
+
+//     } catch (error) {
+
+//         trx.rollback();
+//         throw error;
+//     }
+// };
+
 export const updateOrderStatus = async (orderId, trx) => {
-    console.log(orderId)
+    console.log(orderId);
 
     try {
-
         const updatedOrder = await trx('user_orders')
             .where({ id: orderId })
             .select('ord_order_status')
             .update({ ord_order_status: 6 }) // id of cancel in seeds 
             .returning('*');
-
-
 
         // Update op_is_cancel in order_items table
         const updatedOrderItems = await trx('order_items')
@@ -53,47 +112,22 @@ export const updateOrderStatus = async (orderId, trx) => {
             .update({ op_is_cancel: true }) // Assuming op_is_cancel is a boolean field
             .returning('*');
 
-
         //  update cancel type in user_orders table based on order status and cancel type
 
-        const orderItems = await trx('order_items')
-            .where({ order_id: orderId })
-            .select( 'op_is_cancel');
-
-        let cancelType;
-
-        if (orderItems && orderItems.length > 0) {
-
-            const canceledAllItems = orderItems.every(item => item.op_is_cancel === true);
-            const canceledAnyItem = orderItems.some(item => item.op_is_cancel === true);
-
-            if (canceledAllItems) {
-                cancelType = "full";
-            } else if (canceledAnyItem) {
-                cancelType = "partial";
-            } else {
-                cancelType = null;
-            }
-
-        } else {
-            cancelType = null;
-        }
-
-        // update cancel type in user_orders table 
-        await trx('user_orders')
+        const cancelType = await trx('user_orders')
             .where({ id: orderId })
-            .update({ ord_cancel_type: cancelType })
+            .select('ord_cancel_type')
+            .update({ ord_cancel_type: "full" })
             .returning('*');
 
-        return { updatedOrder, updatedOrderItems };
 
-
+        return { updatedOrder, updatedOrderItems, cancelType };
     } catch (error) {
-
         trx.rollback();
         throw error;
     }
 };
+
 
 
 // update product quantities
@@ -105,7 +139,7 @@ export const updateProductQuantities = async (orderId, trx) => {
             .select('product_id', 'op_qty');
         console.log(productsInOrder)
 
-        const promises = productsInOrder.map(async ({ product_id, op_qty}) => {
+        const promises = productsInOrder.map(async ({ product_id, op_qty }) => {
             console.log(product_id)
             const currentQuantity = await trx('product_inventory')
                 .where('product_id', product_id)
@@ -156,8 +190,11 @@ export const updateStockHistory = async (stockHistoryData, trx) => {
 
 // cancel individual order
 
-export const CancelIndividualItem = async (cancelOrderData, trx) => {
+export const CancelIndividualItem = async (cancelOrderData, trx, itemId) => {
+
+
     try {
+        const cancelOrderItem = await trx("order_items").where({ id: itemId, order_id: cancelOrderData.order_id }).update({ op_is_cancel: true }).returning('*');
         const cancelOrder = await trx('cancel_orders').insert({ ...cancelOrderData, cancel_type: "partial" }).returning('*');
         return cancelOrder;
     } catch (error) {
@@ -165,6 +202,32 @@ export const CancelIndividualItem = async (cancelOrderData, trx) => {
         throw error;
     }
 };
+
+// update individual order status 
+export const updateIndividualOrderStatus = async (orderId, trx, ) => {
+    console.log(orderId);
+
+    try {
+        
+        //  update cancel type in user_orders table based on order status and cancel type
+
+        const cancelType = await trx('user_orders')
+            .where({ id: orderId })
+            .select('ord_cancel_type')
+            .update({ ord_cancel_type: "partial" })
+            .returning('*');
+
+
+        return {  cancelType };
+    } catch (error) {
+        trx.rollback();
+        throw error;
+    }
+};
+
+
+
+
 
 // update individual product quantity
 

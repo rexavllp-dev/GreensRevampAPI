@@ -1,5 +1,5 @@
 import dbConfig from "../../config/dbConfig.js";
-import { CancelIndividualItem, calculateRemainingProductPrice, createCancelOrder, updateIndividualProductQuantity, updateOrderStatus, updateProductQuantities, updateStockHistory } from "../models/cancelOrdersModel.js";
+import { CancelIndividualItem, calculateRemainingProductPrice, createCancelOrder, updateIndividualOrderStatus, updateIndividualProductQuantity, updateOrderStatus, updateProductQuantities, updateStockHistory } from "../models/cancelOrdersModel.js";
 
 // create cancel order and update order status with order id in  user_orders table
 export const createCancelOrders = async (req, res) => {
@@ -57,12 +57,18 @@ export const cancelIndividualItems = async (req, res) => {
 
     try {
 
+        const cancelData = {
+            order_id: cancelOrderData.order_id,
+            cancel_reason_id: cancelOrderData.cancel_reason_id,
+            cancel_note: cancelOrderData.cancel_note,
+            
+        }
         // create cancel order
-        const newCancelOrder = await CancelIndividualItem(cancelOrderData, trx);
+        const newCancelOrder = await CancelIndividualItem(cancelData, trx, cancelOrderData.item_id);
 
         // update order status with order id in  user_orders table
 
-        const updatedOrder = await updateOrderStatus(cancelOrderData.order_id, trx);
+        const updatedOrder = await updateIndividualOrderStatus(cancelOrderData.order_id, trx);
 
         //  update product quantity
 
