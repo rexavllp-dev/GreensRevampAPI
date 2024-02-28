@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/cancel-order', createCancelOrders);
 
 // cancel individual order
-router.post('/cancel-individual-order', cancelIndividualItems);
+router.post('/cancel-individual-order/:product_id', cancelIndividualItems);
 
 
 

@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
@@ -127,7 +127,7 @@ export const createOrder = async (req, res) => {
 
                 orderData.address_id = insertedAddressId?.id; // Assign the new address ID
 
-                console.log(insertedAddressId);
+                console.log(insertedAddressId?.id);
 
             } else {
 
@@ -173,7 +173,7 @@ export const createOrder = async (req, res) => {
 
 
             // Create order data
-            const newOrder = await createUserOrder(trx, customerId, orderData);
+            const newOrder = await createUserOrder(trx, 4, orderData);
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 
@@ -183,22 +183,25 @@ export const createOrder = async (req, res) => {
             orderItems.map(async (item) => {
                 const productId = item.product_id;
                 const Inventory = await getProductInventoryById(productId);
-                const isTrackInventory = Inventory.inventory_management === true;
+                const isTrackInventory = Inventory?.inventory_management === true;
                 if (isTrackInventory) {
                     let newQuantity = parseInt(Inventory.product_quantity) - parseInt(item.op_qty)
                     await updateInventoryQty(trx, productId, { product_quantity: newQuantity });
                     const comment = "Order placed"
                     const action = "reduce"
-                    await updateStockHistoryWhenOrder(trx, productId,Inventory.product_quantity, item.op_qty, newQuantity, comment, action )
+                    await updateStockHistoryWhenOrder(trx, productId, Inventory.product_quantity, item.op_qty, newQuantity, comment, action)
+
                 }
             })
 
             // Commit the transaction if everything is successful
             await trx.commit();
 
+            const getOrderData = await getAOrderData(newOrder[0].id);
+
 
             // send email queue
-            await sendEmailQueueManager(newOrder);
+            await sendEmailQueueManager(getOrderData);
 
             res.status(200).json({
                 status: 200,

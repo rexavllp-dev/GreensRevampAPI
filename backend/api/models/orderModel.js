@@ -6,7 +6,7 @@ import db from '../../config/dbConfig.js';
 export const createUserOrder = async (trx, userId, orderData) => {
 
     let addressId = null;
-    
+
     if (typeof orderData.address_id === 'number') {
         addressId = orderData.address_id;
     } else if (typeof orderData.address_id === 'string' && !isNaN(parseInt(orderData.address_id))) {
@@ -52,6 +52,10 @@ export const createOrderItems = async (trx, orderId, orderItems) => {
             const insertedItem = await trx('order_items')
                 .insert(item)
                 .returning('*');
+
+                const getProduct = await trx('products').select('*').where({id: insertedItem[0].product_id}).first();
+                console.log("products",getProduct);
+                insertedItem.push(getProduct);
             insertedOrderItems.push(insertedItem);
         }
 
@@ -185,6 +189,56 @@ export const getAOrder = async (orderId) => {
 
     return order;
 };
+
+
+
+export const getAOrderData = async (orderId) => {
+    const orders = await db("user_orders")
+        .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .where({ 'user_orders.id': orderId })
+        .select(
+
+            'user_orders.*',
+            'user_orders.id as orderId',
+            'order_items.*',
+            'order_items.id as orderItemId',
+            'order_items.product_id as orderProductId',
+            'products.*',
+            'products.id as productId',
+
+
+        )
+        .groupBy('user_orders.id', 'order_items.id', 'products.id');
+
+
+    // Group orders by orderId
+    const groupedOrders = {};
+    orders.forEach(order => {
+        if (!groupedOrders[order.orderId]) {
+            groupedOrders[order.orderId] = {
+                ...order,
+                products: [],
+                productTotalQty: 0,
+            };
+        }
+        if (order.productId) {
+            const opQty = parseInt(order.op_qty, 10) || 0;
+            groupedOrders[order.orderId].products.push({
+                ...order,
+            });
+
+            // Summing up the op_qty for each product
+            groupedOrders[order.orderId].productTotalQty += opQty;
+        }
+    });
+
+    // Convert the object back to an array of orders
+    const resultOrders = Object.values(groupedOrders);
+
+    return resultOrders;
+};
+
 
 
 

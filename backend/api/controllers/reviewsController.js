@@ -1,21 +1,34 @@
-import { approveReview } from "../models/reviewsModel.js";
+import { addReview, approveReview, getAllReviewsAdmin, getUserPurchases, getsAllReviewsByProductId, likeOrDislikeReview } from "../models/reviewsModel.js";
 
 
 export const addProductReview = async (req, res) => {
 
     const reviewData = req.body;
+    const userId = req.user.userId;
 
     try {
-        const newReview = await addReview(reviewData);
+
+        const userPurchases = await getUserPurchases(2, reviewData.product_id);
+
+        if (!userPurchases || userPurchases.length === 0) {
+            return res.status(403).json({
+                status: 403,
+                success: false,
+                message: "Sorry! You are not allowed to review this product since you haven't bought it on Greeens International",
+            });
+        };
+
+        const newReview = await addReview(userId, reviewData);
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Review created successfully",
+            message: "Thank you so much. Your review has been saved",
             result: newReview
         })
 
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             status: 500,
             success: false,
@@ -23,55 +36,29 @@ export const addProductReview = async (req, res) => {
             error: error
         });
     }
-}
+};
 
-
-
-// method to approve a review by an admin
-
-export const approveReviewByAdmin = async (req, res) => {
-
-    const { reviewId } = req.body;
-
-    try {
-
-        const approvedReview = await approveReview(reviewId);
-
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Review approved successfully",
-            result: approvedReview  
-        })
-    } catch (error) {
-
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to approve review",
-            error: error
-        });
-    }
-
-}
 
 
 // method to get all reviews
+export const getAllProductReviews = async (req, res) => {
 
-export const getAllReviews = async (req, res) => {
+    const productId = req.params.productId;
 
     try {
 
-        const reviews = await getAllReviews();
+        const reviews = await getsAllReviewsByProductId(productId);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Reviews fetched successfully",
             result: reviews
-        })
+        });
 
-} catch(error) {
+    } catch (error) {
+        console.log(error);
+
         res.status(500).json({
             status: 500,
             success: false,
@@ -80,6 +67,92 @@ export const getAllReviews = async (req, res) => {
         });
     }
 
-}
+};
+
+// like dislike for product reviews
+export const reviewLikeAndDislike = async (req, res) => {
+
+    const userId = req.user.userId;
+    const { reviewId, action } = req.body;
+
+    try {
+        const actions = await likeOrDislikeReview(2, reviewId, action);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: `Review ${action}d successfully`,
+
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to like or dislike review",
+            error: error
+        });
+    }
+};
+
+
+
+// Admin Reviews Handler
+// method to approve a review by an admin
+export const approveReviewByAdmin = async (req, res) => {
+
+    const reviewData = req.body;
+    const reviewId = req.params.reviewId;
+
+    try {
+
+        const approvedReview = await approveReview(reviewId, reviewData);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Review approved successfully",
+            result: approvedReview
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to approve review",
+            error: error
+        });
+    }
+
+};
+
+
+
+// get all reviews for admin
+export const getAllReviewsForAdmin = async (req, res) => {
+    try {
+        const reviews = await getAllReviewsAdmin();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Reviews fetched successfully",
+            result: reviews
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to approve review",
+            error: error
+        });
+
+    }
+};
+
+
 
 

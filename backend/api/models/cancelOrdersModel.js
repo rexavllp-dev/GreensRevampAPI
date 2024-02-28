@@ -4,7 +4,7 @@ import db from '../../config/dbConfig.js';
 // create cancel order
 export const createCancelOrder = async (cancelOrderData, trx) => {
     try {
-        const cancelOrder = await trx('cancel_orders').insert(cancelOrderData).returning('*');
+        const cancelOrder = await trx('cancel_orders').insert({ ...cancelOrderData, cancel_type: "full" }).returning('*');
         return cancelOrder;
     } catch (error) {
 
@@ -12,6 +12,25 @@ export const createCancelOrder = async (cancelOrderData, trx) => {
         throw error;
     }
 };
+
+//update cancel type
+
+export const updateCancelType = async (orderId, trx) => {
+
+    try {
+
+        const updatedOrder = await trx('user_orders')
+            .where({ id: orderId })
+            .select('cancel_type')
+            .update({ cancel_type: full })
+
+        return updatedOrder;
+    } catch (error) {
+
+        trx.rollback();
+        throw error;
+    }
+}
 
 
 // update order status
@@ -21,13 +40,53 @@ export const updateOrderStatus = async (orderId, trx) => {
     try {
 
         const updatedOrder = await trx('user_orders')
-            .where({ id:orderId })
+            .where({ id: orderId })
             .select('ord_order_status')
             .update({ ord_order_status: 6 }) // id of cancel in seeds 
             .returning('*');
 
-        return updatedOrder;
-        
+
+
+        // Update op_is_cancel in order_items table
+        const updatedOrderItems = await trx('order_items')
+            .where({ order_id: orderId })
+            .update({ op_is_cancel: true }) // Assuming op_is_cancel is a boolean field
+            .returning('*');
+
+
+        //  update cancel type in user_orders table based on order status and cancel type
+
+        const orderItems = await trx('order_items')
+            .where({ order_id: orderId })
+            .select( 'op_is_cancel');
+
+        let cancelType;
+
+        if (orderItems && orderItems.length > 0) {
+
+            const canceledAllItems = orderItems.every(item => item.op_is_cancel === true);
+            const canceledAnyItem = orderItems.some(item => item.op_is_cancel === true);
+
+            if (canceledAllItems) {
+                cancelType = "full";
+            } else if (canceledAnyItem) {
+                cancelType = "partial";
+            } else {
+                cancelType = null;
+            }
+
+        } else {
+            cancelType = null;
+        }
+
+        // update cancel type in user_orders table 
+        await trx('user_orders')
+            .where({ id: orderId })
+            .update({ ord_cancel_type: cancelType })
+            .returning('*');
+
+        return { updatedOrder, updatedOrderItems };
+
 
     } catch (error) {
 
@@ -46,17 +105,19 @@ export const updateProductQuantities = async (orderId, trx) => {
             .select('product_id', 'op_qty');
         console.log(productsInOrder)
 
-        const promises = productsInOrder.map(async ({ product_id, op_qty: quantity }) => {
+        const promises = productsInOrder.map(async ({ product_id, op_qty}) => {
+            console.log(product_id)
             const currentQuantity = await trx('product_inventory')
                 .where('product_id', product_id)
                 .select('product_quantity')
                 .first();
 
-            console.log(quantity)
+            console.log(op_qty)
+            console.log(currentQuantity)
 
 
 
-            const newQuantity = parseInt(currentQuantity.product_quantity) + parseInt(quantity);
+            const newQuantity = parseInt(currentQuantity?.product_quantity) + parseInt(op_qty);
 
             console.log(newQuantity)
             await trx('product_inventory')
@@ -97,7 +158,7 @@ export const updateStockHistory = async (stockHistoryData, trx) => {
 
 export const CancelIndividualItem = async (cancelOrderData, trx) => {
     try {
-        const cancelOrder = await trx('cancel_orders').insert(cancelOrderData).returning('*');
+        const cancelOrder = await trx('cancel_orders').insert({ ...cancelOrderData, cancel_type: "partial" }).returning('*');
         return cancelOrder;
     } catch (error) {
         trx.rollback();
@@ -108,7 +169,7 @@ export const CancelIndividualItem = async (cancelOrderData, trx) => {
 // update individual product quantity
 
 export const updateIndividualProductQuantity = async (orderId, trx) => {
-    
+
     try {
         // Retrieve the quantity of the specific product in the order
         const orderItem = await trx('order_items')
@@ -119,7 +180,7 @@ export const updateIndividualProductQuantity = async (orderId, trx) => {
 
         // Retrieve the current quantity from the product inventory
         const currentQuantity = await trx('product_inventory')
-            .where({product_id: orderItem.product_id})
+            .where({ product_id: orderItem.product_id })
             .select('product_quantity')
             .first();
 
@@ -138,6 +199,49 @@ export const updateIndividualProductQuantity = async (orderId, trx) => {
         throw error;
     }
 };
+
+
+// calculate the remaining product price that is not cancelled
+
+export const calculateRemainingProductPrice = async (orderId, trx) => {
+
+    try {
+        // Fetch the original order details
+        const orderItems = await trx('user_orders').where({ id: orderId }).first();
+
+        // Fetch the canceled product prices
+        const canceledOrderItems = await trx('order_items')
+            .where({ order_id: orderId })
+            .andWhere({ op_is_cancel: true })
+            .select('op_actual_price');
+
+
+
+        // Calculate the remaining product price
+
+        let remainingProductPrice = orderItems.ord_total;
+
+        if (canceledOrderItems && canceledOrderItems.length > 0) {
+            // Subtract the prices of canceled products
+            const canceledProductPrices = canceledOrderItems.map(item => item.op_actual_price);
+            const cancelProductsTotal = canceledProductPrices.reduce((total, price) => total + price, 0);
+            remainingProductPrice = remainingProductPrice - cancelProductsTotal;
+
+
+        }
+        // return the remaining product price
+        return remainingProductPrice;
+
+
+    } catch (error) {
+        // Rollback the transaction if an error occurs
+        await trx.rollback();
+        throw error;
+    }
+
+}
+
+
 
 
 

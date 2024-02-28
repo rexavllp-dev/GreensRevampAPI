@@ -1,5 +1,5 @@
 import dbConfig from "../../config/dbConfig.js";
-import {  CancelIndividualItem, createCancelOrder, updateIndividualProductQuantity, updateOrderStatus, updateProductQuantities, updateStockHistory } from "../models/cancelOrdersModel.js";
+import { CancelIndividualItem, calculateRemainingProductPrice, createCancelOrder, updateIndividualProductQuantity, updateOrderStatus, updateProductQuantities, updateStockHistory } from "../models/cancelOrdersModel.js";
 
 // create cancel order and update order status with order id in  user_orders table
 export const createCancelOrders = async (req, res) => {
@@ -10,12 +10,12 @@ export const createCancelOrders = async (req, res) => {
     try {
 
         // create cancel order
-        const newCancelOrder = await createCancelOrder(cancelOrderData,trx);
+        const newCancelOrder = await createCancelOrder(cancelOrderData, trx);
 
-    // update order status with order id in  user_orders table
-        const updatedOrder = await updateOrderStatus(cancelOrderData.order_id,trx);
+        // update order status with order id in  user_orders table
+        const updatedOrder = await updateOrderStatus(cancelOrderData.order_id, trx);
         //  update product quantity
-        const updatedQuantity = await updateProductQuantities(cancelOrderData.order_id,trx);
+        const updatedQuantity = await updateProductQuantities(cancelOrderData.order_id, trx);
         // update stock history
         const updatedStockHistory = await updateStockHistory(cancelOrderData.order_id, trx);
 
@@ -51,12 +51,13 @@ export const createCancelOrders = async (req, res) => {
 // cancel individual order
 
 export const cancelIndividualItems = async (req, res) => {
+
     
     const cancelOrderData = req.body;
     const trx = await dbConfig.transaction();
 
     try {
-        
+
         // create cancel order
         const newCancelOrder = await CancelIndividualItem(cancelOrderData, trx);
 
@@ -72,10 +73,21 @@ export const cancelIndividualItems = async (req, res) => {
 
         const updatedStockHistory = await updateStockHistory(cancelOrderData.order_id, trx);
 
+        // Calculate the remaining product price
+        const remainingProductPrice = await calculateRemainingProductPrice(cancelOrderData.order_id, trx);
+
+        // Check if shipping charge should be applied
+        let shipping = 0;
+        if (remainingProductPrice < 100) {
+
+            shipping = 30;
+        }
+
+
         trx.commit();
 
         res.status(200).json({
-            
+
             status: 200,
             success: true,
             message: "Order cancelled successfully",
@@ -83,7 +95,8 @@ export const cancelIndividualItems = async (req, res) => {
                 newCancelOrder,
                 updatedOrder,
                 updatedQuantity,
-                updatedStockHistory
+                updatedStockHistory,
+                grandTotal: remainingProductPrice + shipping
             }
         })
     } catch (error) {
