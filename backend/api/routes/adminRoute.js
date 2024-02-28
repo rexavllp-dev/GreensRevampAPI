@@ -16,8 +16,6 @@ router.put('/approve/:companyId', approveCompanyByAdmin);
 //  reject company verification  company
 router.put('/reject/:companyId', rejectCompanyByAdmin);
 
-
-
 // admin can approve bulk above max orders
 // approve Bulk Max Order and reject 
 router.put('/update-bulk-request/:bulkId', updateAndApproveOrRejectBulkOrders);

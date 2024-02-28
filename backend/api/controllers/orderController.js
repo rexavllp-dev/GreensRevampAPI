@@ -149,7 +149,6 @@ export const createOrder = async (req, res) => {
                     })
                 }
 
-
                 orderData = {
                     address_id: address_id,
                     address_title: existingAddress.address_title,
@@ -173,7 +172,7 @@ export const createOrder = async (req, res) => {
 
 
             // Create order data
-            const newOrder = await createUserOrder(trx, 4, orderData);
+            const newOrder = await createUserOrder(trx, customerId, orderData);
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 

@@ -17,11 +17,10 @@ export const createCancelOrders = async (req, res) => {
         //  update product quantity
         const updatedQuantity = await updateProductQuantities(cancelOrderData.order_id, trx);
         // update stock history
-        const updatedStockHistory = await updateStockHistory(cancelOrderData.order_id, trx);
+        const updatedStockHistory = await updateStockHistory(cancelOrderData, trx);
 
         trx.commit();
         res.status(200).json({
-
             status: 200,
             success: true,
             message: "Order cancelled successfully",

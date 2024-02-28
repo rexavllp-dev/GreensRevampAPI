@@ -162,10 +162,7 @@ export const updateProduct = async (req, res) => {
             dimensions_and_more_info,
             ein_code,
             show_expiry_on_dashboard,
-
-
-
-
+            search_keywords
         } = req.body;
 
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
@@ -188,6 +185,7 @@ export const updateProduct = async (req, res) => {
             dimensions_and_more_info,
             ein_code,
             show_expiry_on_dashboard,
+            search_keywords
 
 
         });
@@ -221,7 +219,7 @@ export const getAllProduct = async (req, res) => {
         let sort = null;
         let minPrice = req.query.min_price;
         let maxPrice = req.query.max_price;
-      
+
         // let sortFeatured = false;
 
         if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
@@ -240,7 +238,7 @@ export const getAllProduct = async (req, res) => {
             sort = req.query.sort;
         }
 
-     
+
         // if (req.query.sort_featured !== null && req.query.sort_featured !== undefined && req.query.sort_featured !== 'undefined') {
         //     sortFeatured = req.query.sort_featured === 'true';
         // }
