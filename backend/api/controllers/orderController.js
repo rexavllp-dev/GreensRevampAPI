@@ -173,7 +173,7 @@ export const createOrder = async (req, res) => {
 
 
             // Create order data
-            const newOrder = await createUserOrder(trx, 2, orderData);
+            const newOrder = await createUserOrder(trx, 4, orderData);
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 
