@@ -15,7 +15,9 @@ const awsConfig = ({
     bucketName: process.env.S3_BUCKET_NAME
 });
 
-const s3 = new aws.S3(awsConfig)
+const s3 = new aws.S3(awsConfig);
+
+
 
 // create products
 export const createProduct = async (req, res) => {
@@ -115,7 +117,6 @@ export const createProduct = async (req, res) => {
             dimensions_and_more_info,
             ein_code,
             show_expiry_on_dashboard,
-
 
 
         })

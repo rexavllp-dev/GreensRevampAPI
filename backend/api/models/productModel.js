@@ -295,7 +295,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
     // Apply availability filters
-    filters.forEach(filter => {
+    filters?.forEach(filter => {
         if (filter.column === 'product_inventory.stock_availability') {
             if (filter.value === 'In stock') {
                 query.where(function () {
