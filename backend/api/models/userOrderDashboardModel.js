@@ -7,6 +7,7 @@ export const getAllUserOrders = async (userId) => {
     const orders = await db("user_orders")
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('address', 'user_orders.address_id', 'address.id')
         .where({ 'user_orders.customer_id': userId })
         .select(
 
@@ -17,10 +18,12 @@ export const getAllUserOrders = async (userId) => {
             'order_items.product_id as orderProductId',
             'products.*',
             'products.id as productId',
+            'address.*',
+            'address.id as addressId'
 
 
         )
-        .groupBy('user_orders.id', 'order_items.id', 'products.id');
+        .groupBy('user_orders.id', 'order_items.id', 'products.id', 'address.id')
 
 
     // Group orders by orderId

@@ -2,16 +2,14 @@ import express from "express";
 import { createOrder, getASingleOrder, getAllOrders, updateOrder } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
-// import verifyProductPrice from "../middleware/verifyProductPrice.js";
+import verifyProductPrice from "../middleware/verifyProductPrice.js";
 
 
 
 const router = express.Router();
 
 // create orders
-router.post('/create_order', verifyToken,
-//  verifyProductPrice, 
- createOrder);
+router.post('/create_order', verifyToken, verifyProductPrice, createOrder);
 // router.post('/create_order', createOrder);
 
 // update orders
@@ -28,7 +26,7 @@ router.get('/get-all-orders', getAllOrders);
 router.get('/get-order-details/:orderId', verifyToken, getOrderDetails);
 
 // get all orders of a user
-router.get('/get-user-orders', getUserOrders);
+router.get('/get-user-orders', verifyToken, getUserOrders);
 
 
 
