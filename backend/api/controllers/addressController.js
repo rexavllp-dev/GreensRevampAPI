@@ -62,8 +62,41 @@ export const createAddress = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
 
-    const addressData = req.body;
+    // const addressData = req.body;
     const addressId = req.params.addressId;
+    const userId = req.user.userId;
+
+    const {
+        address_title,
+        full_name,
+        address_email,
+        mobile_country_code,
+        mobile_number,
+        flat_villa,
+        zip_code,
+        delivery_remark,
+        address_line_1,
+        address_line_2,
+        latitude,
+        longitude,
+        is_default
+    } = req.body;
+
+    const addressData = {
+        address_title,
+        full_name,
+        address_email,
+        mobile_country_code,
+        mobile_number,
+        flat_villa,
+        zip_code,
+        delivery_remark,
+        address_line_1,
+        address_line_2,
+        latitude,
+        longitude,
+        is_default
+    }
 
     console.log('Received address data:', addressData); // Log the received data
     try {
@@ -76,8 +109,8 @@ export const updateAddress = async (req, res) => {
             });
         }
 
-        const userAddresses = await getUserAddresses(req.user?.id);
-        
+        const userAddresses = await getUserAddresses(req.user?.userId);
+
         if (userAddresses.length === 0) {
             // User has no addresses, set is_default to true for the new address
             addressData.is_default = true;
@@ -98,7 +131,7 @@ export const updateAddress = async (req, res) => {
         const address = await updateUserAddress(addressData, addressId);
 
         // Update other addresses
-        await updateOtherUserAddress(req.user?.id, addressId);
+        await updateOtherUserAddress(req.user?.userId, addressId);
 
         res.status(200).json({
             status: 200,
