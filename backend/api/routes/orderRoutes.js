@@ -9,7 +9,7 @@ import verifyProductPrice from "../middleware/verifyProductPrice.js";
 const router = express.Router();
 
 // create orders
-router.post('/create_order', verifyToken, verifyProductPrice, createOrder);
+router.post('/create_order', verifyToken, createOrder);
 // router.post('/create_order', createOrder);
 
 // update orders

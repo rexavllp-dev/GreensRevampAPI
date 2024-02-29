@@ -169,24 +169,83 @@ export const updateProductQuantities = async (orderId, trx) => {
     }
 };
 
+// get all order items
+
+export const getOrderItems = async (orderId, trx) => {
+    
+    const orderItems = await trx('order_items')
+        .where({ order_id: orderId })
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('product_inventory', 'order_items.product_id', 'product_inventory.product_id')
+        .select(
+            'order_items.*',
+            'products.*',
+            'products.id as productId',
+            'product_inventory.*',
+            'product_inventory.id as inventoryId'
+        )
+
+    return orderItems
+}
+
 
 // update stock history
-export const updateStockHistory = async (stockHistoryData, trx) => {
+// export const updateStockHistory = async (stockHistoryData, trx) => {
+
+//     try {
+//         const stockHistory = await trx('stock_history').insert({
+//             ...stockHistoryData,
+//             action: 'add',
+//             comment: 'cancelled'
+//         }).returning('*');
+//         return stockHistory;
+//     } catch (error) {
+//         trx.rollback();
+//         throw error;
+//     }
+// };
+
+
+export const updateInventoryQtyWhenCancel = async (trx, productId, data) => {
 
     try {
-        const stockHistory = await trx('stock_history').insert({
-            ...stockHistoryData,
-            action: 'add',
-            comment: 'cancelled'
-        }).returning('*');
-        return stockHistory;
+
+        const updatedInventory = await db('product_inventory').where({ product_id: productId })
+            .update(data).returning('*')
+
+        // Commit the transaction if everything is successful
     } catch (error) {
-        trx.rollback();
-        throw error;
+        // Rollback the transaction if there's an error
+        await trx.rollback();
+        throw error; // Rethrow the error for the caller to handle
     }
 };
 
 
+export const updateStockHistoryWhenCancel = async (trx, productId, currentStock, qty, newQuantity, comment, action) => {
+
+    try {
+        await db('stock_history').insert({
+            product_id: productId,
+            previous_stock: currentStock,
+            qty: qty,
+            remaining_stock: newQuantity,
+            comment: comment,
+            action: action === 'add' ? 'Stock Returned' : 'Stock cancelled',
+            created_at: new Date(),
+            updated_at: new Date(),
+        });
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        await trx.rollback();
+        throw error; // Rethrow the error for the caller to handle
+    }
+};
+
+
+
+// _________________________________________________________________________________________________________________________________________
 
 // cancel individual order
 
@@ -208,7 +267,7 @@ export const updateIndividualOrderStatus = async (orderId, trx, ) => {
     console.log(orderId);
 
     try {
-        
+
         //  update cancel type in user_orders table based on order status and cancel type
 
         const cancelType = await trx('user_orders')
