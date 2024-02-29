@@ -172,7 +172,7 @@ export const updateProductQuantities = async (orderId, trx) => {
 // get all order items
 
 export const getOrderItems = async (orderId, trx) => {
-    
+
     const orderItems = await trx('order_items')
         .where({ order_id: orderId })
         .leftJoin('products', 'order_items.product_id', 'products.id')
@@ -263,7 +263,7 @@ export const CancelIndividualItem = async (cancelOrderData, trx, itemId) => {
 };
 
 // update individual order status 
-export const updateIndividualOrderStatus = async (orderId, trx, ) => {
+export const updateIndividualOrderStatus = async (orderId, trx,) => {
     console.log(orderId);
 
     try {
@@ -277,7 +277,7 @@ export const updateIndividualOrderStatus = async (orderId, trx, ) => {
             .returning('*');
 
 
-        return {  cancelType };
+        return { cancelType };
     } catch (error) {
         trx.rollback();
         throw error;
@@ -365,13 +365,16 @@ export const calculateRemainingProductPrice = async (orderId, trx) => {
 
 
 export const getOrderItemsByItemId = async (orderId) => {
-    
+
     const orderItems = await db('order_items')
-        .where({ id: orderId })
+
+        .where({ 'order_items.id': orderId })
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('product_inventory', 'order_items.product_id', 'product_inventory.product_id')
-        leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
+        
         .select(
+
             'order_items.*',
             'products.*',
             'products.id as productId',
@@ -382,8 +385,8 @@ export const getOrderItemsByItemId = async (orderId) => {
 
         )
 
-    return orderItems
-}
+    return orderItems;
+};
 
 
 
