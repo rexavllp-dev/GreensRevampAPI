@@ -364,6 +364,30 @@ export const calculateRemainingProductPrice = async (orderId, trx) => {
 }
 
 
+export const getOrderItemsByItemId = async (orderId) => {
+    
+    const orderItems = await db('order_items')
+        .where({ id: orderId })
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('product_inventory', 'order_items.product_id', 'product_inventory.product_id')
+        leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
+        .select(
+            'order_items.*',
+            'products.*',
+            'products.id as productId',
+            'product_inventory.*',
+            'product_inventory.id as inventoryId',
+            'user_orders.*',
+            'user_orders.id as orderId'
+
+        )
+
+    return orderItems
+}
+
+
+
+
 
 
 

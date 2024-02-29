@@ -23,6 +23,7 @@ import {
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
 import passport from 'passport';
 import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailController.js';
+import { updateUserAccountInformations } from '../controllers/UserAccountInformationController.js';
 
 
 
@@ -88,6 +89,11 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 router.get("/auth/facebook", passport.authenticate('facebook', { scope: ['profile', 'email'] }));
 
 router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), facebookAuth);
+
+
+// update user account information in user dashboard
+
+router.put('/update-user-account-information/:userId', updateUserAccountInformations);
 
 export default router;
 

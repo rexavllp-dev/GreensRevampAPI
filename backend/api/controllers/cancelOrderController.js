@@ -1,5 +1,5 @@
 import dbConfig from "../../config/dbConfig.js";
-import { CancelIndividualItem, calculateRemainingProductPrice, createCancelOrder, getOrderItems, updateIndividualOrderStatus, updateIndividualProductQuantity, updateInventoryQtyWhenCancel, updateOrderStatus,   updateStockHistoryWhenCancel } from "../models/cancelOrdersModel.js";
+import { CancelIndividualItem, calculateRemainingProductPrice, createCancelOrder, getOrderItems, getOrderItemsByItemId, updateIndividualOrderStatus, updateIndividualProductQuantity, updateInventoryQtyWhenCancel, updateOrderStatus,   updateStockHistoryWhenCancel } from "../models/cancelOrdersModel.js";
 
 // create cancel order and update order status with order id in  user_orders table
 export const createCancelOrders = async (req, res) => {
@@ -137,8 +137,6 @@ export const cancelIndividualItems = async (req, res) => {
             result: {
                 newCancelOrder,
                 updatedOrder,
-                updatedQuantity,
-                updatedStockHistory,
                 grandTotal: remainingProductPrice + shipping
             }
         })
@@ -151,6 +149,33 @@ export const cancelIndividualItems = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed to cancel order",
+        })
+    }
+}
+
+
+// get all order items
+export const getOrderItem = async (req, res) => {
+    
+    const orderId = req.params.orderId;
+
+    try {
+        
+        const orderItems = await getOrderItemsByItemId(orderId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Order items retrieved successfully",
+            result: orderItems
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to retrieve order items",
         })
     }
 }
