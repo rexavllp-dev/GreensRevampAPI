@@ -26,6 +26,8 @@ export const addReviewImage = async (reviewId, imageUrl) => {
 // update the review by user 
 export const updateReviewByUser = async (reviewId, reviewData) => {
 
+    reviewData.is_approved = false;
+
     const updateReview = await db('product_reviews')
         .where({ id: reviewId })
         .update(reviewData)
@@ -33,7 +35,7 @@ export const updateReviewByUser = async (reviewId, reviewData) => {
 
     return updateReview;
 
-}
+};
 
 
 // get all user reviews by userId
@@ -256,7 +258,7 @@ export const getAllReviewsAdmin = async (sortBy, page, perPage) => {
 
 
     if (sortBy === 'recent') {
-        reviews = reviews.orderBy('product_reviews.created_at', 'desc');
+        reviews = reviews.orderBy(['product_reviews.created_at', 'product_reviews.updated_at'], 'desc');
     };
 
     const offset = (page - 1) * perPage;
@@ -265,6 +267,8 @@ export const getAllReviewsAdmin = async (sortBy, page, perPage) => {
     return review;
 
 };
+
+
 
 
 export const likeOrDislikeReview = async (userId, reviewId, action) => {
@@ -277,3 +281,7 @@ export const likeOrDislikeReview = async (userId, reviewId, action) => {
 
     return actions
 };
+ 
+
+
+ 

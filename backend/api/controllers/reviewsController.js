@@ -83,6 +83,9 @@ export const addProductReview = async (req, res) => {
             reviewImages.push(imageDetails);
         };
 
+          // Save product images to the database
+       
+
         console.log(reviewImages);
 
 
