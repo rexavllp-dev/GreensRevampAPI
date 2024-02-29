@@ -48,7 +48,7 @@ export const addProductReview = async (req, res) => {
             });
         };
 
-        const newReview = await addReview(1, reviewData);
+        const newReview = await addReview(userId, reviewData);
         const reviewId = newReview[0].id;
 
 
@@ -141,7 +141,7 @@ export const getAllUserProductReviews = async (req, res) => {
 
     try {
 
-        const reviews = await getsAllReviewsByUserId(1, sortBy);
+        const reviews = await getsAllReviewsByUserId(userId, sortBy);
 
         res.status(200).json({
             status: 200,
@@ -201,7 +201,7 @@ export const reviewLikeAndDislike = async (req, res) => {
     const { reviewId, action } = req.body;
 
     try {
-        const actions = await likeOrDislikeReview(2, reviewId, action);
+        const actions = await likeOrDislikeReview(userId, reviewId, action);
 
         res.status(200).json({
             status: 200,

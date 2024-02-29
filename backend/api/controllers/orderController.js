@@ -234,6 +234,7 @@ export const createOrder = async (req, res) => {
 
 
 
+// update order
 export const updateOrder = async (req, res) => {
     const orderId = req.params.orderId;
     const updatedData = req.body;
@@ -260,7 +261,7 @@ export const updateOrder = async (req, res) => {
     }
 };
 
-
+// get a single order
 export const getASingleOrder = async (req, res) => {
     const orderId = req.params.orderId;
 
@@ -285,7 +286,7 @@ export const getASingleOrder = async (req, res) => {
     }
 };
 
-
+// get all orders
 export const getAllOrders = async (req, res) => {
     try {
 
