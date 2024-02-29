@@ -55,7 +55,7 @@ export const updateOtherUserAddress = async (userId, addressId) => {
 
     const addresses = await getUserAddresses(userId);
     for (let i = 0; i < addresses.length; i++) {
-        if (addresses[i].id !== addressId) {
+        if (addresses[i].id != addressId) {
             const updatedAddress = { ...addresses[i], is_default: false };
             await updateUserAddress(updatedAddress, addresses[i].id);
         }

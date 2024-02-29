@@ -29,7 +29,7 @@ export const createAddress = async (req, res) => {
             // User has existing addresses
             if (addressData.is_default) {
                 // Find the current default address
-                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default === true);
+                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default == true);
                 if (defaultAddressIndex !== -1) {
                     // Set is_default to false for the current default address
                     userAddresses[defaultAddressIndex].is_default = false;
@@ -118,7 +118,7 @@ export const updateAddress = async (req, res) => {
             // User has existing addresses
             if (addressData.is_default) {
                 // Find the current default address
-                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default === true);
+                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default == true);
                 if (defaultAddressIndex !== -1) {
                     // Set is_default to false for the current default address
                     userAddresses[defaultAddressIndex].is_default = false;

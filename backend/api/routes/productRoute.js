@@ -36,7 +36,6 @@ router.get('/get-product/:productId', getSingleProduct)
 router.delete('/delete-product', deleteProduct);
 
 // get all products.
-
 router.get('/get-products', getAllProduct);
 
 router.get('/get-all-option-products', getAllOptionProducts);
