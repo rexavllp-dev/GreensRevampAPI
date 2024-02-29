@@ -136,12 +136,12 @@ export const updateUserReview = async (req, res) => {
 export const getAllUserProductReviews = async (req, res) => {
 
     const userId = req.user.userId;
-    const  {sortBy}  = req.query; 
-    console.log(sortBy);
+    const { sortBy, page, perPage } = req.query;
+    
 
     try {
 
-        const reviews = await getsAllReviewsByUserId(userId, sortBy);
+        const reviews = await getsAllReviewsByUserId( 1, sortBy, parseInt(page), parseInt(perPage) );
 
         res.status(200).json({
             status: 200,
@@ -255,11 +255,13 @@ export const approveReviewByAdmin = async (req, res) => {
 };
 
 
-
 // get all reviews for admin
 export const getAllReviewsForAdmin = async (req, res) => {
+
+    const { sortBy, page, perPage } = req.query;
+
     try {
-        const reviews = await getAllReviewsAdmin();
+        const reviews = await getAllReviewsAdmin(sortBy, parseInt(page), parseInt(perPage));
 
         res.status(200).json({
             status: 200,

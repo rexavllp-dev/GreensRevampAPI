@@ -131,7 +131,7 @@ export const insertNewAddressIntoDatabase = async (
             .insert({
                 user_id: customerId,
                 full_name: customerName,
-                usr_email: customerEmail,
+                address_email: customerEmail,
                 mobile_country_code: customerCountryCode,
                 mobile_number: customerPhone,
                 address_line_1: addressLine,

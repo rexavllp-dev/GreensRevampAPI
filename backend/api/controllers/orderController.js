@@ -153,7 +153,7 @@ export const createOrder = async (req, res) => {
                     address_id: address_id,
                     address_title: existingAddress.address_title,
                     customer_name: existingAddress.full_name,
-                    customer_email: existingAddress.usr_email,
+                    customer_email: existingAddress.address_email,
                     customer_phone_country_code: existingAddress.mobile_country_code,
                     customer_phone: existingAddress.mobile_number,
                     address_line_1: existingAddress.address_line_1,
