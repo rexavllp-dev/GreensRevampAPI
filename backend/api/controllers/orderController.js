@@ -149,7 +149,6 @@ export const createOrder = async (req, res) => {
                     })
                 }
 
-
                 orderData = {
                     address_id: address_id,
                     address_title: existingAddress.address_title,
@@ -173,7 +172,7 @@ export const createOrder = async (req, res) => {
 
 
             // Create order data
-            const newOrder = await createUserOrder(trx, 4, orderData);
+            const newOrder = await createUserOrder(trx, customerId, orderData);
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 
@@ -235,6 +234,7 @@ export const createOrder = async (req, res) => {
 
 
 
+// update order
 export const updateOrder = async (req, res) => {
     const orderId = req.params.orderId;
     const updatedData = req.body;
@@ -261,7 +261,7 @@ export const updateOrder = async (req, res) => {
     }
 };
 
-
+// get a single order
 export const getASingleOrder = async (req, res) => {
     const orderId = req.params.orderId;
 
@@ -286,7 +286,7 @@ export const getASingleOrder = async (req, res) => {
     }
 };
 
-
+// get all orders
 export const getAllOrders = async (req, res) => {
     try {
 

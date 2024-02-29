@@ -44,7 +44,6 @@ export const createCancelOrders = async (req, res) => {
 
         trx.commit();
         res.status(200).json({
-
             status: 200,
             success: true,
             message: "Order cancelled successfully",
