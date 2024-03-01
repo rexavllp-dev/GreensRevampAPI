@@ -14,8 +14,6 @@ const awsConfig = ({
 const s3 = new aws.S3(awsConfig);
 
 
-
-
 // user reviews controller
 export const addProductReview = async (req, res) => {
 
@@ -83,6 +81,9 @@ export const addProductReview = async (req, res) => {
             reviewImages.push(imageDetails);
         };
 
+          // Save product images to the database
+       
+
         console.log(reviewImages);
 
 
@@ -136,12 +137,12 @@ export const updateUserReview = async (req, res) => {
 export const getAllUserProductReviews = async (req, res) => {
 
     const userId = req.user.userId;
-    const  {sortBy}  = req.query; 
-    console.log(sortBy);
+    const { sortBy, page, perPage } = req.query;
+    
 
     try {
 
-        const reviews = await getsAllReviewsByUserId(userId, sortBy);
+        const reviews = await getsAllReviewsByUserId( 1, sortBy, parseInt(page), parseInt(perPage) );
 
         res.status(200).json({
             status: 200,
@@ -255,11 +256,13 @@ export const approveReviewByAdmin = async (req, res) => {
 };
 
 
-
 // get all reviews for admin
 export const getAllReviewsForAdmin = async (req, res) => {
+
+    const { sortBy, page, perPage } = req.query;
+
     try {
-        const reviews = await getAllReviewsAdmin();
+        const reviews = await getAllReviewsAdmin(sortBy, parseInt(page), parseInt(perPage));
 
         res.status(200).json({
             status: 200,

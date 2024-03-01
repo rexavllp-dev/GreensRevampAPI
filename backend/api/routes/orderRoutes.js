@@ -2,7 +2,7 @@ import express from "express";
 import { createOrder, getASingleOrder, getAllOrders, updateOrder } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
-import verifyProductPrice from "../middleware/verifyProductPrice.js";
+
 
 
 

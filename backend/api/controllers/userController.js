@@ -1187,6 +1187,35 @@ export const getSingleUser = async (req, res) => {
 };
 
 
+// get user by middleware
+export const getUserDetails = async (req, res) => {
+
+    const userId = req.user.userId;
+    console.log(userId);
+
+    try {
+
+        const userDetails = await getUserById(userId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetch user details successfully",
+            result: userDetails
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch user details",
+            error: error
+        });
+    }
+};
+
+
 // middleware
 export const getUserInformation = async (req, res) => {
     const { token } = req.params;

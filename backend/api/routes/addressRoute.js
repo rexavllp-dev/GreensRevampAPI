@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/create-address', verifyToken , createAddress);
 
 // update address
-router.put('/update-address/:addressId', updateAddress);
+router.put('/update-address/:addressId', verifyToken, updateAddress);
 
 // get a address
 

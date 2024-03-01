@@ -430,6 +430,7 @@ export const addProductImages = async (req, res) => {
         if (!files?.length) {
             files = [files]
         }
+        
         const isBaseImage = req.body?.isBaseImage;
         let productImages = [];
 

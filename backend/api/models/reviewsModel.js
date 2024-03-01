@@ -26,6 +26,8 @@ export const addReviewImage = async (reviewId, imageUrl) => {
 // update the review by user 
 export const updateReviewByUser = async (reviewId, reviewData) => {
 
+    reviewData.is_approved = false;
+
     const updateReview = await db('product_reviews')
         .where({ id: reviewId })
         .update(reviewData)
@@ -33,12 +35,13 @@ export const updateReviewByUser = async (reviewId, reviewData) => {
 
     return updateReview;
 
-}
+};
 
 
 // get all user reviews by userId
-export const getsAllReviewsByUserId = async (userId, sortBy) => {
-    let reviews =  db('products')
+export const getsAllReviewsByUserId = async ( userId, sortBy, page, perPage ) => {
+
+    let reviews = db('products')
 
         .leftJoin('product_reviews', 'products.id', 'product_reviews.product_id')
         .leftJoin('review_gallery', 'product_reviews.id', 'review_gallery.review_id')
@@ -48,8 +51,8 @@ export const getsAllReviewsByUserId = async (userId, sortBy) => {
 
         .where({ 'users.id': userId })
         .where({ 'product_reviews.is_approved': true })
-        .select(
 
+        .select(
 
             'users.usr_firstname',
             'users.usr_lastname',
@@ -90,21 +93,23 @@ export const getsAllReviewsByUserId = async (userId, sortBy) => {
 
         );
 
-        if (sortBy === 'recent') {
-            reviews = reviews.orderBy('product_reviews.created_at', 'desc');
-        } else if (sortBy === 'useful') {
-            reviews = reviews.orderBy(db.raw('COUNT(CASE WHEN review_likes_dislikes.action = \'like\' THEN 1 ELSE NULL END)'), 'desc');
-        } else if (sortBy === 'low_to_high') {
-            reviews = reviews.orderBy('product_reviews.rating', 'asc');
-        } else if (sortBy === 'high_to_low') {
-            reviews = reviews.orderBy('product_reviews.rating', 'desc');
-        }
+    if (sortBy === 'recent') {
+        reviews = reviews.orderBy('product_reviews.created_at', 'desc');
+    } else if (sortBy === 'useful') {
+        reviews = reviews.orderBy(db.raw('COUNT(CASE WHEN review_likes_dislikes.action = \'like\' THEN 1 ELSE NULL END)'), 'desc');
+    } else if (sortBy === 'low_to_high') {
+        reviews = reviews.orderBy('product_reviews.rating', 'asc');
+    } else if (sortBy === 'high_to_low') {
+        reviews = reviews.orderBy('product_reviews.rating', 'desc');
+    };
+
+
+    const offset = (page - 1) * perPage;
+    const review = await reviews.offset(offset).limit(perPage);
+
+
+    return review;
     
-    
-
-
-
-    return reviews;
 };
 
 
@@ -141,6 +146,7 @@ export const getsAllReviewsByProductId = async (productId) => {
     const reviews = await db('products')
 
         .leftJoin('product_reviews', 'products.id', 'product_reviews.product_id')
+        .leftJoin('review_gallery', 'product_reviews.id', 'review_gallery.review_id')
         .leftJoin('users', 'product_reviews.user_id', 'users.id')
         .leftJoin('review_likes_dislikes', 'product_reviews.id', 'review_likes_dislikes.review_id')
 
@@ -157,7 +163,9 @@ export const getsAllReviewsByProductId = async (productId) => {
 
             db.raw('COUNT(CASE WHEN review_likes_dislikes.action = \'like\' THEN 1 ELSE NULL END) AS likes'),
             db.raw('COUNT(CASE WHEN review_likes_dislikes.action = \'dislike\' THEN 1 ELSE NULL END) AS dislikes'),
-            db.raw('CAST(COUNT(product_reviews.rating) AS FLOAT) AS total_ratings')
+            db.raw('CAST(COUNT(product_reviews.rating) AS FLOAT) AS total_ratings'),
+
+            db.raw(`jsonb_agg(jsonb_build_object('id', review_gallery.id, 'url', review_gallery.url)) AS reviewImages`)
 
         )
 
@@ -172,9 +180,9 @@ export const getsAllReviewsByProductId = async (productId) => {
             'product_reviews.created_at'
         );
 
-    
+
     const totalRatings = parseFloat(reviews.reduce((acc, review) => acc + review.total_ratings, 0));
-   
+
     // Calculate average rating
     let averageRating = totalRatings > 0 ? parseFloat(reviews.reduce((acc, review) => acc + review.rating, 0) / totalRatings) : 0;
     averageRating = parseFloat(averageRating.toFixed(1));
@@ -207,11 +215,12 @@ export const approveReview = async (reviewId, reviewData) => {
 
 
 // get all reviews for admin 
-export const getAllReviewsAdmin = async () => {
+export const getAllReviewsAdmin = async (sortBy, page, perPage) => {
 
-    const reviews = await db('product_reviews')
+    let reviews = db('product_reviews')
         .leftJoin('users', 'users.id', 'product_reviews.user_id')
         .leftJoin('products', 'products.id', 'product_reviews.product_id')
+        .leftJoin('review_gallery', 'product_reviews.id', 'review_gallery.review_id')
 
         .select(
 
@@ -221,18 +230,45 @@ export const getAllReviewsAdmin = async () => {
             'product_reviews.is_approved',
             'product_reviews.created_at as createdAt',
 
+
             'products.prd_name',
 
             'users.usr_firstname',
             'users.usr_lastname',
 
+            db.raw(`jsonb_agg(jsonb_build_object('id', review_gallery.id, 'url', review_gallery.url)) AS reviewImages`)
+
+        )
+
+        .groupBy(
+
+            'product_reviews.id',
+            'product_reviews.review',
+            'product_reviews.rating',
+            'product_reviews.is_approved',
+            'product_reviews.created_at',
 
 
-        );
 
-    return reviews;
+            'products.prd_name',
+
+            'users.usr_firstname',
+            'users.usr_lastname'
+        )
+
+
+    if (sortBy === 'recent') {
+        reviews = reviews.orderBy(['product_reviews.created_at', 'product_reviews.updated_at'], 'desc');
+    };
+
+    const offset = (page - 1) * perPage;
+    const review = await reviews.offset(offset).limit(perPage);
+
+    return review;
 
 };
+
+
 
 
 export const likeOrDislikeReview = async (userId, reviewId, action) => {
@@ -245,3 +281,7 @@ export const likeOrDislikeReview = async (userId, reviewId, action) => {
 
     return actions
 };
+ 
+
+
+ 
