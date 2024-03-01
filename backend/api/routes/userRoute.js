@@ -4,6 +4,7 @@ import {
     deleteUser,
     getAllUsers,
     getSingleUser,
+    getUserDetails,
     getUserInformation,
     loginWithOtp,
     loginWithPassword,
@@ -80,6 +81,9 @@ router.post('/reset-password', resetPassword);
 router.get('/:id', getSingleUser);
 
 router.get('/getuserinfo/:token', getUserInformation);
+
+// get user details by middleware
+router.get('/user-details', verifyToken, getUserDetails);
 
 // update using email  using token
 router.put('/update_email/:token', updateEmailUsingToken);
