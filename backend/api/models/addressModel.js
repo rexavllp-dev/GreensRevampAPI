@@ -1,7 +1,12 @@
 import db from '../../config/dbConfig.js';
 
-export const createUserAddress = async (addressData) => {
-    const address = await db('address').insert(addressData);
+export const createUserAddress = async (userId, addressData) => {
+    const address = await db('address')
+    .insert({
+        user_id: userId,
+        ...addressData
+    });
+    
     return address;
 }
 

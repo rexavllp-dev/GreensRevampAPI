@@ -39,12 +39,11 @@ export const createAddress = async (req, res) => {
             }
         };
 
-        const address = await createUserAddress(addressData);
+        const address = await createUserAddress(userId, addressData);
 
         res.status(200).json({
             status: 200,
             success: true,
-            result: address,
             message: 'Address created successfully',
         })
 

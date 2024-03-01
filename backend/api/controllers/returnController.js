@@ -3,7 +3,6 @@ import sharp from "sharp";
 import aws from 'aws-sdk';
 
 
-
 const awsConfig = ({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -23,6 +22,15 @@ export const returnProduct = async (req, res) => {
 
 
     try {
+
+          // Check if files are uploaded
+          if (!files || !files.length) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "File are required for return request."
+            });
+        };
 
         if (!files?.length) {
             files = [files]

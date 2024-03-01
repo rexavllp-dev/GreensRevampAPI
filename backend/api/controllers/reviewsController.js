@@ -14,8 +14,6 @@ const awsConfig = ({
 const s3 = new aws.S3(awsConfig);
 
 
-
-
 // user reviews controller
 export const addProductReview = async (req, res) => {
 
