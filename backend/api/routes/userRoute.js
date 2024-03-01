@@ -25,7 +25,6 @@ import { forgotPassword, resetPassword } from '../controllers/forgotPasswordCont
 import passport from 'passport';
 import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailController.js';
 import { ChangeUserPassword, updateUserAccountInformations, updateUserAccountToCompany } from '../controllers/UserAccountInformationController.js';
-import { updateUserAccountInformations } from '../controllers/UserAccountInformationController.js';
 import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
 
