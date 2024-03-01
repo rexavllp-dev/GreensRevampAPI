@@ -25,3 +25,9 @@ export const addReturnImage = async (returnId, imageUrl) => {
         });
 };
 
+
+export const getAllReturnProducts = async () => {
+    const returns = await db('return_products')
+        .select('*')
+    return returns;
+}

@@ -90,3 +90,29 @@ export const returnProduct = async (req, res) => {
         });
     }
 };
+
+
+// admin controllers returns
+
+export const  getAllReturns = async (req, res) => {
+    
+    try {
+        const returns = await getAllReturnProducts();
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Returns fetched successfully',
+            result: returns
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: 'Failed to get returns. Please try again later.',
+            error: error
+            
+        })
+    }
+}
