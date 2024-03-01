@@ -420,3 +420,50 @@ export const sendOrderInvoices = async (orderData, pdfData) => {
         throw error
     }
 };
+
+
+
+ // update user account to company account 
+
+ export const UpdateUserAccountToCompany = async (usr_email, usr_firstname) => {
+
+    const emailData = {
+        email: usr_email,
+        subject: `Registration Complete`,
+        html: `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Registration Complete</title>
+  </head>
+  <body>
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+
+      <!-- Logo -->
+      <div style="text-align: center;">
+          <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+      </div>
+  
+          <h2>Registration Complete</h2>
+  
+          <p> Hello <b> ${usr_firstname} </b>,</p>
+  
+          <p>Congratulations! You have successfully completed your company registration. Admin will verify your account and switch your account to business account.</p>
+
+  
+          <p>Best regards,<br> <b>Greens International </b> </p>
+  
+      </div>
+  </body>
+  </html>`,
+    };
+
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
+
+};
+

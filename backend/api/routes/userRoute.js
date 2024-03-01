@@ -23,7 +23,8 @@ import {
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
 import passport from 'passport';
 import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailController.js';
-import { updateUserAccountInformations } from '../controllers/UserAccountInformationController.js';
+import { ChangeUserPassword, updateUserAccountInformations, updateUserAccountToCompany } from '../controllers/UserAccountInformationController.js';
+import verifyToken from '../middleware/verifyToken.js';
 
 
 
@@ -57,7 +58,7 @@ router.get('/resendemail/:token', resendEmail);
 // for mobile resend
 router.get('/resendotp/:token', resendOtp);
 // login rend otp
-router.post('/resend-login-otp',resendLoginOtp);
+router.post('/resend-login-otp', resendLoginOtp);
 
 // forgot password
 router.post('/forgot-password', forgotPassword);
@@ -94,6 +95,13 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', { failur
 // update user account information in user dashboard
 
 router.put('/update-user-account-information/:userId', updateUserAccountInformations);
+
+// change user password 
+router.post('/change-password/:userId', verifyToken, ChangeUserPassword);
+
+// update user account to company account
+
+router.put('/update-user-account-to-company/:userId', updateUserAccountToCompany);
 
 export default router;
 

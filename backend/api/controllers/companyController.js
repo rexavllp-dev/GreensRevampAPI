@@ -270,8 +270,6 @@ export const registerCompany = async (req, res) => {
         // Send email verification link
         await sendVerificationEmail(usr_email, usr_firstname, token, 'company');
 
-
-
         console.log(newUser);
         res.status(201).json({
             status: 201,
