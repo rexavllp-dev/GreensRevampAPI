@@ -1,4 +1,4 @@
-import { addReturnImage, createReturnPrd } from "../models/returnModel.js";
+import { addReturnImage, createReturnPrd, getAllReturnProducts, getReturnById } from "../models/returnModel.js";
 import sharp from "sharp";
 import aws from 'aws-sdk';
 
@@ -23,8 +23,8 @@ export const returnProduct = async (req, res) => {
 
     try {
 
-          // Check if files are uploaded
-          if (!files || !files.length) {
+        // Check if files are uploaded
+        if (!files || !files.length) {
             return res.status(400).json({
                 status: 400,
                 success: false,
@@ -44,7 +44,7 @@ export const returnProduct = async (req, res) => {
 
         for (let i = 0; i < files?.length; i++) {
             const file = files[i];
-            
+
 
             const resizedBuffer = await sharp(file.data)
                 .resize({ width: 300, height: 300 })
@@ -61,7 +61,7 @@ export const returnProduct = async (req, res) => {
 
             const imageUrl = s3Data.Location;
             console.log(imageUrl);
-            
+
             await addReturnImage(returnId, imageUrl);
 
             const imageDetails = {
@@ -87,6 +87,64 @@ export const returnProduct = async (req, res) => {
             success: false,
             message: "Failed to submit return request.",
             error: error
+        });
+    }
+};
+
+
+// admin controllers returns
+
+
+// get single returns
+export const getSingleReturn = async (req, res) => {
+
+    const returnId = req.params.returnId;
+
+    try {
+
+        const returnData = await getReturnById(returnId);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched returns successfully",
+            result: returnData
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch returns",
+            result: error
+        });
+
+    }
+};
+
+
+// get all returns for admin 
+export const getAllReturnsForAdmin = async (req, res) => {
+
+    try {
+        const returns = await getAllReturnProducts();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Returns fetched successfully',
+            result: returns
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: 'Failed to get returns. Please try again later.',
+            error: error
+
         });
     }
 };

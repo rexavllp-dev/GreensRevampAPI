@@ -217,6 +217,7 @@ export const approveReview = async (reviewId, reviewData) => {
 // get all reviews for admin 
 export const getAllReviewsAdmin = async (sortBy, page, perPage) => {
 
+
     let reviews = db('product_reviews')
         .leftJoin('users', 'users.id', 'product_reviews.user_id')
         .leftJoin('products', 'products.id', 'product_reviews.product_id')

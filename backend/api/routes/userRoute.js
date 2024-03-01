@@ -4,6 +4,7 @@ import {
     deleteUser,
     getAllUsers,
     getSingleUser,
+    getUserDetails,
     getUserInformation,
     loginWithOtp,
     loginWithPassword,
@@ -23,9 +24,10 @@ import {
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
 import passport from 'passport';
 import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailController.js';
-import { updateUserAccountInformations } from '../controllers/UserAccountInformationController.js';
+import { ChangeUserPassword, updateUserAccountInformations, updateUserAccountToCompany } from '../controllers/UserAccountInformationController.js';
 import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
+import { replaceAProduct } from '../controllers/replaceController.js';
 
 
 
@@ -67,7 +69,7 @@ router.get('/resendemail/:token', resendEmail);
 router.get('/resendotp/:token', resendOtp);
 
 // login rend otp
-router.post('/resend-login-otp',resendLoginOtp);
+router.post('/resend-login-otp', resendLoginOtp);
 
 // forgot password
 router.post('/forgot-password', forgotPassword);
@@ -80,6 +82,9 @@ router.post('/reset-password', resetPassword);
 router.get('/:id', getSingleUser);
 
 router.get('/getuserinfo/:token', getUserInformation);
+
+// get user details by middleware
+router.get('/user-details', verifyToken, getUserDetails);
 
 // update using email  using token
 router.put('/update_email/:token', updateEmailUsingToken);
@@ -111,10 +116,19 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', { failur
 
 router.put('/update-user-account-information/:userId', updateUserAccountInformations);
 
+// change user password 
+router.post('/change-password/:userId', verifyToken, ChangeUserPassword);
+
+// update user account to company account
+
+router.put('/update-user-account-to-company/:userId', updateUserAccountToCompany);
 
 
 // user return products routes 
 router.post('/return-product', verifyToken, returnProduct);
+
+// user replacement products routes
+router.post('/replace-product', verifyToken, replaceAProduct)
 
 export default router;
 
