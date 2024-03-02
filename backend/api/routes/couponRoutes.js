@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCoupon, deleteCoupon, getAllCoupons, getSingleCoupon, updateCoupon } from '../controllers/couponController.js';
+import { applyCoupon, createCoupon, deleteCoupon, getAllCoupons, getSingleCoupon, updateCoupon } from '../controllers/couponController.js';
 
 
 const router = express.Router();
@@ -19,6 +19,9 @@ router.get('/get_all_coupons', getAllCoupons);
 
 // delete coupon
 router.delete('/delete_coupon/:couponId', deleteCoupon);
+
+// Apply coupon
+router.post('/apply-coupon', applyCoupon);
 
 
 

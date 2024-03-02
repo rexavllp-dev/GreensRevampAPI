@@ -368,6 +368,7 @@ export const getProductFromCart = async (req, res) => {
     try {
 
         if (req.session.cart) {
+
             data = await calculatePrice({ session: req.session });
 
             return res.status(200).json({
@@ -376,16 +377,17 @@ export const getProductFromCart = async (req, res) => {
                 result: data,
                 message: 'Cart retrieved successfully',
             })
+
         } else {
+
             return res.status(200).json({
                 status: 200,
                 success: true,
                 result: [],
                 message: 'Cart is empty',
             })
+
         }
-
-
 
     } catch (error) {
 
@@ -396,6 +398,7 @@ export const getProductFromCart = async (req, res) => {
             error: error,
             message: 'Failed to get cart. Please try again later.',
         })
+        
     }
 }
 

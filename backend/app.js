@@ -12,7 +12,7 @@ import categoryRoutes from './api/routes/categoryRoute.js';
 import cartRoutes from './api/routes/cartRoute.js';
 import addressRoutes from './api/routes/addressRoute.js';
 import saveForLaterRoutes from './api/routes/saveForLaterRoute.js';
-import wishlistRoutes from './api/routes/wishlistRoute.js'; 
+import wishlistRoutes from './api/routes/wishlistRoute.js';
 import orderRoutes from './api/routes/orderRoutes.js';
 import paymentRoutes from './api/routes/paymentRoutes.js';
 import cancelReasonsRoutes from './api/routes/cancelReasonsRoutes.js';
@@ -39,21 +39,21 @@ const app = express();
 // const io = createSocketServer(server);
 // app.set('socketio', io);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const corsOptions = {
-  credentials: true,
-  origin: true,
+    credentials: true,
+    origin: true,
 };
 
 app.use(morgan('combined'))
 
 // set up session
 app.use(
-  session({
-    secret: 'PP1vPtETlCit2f2omXKKQhn1VUC2BSWOEHhYRAqy2W5rgs1Czl1mBPkLIJclwabVzs5HXhIzKYD8ZxlMWy4FNAbrNru8mh07Gr3vxIyDxUcZbnUIoYYcqt1iNldXB7yfbDVsg0n2MDurOXOpDOrFFw3sAwHj7ZHCzUrZEs5wAgGcX9xWQhBx7wTkoWeGW4rZXbx',
-    resave: false,
-    saveUninitialized: false,
-  })
+    session({
+        secret: 'PP1vPtETlCit2f2omXKKQhn1VUC2BSWOEHhYRAqy2W5rgs1Czl1mBPkLIJclwabVzs5HXhIzKYD8ZxlMWy4FNAbrNru8mh07Gr3vxIyDxUcZbnUIoYYcqt1iNldXB7yfbDVsg0n2MDurOXOpDOrFFw3sAwHj7ZHCzUrZEs5wAgGcX9xWQhBx7wTkoWeGW4rZXbx',
+        resave: false,
+        saveUninitialized: false,
+    })
 );
 
 // Initialize Passport and restore authentication state from the session
@@ -89,39 +89,36 @@ app.use('/api/v1/coupons', couponRoutes);
 
 
 app.get('/', (req, res) => {
-  res.json("Greens_international Server is Online")
+    res.json("Greens_international Server is Online")
 });
 
 
 
 
 app.get('/download/:url', async function (req, res) {
-  let fileUrl = req.params.url;
-  // const fileUrl = 'https://greensecombucket.s3.ap-south-1.amazonaws.com/images/image%20%2819%29.png';
+    let fileUrl = req.params.url;
+    // const fileUrl = 'https://greensecombucket.s3.ap-south-1.amazonaws.com/images/image%20%2819%29.png';
 
-  try {
-    // Make a GET request to the external API
-    const response = await axios({
-      method: 'get',
-      url: fileUrl,
-      responseType: 'stream', // This ensures the response is treated as a stream
-    });
+    try {
+        // Make a GET request to the external API
+        const response = await axios({
+            method: 'get',
+            url: fileUrl,
+            responseType: 'stream', // This ensures the response is treated as a stream
+        });
 
-    // Set the appropriate headers for the file download
-    res.setHeader('Content-Disposition', `attachment; filename=${encodeURIComponent(fileUrl)}`);
-    // res.setHeader('Content-Type', 'image/png'); // Adjust the Content-Type based on the file type
+        // Set the appropriate headers for the file download
+        res.setHeader('Content-Disposition', `attachment; filename=${encodeURIComponent(fileUrl)}`);
+        // res.setHeader('Content-Type', 'image/png'); // Adjust the Content-Type based on the file type
 
-    // Pipe the response stream to the client response
-    response.data.pipe(res);
-  } catch (error) {
-    console.error('Error downloading file:', error);
-    res.status(500).send('Internal Server Error');
-  }
+        // Pipe the response stream to the client response
+        response.data.pipe(res);
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-
-
-
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+    console.log(`Server is running on port ${PORT}`)
 });
