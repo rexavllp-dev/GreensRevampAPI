@@ -29,6 +29,7 @@ import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
+import { getNotifyProduct, notifyProduct } from '../controllers/notifyProductController.js';
 
 
 
@@ -131,6 +132,14 @@ router.post('/return-product', verifyToken, returnProduct);
 router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunicationAndPrivacy);
 // user replacement products routes
 router.post('/replace-product', verifyToken, replaceAProduct)
+
+// notify product
+
+// create notify product
+router.post('/notify-product', verifyToken, notifyProduct);
+
+// get notify product
+router.get('/get-notify-product', verifyToken, getNotifyProduct);
 
 export default router;
 
