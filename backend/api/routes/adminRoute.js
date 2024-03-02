@@ -1,7 +1,9 @@
 import express from 'express';
 import { adminUserRegister,  approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin,  rejectCompanyByAdmin } from '../controllers/adminController.js';
 import {  updateAndApproveOrRejectBulkOrders } from '../controllers/bulkController.js';
+import { AddPrivacyPolicy, deletePrivacyPolicyById, getALLPrivacyPolicy, updatePrivacyPolicyById } from '../controllers/PrivacyPoliciesController.js';
 import { getAllReturnsForAdmin, getSingleReturn } from '../controllers/returnController.js';
+import { getAllReplacementsForAdmin, getSingleReplacement } from '../controllers/replaceController.js';
 
 
 const router = express.Router();
@@ -22,6 +24,20 @@ router.put('/reject/:companyId', rejectCompanyByAdmin);
 router.put('/update-bulk-request/:bulkId', updateAndApproveOrRejectBulkOrders);
 
 
+// privacy policy routes
+
+// create privacy policy
+router.post('/create-privacy-policy', AddPrivacyPolicy);
+
+// get privacy policy
+router.get('/get-privacy-policy', getALLPrivacyPolicy);
+
+// update privacy policy
+router.put('/update-privacy-policy/:id', updatePrivacyPolicyById);
+
+// delete privacy policy
+router.delete('/delete-privacy-policy/:id', deletePrivacyPolicyById);
+
 // admin return
 
 // get all returns for admin
@@ -31,8 +47,11 @@ router.get('/get-all-returns', getAllReturnsForAdmin);
 router.get('/get-return/:returnId', getSingleReturn);
 
 
+// get single replacement for admin
+router.get('/get-return/:replaceId', getSingleReplacement);
 
-
+// get all replacements for admin
+router.get('/get-all-replacements', getAllReplacementsForAdmin);
 
 
 
