@@ -4,7 +4,7 @@ import db from '../../config/dbConfig.js';
 // create cancel order
 export const createCancelOrder = async (cancelOrderData, trx) => {
     try {
-        const cancelOrder = await trx('cancel_orders').insert({ ...cancelOrderData, cancel_type: "full" }).returning('*');
+        const cancelOrder = await trx('reasons').insert({ ...cancelOrderData, cancel_type: "full" }).returning('*');
         return cancelOrder;
     } catch (error) {
 
@@ -33,68 +33,7 @@ export const updateCancelType = async (orderId, trx) => {
 }
 
 
-// update order status
 
-// export const updateOrderStatus = async (orderId, trx) => {
-//     console.log(orderId)
-
-//     try {
-
-//         const updatedOrder = await trx('user_orders')
-//             .where({ id: orderId })
-//             .select('ord_order_status')
-//             .update({ ord_order_status: 6 }) // id of cancel in seeds 
-//             .returning('*');
-
-
-
-//         // Update op_is_cancel in order_items table
-//         const updatedOrderItems = await trx('order_items')
-//             .where({ order_id: orderId })
-//             .update({ op_is_cancel: true }) // Assuming op_is_cancel is a boolean field
-//             .returning('*');
-
-
-//         //  update cancel type in user_orders table based on order status and cancel type
-
-//         const orderItems = await trx('order_items')
-//             .where({ order_id: orderId })
-//             .select( 'op_is_cancel');
-
-//         let cancelType;
-
-//         if (orderItems && orderItems.length > 0) {
-
-//             const canceledAllItems = orderItems.every(item => item.op_is_cancel === true);
-//             const canceledAnyItem = orderItems.some(item => item.op_is_cancel === true);
-
-//             if (canceledAllItems) {
-//                 cancelType = "full";
-//             } else if (canceledAnyItem) {
-//                 cancelType = "partial";
-//             } else {
-//                 cancelType = null;
-//             }
-
-//         } else {
-//             cancelType = null;
-//         }
-
-//         // update cancel type in user_orders table 
-//         await trx('user_orders')
-//             .where({ id: orderId })
-//             .update({ ord_cancel_type: cancelType })
-//             .returning('*');
-
-//         return { updatedOrder, updatedOrderItems };
-
-
-//     } catch (error) {
-
-//         trx.rollback();
-//         throw error;
-//     }
-// };
 
 export const updateOrderStatus = async (orderId, trx) => {
     console.log(orderId);
@@ -189,21 +128,7 @@ export const getOrderItems = async (orderId, trx) => {
 }
 
 
-// update stock history
-// export const updateStockHistory = async (stockHistoryData, trx) => {
 
-//     try {
-//         const stockHistory = await trx('stock_history').insert({
-//             ...stockHistoryData,
-//             action: 'add',
-//             comment: 'cancelled'
-//         }).returning('*');
-//         return stockHistory;
-//     } catch (error) {
-//         trx.rollback();
-//         throw error;
-//     }
-// };
 
 
 export const updateInventoryQtyWhenCancel = async (trx, productId, data) => {
@@ -254,7 +179,7 @@ export const CancelIndividualItem = async (cancelOrderData, trx, itemId) => {
 
     try {
         const cancelOrderItem = await trx("order_items").where({ id: itemId, order_id: cancelOrderData.order_id }).update({ op_is_cancel: true }).returning('*');
-        const cancelOrder = await trx('cancel_orders').insert({ ...cancelOrderData, cancel_type: "partial" }).returning('*');
+        const cancelOrder = await trx('reasons').insert({ ...cancelOrderData, cancel_type: "partial" }).returning('*');
         return cancelOrder;
     } catch (error) {
         trx.rollback();
@@ -372,6 +297,8 @@ export const getOrderItemsByItemId = async (orderId) => {
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('product_inventory', 'order_items.product_id', 'product_inventory.product_id')
         .leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('product_price', 'order_items.product_id', 'product_price.product_id')
+
         
         .select(
 
@@ -381,7 +308,10 @@ export const getOrderItemsByItemId = async (orderId) => {
             'product_inventory.*',
             'product_inventory.id as inventoryId',
             'user_orders.*',
-            'user_orders.id as orderId'
+            'user_orders.id as orderId',
+            'product_price.*',
+            'product_price.id as priceId'
+
 
         )
 
