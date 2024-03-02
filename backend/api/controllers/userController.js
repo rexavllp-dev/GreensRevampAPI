@@ -51,7 +51,7 @@ export const getAllUsers = async (req, res) => {
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Users fetch successfull ",
+            message: "Users fetch successfully ",
             result: users
         });
 
@@ -1182,6 +1182,34 @@ export const getSingleUser = async (req, res) => {
             success: false,
             message: "Failed to get user! Please try again later."
 
+        });
+    }
+};
+
+
+// get user by middleware
+export const getUserDetails = async (req, res) => {
+
+    try {
+
+        const userId = req.user.userId;
+
+        const userDetails = await getUserById(userId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetch user details successfully",
+            result: userDetails
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch user details",
+            error: error
         });
     }
 };

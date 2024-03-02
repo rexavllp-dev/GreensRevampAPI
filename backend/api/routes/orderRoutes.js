@@ -5,10 +5,12 @@ import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbord
 
 
 
+
 const router = express.Router();
 
-// create orders with all the order items, email queue
+// create orders
 router.post('/create_order', verifyToken, createOrder);
+// router.post('/create_order', createOrder);
 
 // update orders
 router.put('/update-order/:orderId', updateOrder);
@@ -24,7 +26,7 @@ router.get('/get-all-orders', getAllOrders);
 router.get('/get-order-details/:orderId', verifyToken, getOrderDetails);
 
 // get all orders of a user
-router.get('/get-user-orders/:userId', verifyToken, getUserOrders);
+router.get('/get-user-orders', verifyToken, getUserOrders);
 
 
 

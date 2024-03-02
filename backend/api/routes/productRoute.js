@@ -5,7 +5,7 @@ import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../contro
 import {  createProductInventory,  modifyStock,  updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
-import { addProductReview, approveReviewByAdmin, getAllReviews } from '../controllers/reviewsController.js';
+import { addProductReview, approveReviewByAdmin, getAllProductReviews,  getAllReviewsForAdmin, getAllUserProductReviews, reviewLikeAndDislike, updateUserReview } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getAllRelatedProductPublicByProductId, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getAllOptions, updateOption } from '../controllers/optionController.js';
 import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
@@ -15,6 +15,7 @@ import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVari
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkStatusWithProductStatus, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
+import { replaceAProduct } from '../controllers/replaceController.js';
 
 
 
@@ -36,7 +37,6 @@ router.get('/get-product/:productId', getSingleProduct)
 router.delete('/delete-product', deleteProduct);
 
 // get all products.
-
 router.get('/get-products', getAllProduct);
 
 router.get('/get-all-option-products', getAllOptionProducts);
@@ -139,17 +139,45 @@ router.get('/get-related-products/:productId', getRelatedProductsWithProductId);
 // delete related product
 router.delete('/delete-related-product', deleteRelatedProduct);
 
+
+
+
+
+
 // reviews routes
 
-router.post('/create-review', addProductReview);
+router.post('/review/create-review', verifyToken, addProductReview);
 
-// approve review by admin 
-router.put('/approve-review', approveReviewByAdmin);
-
+// update user review
+router.put('/review/update-review/:reviewId', updateUserReview);
 
 // get all reviews 
-router.get('/get-reviews', getAllReviews);
+router.get('/review/get-reviews/:productId', getAllProductReviews);
+
+// get all reviews for user by userId
+router.get('/review/get-user-reviews', verifyToken, getAllUserProductReviews);
+
+// like and dislike for product reviews
+router.post('/review/like-dislike', verifyToken, reviewLikeAndDislike);
+
+
+// admin reviews
+
+// approve review by admin 
+router.put('/review/approve-review/:reviewId', approveReviewByAdmin);
+
+// get all reviews for admin
+router.get('/review/get-all-reviews', getAllReviewsForAdmin);
+
+
+
+// replacement products routes
+
+
+
 // __________________________________________________________________________________________________
+
+
 // option route
 
 //get all options

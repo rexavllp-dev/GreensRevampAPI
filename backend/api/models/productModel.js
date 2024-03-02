@@ -185,7 +185,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             ) as product_img
         `),
 
-            // db.raw('COALESCE(products_price.special_price, products_price.product_price) as computed_price'),
+          
 
         )
         .distinct('products.id')
@@ -200,16 +200,12 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             'product_category.id',
             'vat.id'
 
-
-
         )
         .whereNull('products.deleted_at')
 
-
-
     //   search query
     if (search) {
-        console.log(search);
+      
         query.where(function () {
             this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
                 .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
@@ -223,9 +219,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     // Log the search query and total product count
     // console.log('Search:', search);
     // console.log('Total Product Count:', totalCount.total);
-
-
-
 
 
     // Apply range  filters
@@ -302,7 +295,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
     // Apply availability filters
-    filters.forEach(filter => {
+    filters?.forEach(filter => {
         if (filter.column === 'product_inventory.stock_availability') {
             if (filter.value === 'In stock') {
                 query.where(function () {

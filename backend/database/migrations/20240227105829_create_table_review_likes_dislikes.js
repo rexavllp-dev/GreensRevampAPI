@@ -4,12 +4,11 @@
  * @returns { Promise<void> }
  */
 export const up = async (knex) => {
-    await knex.schema.createTable('cancel_orders', (table) => {
+    await knex.schema.createTable('review_likes_dislikes', (table) => {
         table.increments('id').primary();
-        table.integer('order_id').unsigned().references('id').inTable('user_orders');
-        table.integer('cancel_reason_id').unsigned().references('id').inTable('cancel_reasons');
-        table.string('cancel_note');
-        table.enum('cancel_type', ["full", "partial"]);
+        table.integer('user_id').unsigned().references('id').inTable('users');
+        table.integer('review_id').unsigned().references('id').inTable('product_reviews');
+        table.enum('action', ['like', 'dislike']);
         table.dateTime('created_at').defaultTo(knex.fn.now());
         table.dateTime('updated_at').defaultTo(knex.fn.now());
     });
@@ -21,6 +20,5 @@ export const up = async (knex) => {
  * @returns { Promise<void> }
  */
 export const down = async (knex) => {
-    return knex.schema.dropTable('cancel_orders');
+    return knex.schema.dropTable('review_likes_dislikes');
 };
-

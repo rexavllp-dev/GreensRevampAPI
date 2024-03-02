@@ -37,11 +37,14 @@ export const getAllWishlist = async (userId) => {
             .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
             .crossJoin('vat')
             .where('wishlist.user_id', userId)
+            .whereNot('wishlist.product_id', null)
             .select(
                 'products.*',
                 'products.id as product_id',
                 'brands.*',
                 'brands.id as brand_id',
+                'wishlist.*',
+                'wishlist.id as wishlistId',
                 'categories.*',
                 "categories.id as category_id",
                 "products_price.*",
@@ -85,6 +88,7 @@ export const getAllWishlist = async (userId) => {
                 'product_seo.id',
                 'product_badge.id',
                 'product_category.id',
+                'wishlist.id',
                 'vat.id'
             );
 

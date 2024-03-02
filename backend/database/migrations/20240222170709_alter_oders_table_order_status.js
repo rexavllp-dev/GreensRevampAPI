@@ -4,7 +4,6 @@
 */
 export const up = async (knex) => {
     await knex.schema.alterTable('user_orders', (table) => {
-
         table.integer('ord_order_status').unsigned().references('id').inTable('order_statuses').alter();
     });
 };
@@ -16,7 +15,6 @@ export const up = async (knex) => {
 */
 export const down = async (knex) => {
     await knex.schema.alterTable('user_orders', (table) => {
-
         table.integer('ord_order_status').unsigned().references('id').inTable('order_statuses').alter();
     });
 };

@@ -1,7 +1,12 @@
 import db from '../../config/dbConfig.js';
 
-export const createUserAddress = async (addressData) => {
-    const address = await db('address').insert(addressData);
+export const createUserAddress = async (userId, addressData) => {
+    const address = await db('address')
+    .insert({
+        user_id: userId,
+        ...addressData
+    });
+    
     return address;
 }
 
@@ -55,7 +60,7 @@ export const updateOtherUserAddress = async (userId, addressId) => {
 
     const addresses = await getUserAddresses(userId);
     for (let i = 0; i < addresses.length; i++) {
-        if (addresses[i].id !== addressId) {
+        if (addresses[i].id != addressId) {
             const updatedAddress = { ...addresses[i], is_default: false };
             await updateUserAddress(updatedAddress, addresses[i].id);
         }

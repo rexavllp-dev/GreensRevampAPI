@@ -3,17 +3,16 @@ import db from '../../config/dbConfig.js';
 
 
 // Function to create a user order
-export const createUserOrder = async (userId, orderData) => {
+export const createUserOrder = async (trx, userId, orderData) => {
 
     let addressId = null;
+
     if (typeof orderData.address_id === 'number') {
         addressId = orderData.address_id;
     } else if (typeof orderData.address_id === 'string' && !isNaN(parseInt(orderData.address_id))) {
         addressId = parseInt(orderData.address_id);
     }
 
-    console.log(orderData);
-    const trx = await db.transaction(); // Start a transaction
 
     try {
         const newOrder = await trx("user_orders")
@@ -32,12 +31,37 @@ export const createUserOrder = async (userId, orderData) => {
             })
             .returning('*');
 
+        return newOrder;
+    } catch (error) {
+        await trx.rollback();
+        throw error;
+    }
+};
 
+
+
+// Function to create order items
+export const createOrderItems = async (trx, orderId, orderItems) => {
+
+    try {
+
+        const insertedOrderItems = [];
+
+        for (const item of orderItems) {
+            item.order_id = orderId;
+            const insertedItem = await trx('order_items')
+                .insert(item)
+                .returning('*');
+
+                const getProduct = await trx('products').select('*').where({id: insertedItem[0].product_id}).first();
+                console.log("products",getProduct);
+                insertedItem.push(getProduct);
+            insertedOrderItems.push(insertedItem);
+        }
+
+        return insertedOrderItems;
 
         // Commit the transaction if everything is successful
-        await trx.commit();
-
-        return newOrder;
     } catch (error) {
         // Rollback the transaction if there's an error
         await trx.rollback();
@@ -45,18 +69,37 @@ export const createUserOrder = async (userId, orderData) => {
     }
 };
 
-// Function to create order items
-export const createOrderItems = async (orderId, orderItems) => {
-    const trx = await db.transaction(); // Start a transaction
+// Update product inventory
+export const updateInventoryQty = async (trx, productId, data) => {
 
     try {
-        for (const item of orderItems) {
-            item.order_id = orderId;
-            await db('order_items').transacting(trx).insert(item);
-        }
+
+        const updatedInventory = await db('product_inventory').where({ product_id: productId })
+            .update(data).returning('*')
 
         // Commit the transaction if everything is successful
-        await trx.commit();
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        await trx.rollback();
+        throw error; // Rethrow the error for the caller to handle
+    }
+};
+
+// Update stock history table
+export const updateStockHistoryWhenOrder = async (trx, productId, currentStock, qty, newQuantity, comment, action) => {
+
+    try {
+        await db('stock_history').insert({
+            product_id: productId,
+            previous_stock: currentStock,
+            qty: qty,
+            remaining_stock: newQuantity,
+            comment: comment,
+            action: action === 'add' ? 'Stock Returned' : 'Stock Sold',
+            created_at: new Date(),
+            updated_at: new Date(),
+        });
+        // Commit the transaction if everything is successful
     } catch (error) {
         // Rollback the transaction if there's an error
         await trx.rollback();
@@ -68,28 +111,27 @@ export const createOrderItems = async (orderId, orderItems) => {
 
 // Function to insert a new address into the database
 export const insertNewAddressIntoDatabase = async (
+    trx,
     customerId,
     addressLine,
     addressLine2,
     flatVilla,
     customerName,
+    customerEmail,
     customerCountryCode,
     customerPhone,
     contactlessDelivery,
     deliveryRemark,
     zipCode,
-
+    addressTitle
 ) => {
-    const trx = await db.transaction(); // Start a transaction
-
-    console.log(addressLine);
     try {
-        // Insert the new address into the database
+
         const [insertedAddressId] = await trx("address")
             .insert({
-
                 user_id: customerId,
                 full_name: customerName,
+                address_email: customerEmail,
                 mobile_country_code: customerCountryCode,
                 mobile_number: customerPhone,
                 address_line_1: addressLine,
@@ -98,20 +140,23 @@ export const insertNewAddressIntoDatabase = async (
                 contactless_delivery: contactlessDelivery,
                 delivery_remark: deliveryRemark,
                 zip_code: zipCode,
-
+                address_title: addressTitle
             })
+
             .returning('id');
 
-        // Commit the transaction if everything is successful
-        await trx.commit();
-
         return insertedAddressId;
+
     } catch (error) {
-        // Rollback the transaction if there's an error
+
         await trx.rollback();
-        throw error; // Rethrow the error for the caller to handle
+
+        throw error;
     }
 };
+
+
+
 
 
 export const updateAnOrder = async (orderId, updatedData) => {
@@ -128,6 +173,7 @@ export const getAOrder = async (orderId) => {
         .where({ 'user_orders.id': orderId })
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('address', 'user_orders.address_id', 'address.id')
 
         .select(
 
@@ -137,7 +183,8 @@ export const getAOrder = async (orderId) => {
             'order_items.id as orderItemId',
             'products.*',
             'products.id as productId',
-
+            'address.*',
+            'address.id as addressId'
         );
 
     return order;
@@ -145,43 +192,93 @@ export const getAOrder = async (orderId) => {
 
 
 
-
-export const getAllUserOrders = async (order_status_id, search_query,order_date) => {
+export const getAOrderData = async (orderId) => {
     const orders = await db("user_orders")
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
+        .where({ 'user_orders.id': orderId })
         .select(
 
             'user_orders.*',
             'user_orders.id as orderId',
             'order_items.*',
             'order_items.id as orderItemId',
+            'order_items.product_id as orderProductId',
             'products.*',
             'products.id as productId',
 
+
+        )
+        .groupBy('user_orders.id', 'order_items.id', 'products.id');
+
+
+    // Group orders by orderId
+    const groupedOrders = {};
+    orders.forEach(order => {
+        if (!groupedOrders[order.orderId]) {
+            groupedOrders[order.orderId] = {
+                ...order,
+                products: [],
+                productTotalQty: 0,
+            };
+        }
+        if (order.productId) {
+            const opQty = parseInt(order.op_qty, 10) || 0;
+            groupedOrders[order.orderId].products.push({
+                ...order,
+            });
+
+            // Summing up the op_qty for each product
+            groupedOrders[order.orderId].productTotalQty += opQty;
+        }
+    });
+
+    // Convert the object back to an array of orders
+    const resultOrders = Object.values(groupedOrders);
+
+    return resultOrders;
+};
+
+
+
+
+
+export const getAllUserOrders = async (order_status_id, search_query, order_date) => {
+    let orders = await db("user_orders")
+        .select(
+            'user_orders.*',
+            'user_orders.id as orderId'
         );
 
     if (order_status_id !== null) {
-        orders.where({ 'user_orders.ord_order_status': order_status_id })
-
-    }
+        orders.where({ 'user_orders.ord_order_status': order_status_id });
+    };
 
     if (search_query !== null) {
-        orders.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
-        .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
-        .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`)
-        .orWhere('user_orders.ord_status', 'ilike', `%${search_query}%`)
-        
+        orders.where(function () {
+            this.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
+                .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
+                .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`);
+        });
+    };
+
+    if (order_date !== null) {
+        orders.where({ 'user_orders.created_at': order_date });
+    };
+
+    for (let order of orders) {
+        let products = await db("order_items")
+            .leftJoin('products', 'order_items.product_id', 'products.id')
+            .select(
+                'order_items.*',
+                'order_items.id as orderItemId',
+                'products.*',
+                'products.id as productId',
+            )
+            .where('order_items.order_id', order.id);
+
+        order.products = products;
     }
-
-    if(order_date!==null){
-
-        orders.where({ 'user_orders.created_at': order_date })
-
-    }
-
-
-
 
     return orders;
 };

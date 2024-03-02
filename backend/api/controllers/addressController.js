@@ -8,6 +8,8 @@ import {
 } from "../models/addressModel.js";
 
 
+
+
 // create address
 export const createAddress = async (req, res) => {
 
@@ -29,7 +31,7 @@ export const createAddress = async (req, res) => {
             // User has existing addresses
             if (addressData.is_default) {
                 // Find the current default address
-                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default === true);
+                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default == true);
                 if (defaultAddressIndex !== -1) {
                     // Set is_default to false for the current default address
                     userAddresses[defaultAddressIndex].is_default = false;
@@ -39,12 +41,11 @@ export const createAddress = async (req, res) => {
             }
         };
 
-        const address = await createUserAddress(addressData);
+        const address = await createUserAddress(userId, addressData);
 
         res.status(200).json({
             status: 200,
             success: true,
-            result: address,
             message: 'Address created successfully',
         })
 
@@ -62,8 +63,41 @@ export const createAddress = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
 
-    const addressData = req.body;
+    // const addressData = req.body;
     const addressId = req.params.addressId;
+    const userId = req.user.userId;
+
+    const {
+        address_title,
+        full_name,
+        address_email,
+        mobile_country_code,
+        mobile_number,
+        flat_villa,
+        zip_code,
+        delivery_remark,
+        address_line_1,
+        address_line_2,
+        latitude,
+        longitude,
+        is_default
+    } = req.body;
+
+    const addressData = {
+        address_title,
+        full_name,
+        address_email,
+        mobile_country_code,
+        mobile_number,
+        flat_villa,
+        zip_code,
+        delivery_remark,
+        address_line_1,
+        address_line_2,
+        latitude,
+        longitude,
+        is_default
+    }
 
     console.log('Received address data:', addressData); // Log the received data
     try {
@@ -76,8 +110,8 @@ export const updateAddress = async (req, res) => {
             });
         }
 
-        const userAddresses = await getUserAddresses(req.user?.id);
-        
+        const userAddresses = await getUserAddresses(req.user?.userId);
+
         if (userAddresses.length === 0) {
             // User has no addresses, set is_default to true for the new address
             addressData.is_default = true;
@@ -85,7 +119,7 @@ export const updateAddress = async (req, res) => {
             // User has existing addresses
             if (addressData.is_default) {
                 // Find the current default address
-                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default === true);
+                const defaultAddressIndex = userAddresses.findIndex(address => address.is_default == true);
                 if (defaultAddressIndex !== -1) {
                     // Set is_default to false for the current default address
                     userAddresses[defaultAddressIndex].is_default = false;
@@ -98,7 +132,7 @@ export const updateAddress = async (req, res) => {
         const address = await updateUserAddress(addressData, addressId);
 
         // Update other addresses
-        await updateOtherUserAddress(req.user?.id, addressId);
+        await updateOtherUserAddress(req.user?.userId, addressId);
 
         res.status(200).json({
             status: 200,
@@ -176,7 +210,7 @@ export const getAllAddresses = async (req, res) => {
             message: 'Failed to get addresses. Please try again later.'
         })
     }
-}
+};
 
 // delete address
 

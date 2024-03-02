@@ -4,7 +4,7 @@ import { createTransaction } from './transactionController.js';
 import { calculatePrice } from '../helpers/calculatePrice.js';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import { updateAnOrder } from "../models/orderModel.js";
-import { createATransaction } from '../models/transactionModel.js';
+import { createATransaction, findTransaction } from '../models/transactionModel.js';
 
 export const handlePaymentRequest = async (req, res) => {
 
@@ -14,14 +14,14 @@ export const handlePaymentRequest = async (req, res) => {
         // const collectable_amount = 1000; // Amount need to be collected
         const orderID = req.body.order_id;
 
-        if(!orderID) {
+        if (!orderID) {
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: 'Order ID is required',
             })
         }
-    
+
         let data = null;
 
         if (!req.session.cart) {
@@ -96,8 +96,19 @@ export const handlePaymentRequestCompletion = async (req, res) => {
         console.log(lineItems.data[0].price.id);
         const stripeTransactionId = lineItems.data[0].price.id;
 
-        const transaction = await createATransaction({ order_id: orderId, stripe_transaction_id: stripeTransactionId });
+        const isTransactionExist = await findTransaction({ order_id: orderId });
+        console.log(isTransactionExist)
 
+        if (isTransactionExist?.length) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Transaction already exist",
+                result: isTransactionExist
+            });
+        }
+
+        const transaction = await createATransaction({ order_id: orderId, stripe_transaction_id: stripeTransactionId });
 
         res.status(200).json({
             status: 200,
