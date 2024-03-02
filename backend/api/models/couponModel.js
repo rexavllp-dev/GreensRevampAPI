@@ -9,7 +9,7 @@ export const createACoupon = async (couponData) => {
 
 export const updateACoupon = async (couponId, couponData) => {
     const coupon = await db("coupons")
-        .where({ id: couponId }) 
+        .where({ id: couponId })
         .update(couponData)
         .returning('*');
     return coupon;
@@ -19,6 +19,14 @@ export const updateACoupon = async (couponId, couponData) => {
 export const getACoupon = async (couponId) => {
     const coupon = await db("coupons")
         .where({ id: couponId })
+        .first();
+    return coupon;
+};
+
+// Get single coupon by coupon code 
+export const getCouponByCode = async (couponCode) => {
+    const coupon = await db("coupons")
+        .where({ coupon_code: couponCode })
         .first();
     return coupon;
 };

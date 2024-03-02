@@ -47,6 +47,7 @@ export const getAllReplacementProducts = async () => {
         .leftJoin('replacement_gallery', 'replace_products.id', 'replacement_gallery.replace_id')
         .select(
 
+            'replace_products.id as replaceId',
 
             'order_items.id as orderItemId',
             'order_items.op_qty',
@@ -73,6 +74,8 @@ export const getAllReplacementProducts = async () => {
 
         .groupBy(
 
+            'replace_products.id',
+
             'order_items.id',
             'order_items.op_qty',
             'order_items.created_at',
@@ -88,4 +91,12 @@ export const getAllReplacementProducts = async () => {
 
 
     return replacements;
+};
+
+
+
+export const updateReplacementStatusByAdmin = async (replaceId, replaceStatus) => {
+    return await db('replace_products')
+        .where({ id: replaceId })
+        .update({ replace_status: replaceStatus });
 };
