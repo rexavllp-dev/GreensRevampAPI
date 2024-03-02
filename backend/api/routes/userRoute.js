@@ -28,6 +28,7 @@ import { ChangeUserPassword, updateUserAccountInformations, updateUserAccountToC
 import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
+import { replaceAProduct } from '../controllers/replaceController.js';
 
 
 
@@ -128,6 +129,8 @@ router.post('/return-product', verifyToken, returnProduct);
 
 // user communication and privacy
 router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunicationAndPrivacy);
+// user replacement products routes
+router.post('/replace-product', verifyToken, replaceAProduct)
 
 export default router;
 

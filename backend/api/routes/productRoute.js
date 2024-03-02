@@ -15,6 +15,7 @@ import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVari
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkStatusWithProductStatus, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
+import { replaceAProduct } from '../controllers/replaceController.js';
 
 
 
@@ -141,6 +142,8 @@ router.delete('/delete-related-product', deleteRelatedProduct);
 
 
 
+
+
 // reviews routes
 
 router.post('/review/create-review', verifyToken, addProductReview);
@@ -158,7 +161,6 @@ router.get('/review/get-user-reviews', verifyToken, getAllUserProductReviews);
 router.post('/review/like-dislike', verifyToken, reviewLikeAndDislike);
 
 
-
 // admin reviews
 
 // approve review by admin 
@@ -167,6 +169,9 @@ router.put('/review/approve-review/:reviewId', approveReviewByAdmin);
 // get all reviews for admin
 router.get('/review/get-all-reviews', getAllReviewsForAdmin);
 
+
+
+// replacement products routes
 
 
 
