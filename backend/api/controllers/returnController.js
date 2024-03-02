@@ -148,3 +148,29 @@ export const getAllReturnsForAdmin = async (req, res) => {
         });
     }
 };
+
+// admin return status update
+export const updateReturnStatus = async (req, res) => {
+
+    const returnData = req.body;
+    const returnId = req.params.returnId;
+
+    try {
+        const updatedData = await getReturnById(returnId, returnData);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Updated return status successfully",
+        });
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to update return status",
+            error: error
+        });
+    }
+};
