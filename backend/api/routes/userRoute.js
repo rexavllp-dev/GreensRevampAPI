@@ -78,13 +78,10 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 
 
-// get single user
-router.get('/:id', getSingleUser);
-
-router.get('/getuserinfo/:token', getUserInformation);
-
 // get user details by middleware
 router.get('/user-details', verifyToken, getUserDetails);
+
+router.get('/getuserinfo/:token', getUserInformation);
 
 // update using email  using token
 router.put('/update_email/:token', updateEmailUsingToken);
@@ -129,6 +126,10 @@ router.post('/return-product', verifyToken, returnProduct);
 
 // user replacement products routes
 router.post('/replace-product', verifyToken, replaceAProduct)
+
+
+// get single user
+router.get('/:id', getSingleUser);
 
 export default router;
 
