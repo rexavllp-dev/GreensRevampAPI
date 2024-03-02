@@ -460,13 +460,13 @@ export const updateUserCompany = async (req, res) => {
         };
 
         // checking if there are files
-        if (!req.files) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: "No image provided",
-            });
-        }
+        // if (!req.files) {
+        //     return res.status(400).json({
+        //         status: 400,
+        //         success: false,
+        //         message: "No image provided",
+        //     });
+        // }
 
         let company_vat_certificate;
         let company_trade_license;
