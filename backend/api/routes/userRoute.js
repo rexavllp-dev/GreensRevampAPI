@@ -16,7 +16,7 @@ import {
     updateEmailUsingToken,
     updateMobileUsingToken,
     updateUserDetails,
-    verifyEmail,
+    verifyEmail, 
     verifyLoginOtp,
     verifyOtp
 } from '../controllers/userController.js';

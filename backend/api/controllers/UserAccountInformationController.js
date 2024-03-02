@@ -1,6 +1,6 @@
 import { checkCompanyExist } from "../models/companyModel.js";
 import { createCompany, updateUserAccountInformation } from "../models/userAccountInformationModel.js";
-import { checkUserExist, getUserById } from "../models/userModel.js";
+import { getUserById } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
