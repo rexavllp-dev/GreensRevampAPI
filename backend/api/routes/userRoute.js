@@ -27,6 +27,7 @@ import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailControl
 import { ChangeUserPassword, updateUserAccountInformations, updateUserAccountToCompany } from '../controllers/UserAccountInformationController.js';
 import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
+import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
 
 
 
@@ -122,9 +123,11 @@ router.post('/change-password/:userId', verifyToken, ChangeUserPassword);
 
 router.put('/update-user-account-to-company/:userId', updateUserAccountToCompany);
 
-
 // user return products routes 
 router.post('/return-product', verifyToken, returnProduct);
+
+// user communication and privacy
+router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunicationAndPrivacy);
 
 export default router;
 

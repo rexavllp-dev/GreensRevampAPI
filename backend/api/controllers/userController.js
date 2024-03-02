@@ -51,7 +51,7 @@ export const getAllUsers = async (req, res) => {
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Users fetch successfull ",
+            message: "Users fetch successfully ",
             result: users
         });
 
