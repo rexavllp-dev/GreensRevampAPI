@@ -161,12 +161,11 @@ export const applyCoupon = async (req, res) => {
                 message: "Coupon expired"
             })
         }
-
+        
         let coupons = req.session.coupons;
-        console.log(coupons);
 
         // Check coupon limit reached if we have previously applied coupon in the session
-        if(coupons === undefined || !coupons?.length) {
+        if (coupons !== undefined || !coupons?.length) {
 
             // Check coupon limit reached
             if (coupons?.length > 2) {
@@ -176,7 +175,7 @@ export const applyCoupon = async (req, res) => {
                     message: "Coupon limit reached"
                 })
             }
-    
+
             // Check coupon type limit reached (normal)
             if (coupons?.length === 1 && coupons[0].coupon_type === 'normal' && coupon.coupon_type === 'normal') {
                 return res.status(404).json({
@@ -185,7 +184,7 @@ export const applyCoupon = async (req, res) => {
                     message: "Normal coupon limit reached. You can only apply refund coupon"
                 })
             }
-    
+
             // Check coupon type limit reached (refund)
             if (coupons?.length === 1 && coupons[0].coupon_type === 'refund' && coupon.coupon_type === 'refund') {
                 return res.status(404).json({
@@ -212,10 +211,12 @@ export const applyCoupon = async (req, res) => {
 
         coupons = coupons?.sort(sortByCouponType);
 
-        const { totals } = calculatePrice({
+        const calcPrice = await calculatePrice({
             session: req.session,
             calculateCouponDiscount: false
         })
+
+        const totals = calcPrice.totals;
 
         // Map through the coupons and calculate the discount
         let discount = 0;
@@ -235,6 +236,8 @@ export const applyCoupon = async (req, res) => {
 
             if (couponType === 'normal' && couponDiscountType === 'percentage') {
                 couponPriceValue = withDiscount * (couponValue / 100);
+                console.log('withDiscount: ', withDiscount);
+                console.log('couponPriceValue: ', couponPriceValue);
                 if (withDiscount < minAmount) {
                     if (coupons.length === 1) {
                         return res.status(400)
@@ -322,14 +325,13 @@ export const applyCoupon = async (req, res) => {
                 discount += couponPriceValue;
                 is_free_shipping = isFreeShipping;
             }
-
-
         }
 
         const discountData = {
-            discount: discount,
+            discount: discount.toFixed(2),
             is_free_shipping: is_free_shipping
         }
+        console.log('discountData: ', discountData);
 
         req.session.coupon_discount = discountData;
         // await session.save();

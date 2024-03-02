@@ -55,7 +55,7 @@ export const calculatePrice = async ({
                 product.stock_availability === 'Out of stock' &&
                 cart[i].quantity <= product.product_quantity &&
                 cart[i].max_quantity <= product.max_qty
-                
+
             ) {
                 // If the product is not in the condition, continue to the next iteration
                 productCount++;
@@ -113,7 +113,6 @@ export const calculatePrice = async ({
 
             // Apply VAT to regular and special prices if within the offer period
             const vatPercentage = vat.vat / 100;
-            price = price
             cart[i].price = price;
             cart[i].priceVat = price + (price * vatPercentage);
             cart[i].totalPrice = price * parseInt(cart[i].quantity);
@@ -125,7 +124,7 @@ export const calculatePrice = async ({
 
             // Track total discount for all products
             totalDiscount += discount * parseInt(cart[i].quantity);
-            cart[i].subTotal = basePrice * parseInt(cart[i].quantity);
+            cart[i].subTotal = price * parseInt(cart[i].quantity);
             subTotal += cart[i].subTotal;
 
             // Calculate the total product price which don't have discount
@@ -140,68 +139,6 @@ export const calculatePrice = async ({
     if (calculateCouponDiscount && couponDiscount.discount > 0) {
         totalDiscount += parseFloat(couponDiscount.discount);
     }
-
-    // // Loop through the coupon codes
-    // for (let i = 0; i < coupons.length; i++) {
-
-    //     const couponCode = coupons[i];
-
-    //     // Find the coupon code in the database
-    //     const coupon = await getACoupon(couponCode);
-
-    //     if (coupon) {
-
-    //         if (coupon.coupon_status === false) {
-    //             coupons.splice(i, 1);
-    //             session.coupons = coupons;
-    //             continue;
-    //         }
-
-    //         // Check coupon start date and end date
-    //         const couponStartDate = new Date(coupon.coupon_start_date);
-    //         const couponEndDate = new Date(coupon.coupon_end_date);
-    //         const currentDate = new Date();
-    //         if (currentDate < couponStartDate || currentDate > couponEndDate) {
-    //             coupons.splice(i, 1);
-    //             session.coupons = coupons;
-    //             continue;
-    //         }
-
-    //         let productsAmount = 0;
-
-    //         const couponType = coupon.coupon_type;
-    //         const couponDiscountType = coupon.coupon_discount_type;
-    //         const couponValue = coupon.coupon_value;
-    //         const minAmount = coupon.min_amount;
-
-    //         if (i === 0) {
-    //             if (couponType === 'normal') {
-    //                 productsAmount = totalProductPriceVat;
-    //             } else if (couponType === 'refund') {
-    //                 productsAmount = discountProductTotal;
-    //             }
-    //         }
-    //         else {
-    //             if (couponType === 'normal') {
-    //                 productsAmount = totalProductPriceVat - totalDiscount;
-    //             } else if (couponType === 'refund') {
-    //                 productsAmount = discountProductTotal - totalDiscount;
-    //             }
-    //         }
-
-    //         if (productsAmount < minAmount) {
-    //             continue;
-    //         }
-
-    //         if (couponDiscountType === 'percentage') {
-    //             couponDiscount = (productsAmount * couponValue) / 100;
-    //         } else if (couponDiscountType === 'fixed') {
-    //             couponDiscount = couponValue;
-    //         }
-
-    //     }
-
-    // }
 
     // Add store pickup charge only if isStorePickup is true and totalProductPrice is less than 50
     let storePickupCharge = 0;
@@ -227,17 +164,18 @@ export const calculatePrice = async ({
     // Calculate total product price with VAT
     const taxPrice = (totalProductPrice * taxRate)
     const totalProductCount = productCount;
-    const totalProductVAT = (parseFloat(subTotal) - parseFloat(totalDiscount)) * (vat.vat / 100);
+    const totalProductVAT = ((parseFloat(subTotal) - parseFloat(totalDiscount)) + shippingCharge + codCharge + storePickupCharge) * taxRate;
 
     // Set price for checking the coupons (with and without discount charge)
     couponCheckPrices.withDiscount = nonActiveProductsCount === 0 ? 0 : discountProductTotal + shippingCharge + storePickupCharge;
     couponCheckPrices.withoutDiscount = nonActiveProductsCount === 0 ? 0 : (totalProductPriceVat - totalDiscount) + shippingCharge + storePickupCharge;
 
     // Grand Total formula =((sub total-Discount)+Service charges+Delivery charge))+vat 5%
-    const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : ((subTotal - totalDiscount) + shippingCharge + codCharge + storePickupCharge) + taxPrice
+    const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : ((subTotal - totalDiscount) + shippingCharge + codCharge + storePickupCharge) + totalProductVAT;
     const totalProductPriceWithVAT = nonActiveProductsCount === 0 ? 0 : (subTotal - totalDiscount) + taxPrice
 
     const totals = {
+
         subTotal: subTotal.toFixed(2),
         grandTotal: grandTotalWithVAT.toFixed(2),
         totalProductPrice: totalProductPrice.toFixed(2),
