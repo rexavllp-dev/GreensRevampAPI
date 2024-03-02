@@ -55,7 +55,7 @@ export const calculatePrice = async ({
                 product.stock_availability === 'Out of stock' &&
                 cart[i].quantity <= product.product_quantity &&
                 cart[i].max_quantity <= product.max_qty
-
+                
             ) {
                 // If the product is not in the condition, continue to the next iteration
                 productCount++;

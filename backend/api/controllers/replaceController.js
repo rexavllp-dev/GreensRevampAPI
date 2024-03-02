@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import aws from 'aws-sdk';
-import { addReplaceImage, createReplacePrd, getAllReplacementProducts, getReplacementById } from "../models/replaceModel.js";
+import { addReplaceImage, createReplacePrd, getAllReplacementProducts, getReplacementById, updateReplacementStatusByAdmin } from "../models/replaceModel.js";
+
 
 
 const awsConfig = ({
@@ -127,7 +128,7 @@ export const getSingleReplacement = async (req, res) => {
 export const getAllReplacementsForAdmin = async (req, res) => {
 
     try {
-        
+
         const replacements = await getAllReplacementProducts();
 
         res.status(200).json({
@@ -146,6 +147,36 @@ export const getAllReplacementsForAdmin = async (req, res) => {
             message: 'Failed to get replacements. Please try again later.',
             error: error
 
+        });
+    }
+};
+
+
+// admin return status update
+export const updateReplacementStatus = async (req, res) => {
+
+    const { replace_status } = req.body;
+    const replaceId = req.params.replacementId;
+
+    console.log(replace_status);
+    try {
+        const updatedData = await updateReplacementStatusByAdmin(replaceId, replace_status);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Updated replacement status successfully",
+            result: updatedData
+        });
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to update replacement status",
+            error: error
         });
     }
 };

@@ -3,7 +3,7 @@ import { adminUserRegister,  approveCompanyByAdmin, isActiveByAdmin, isNotActive
 import {  updateAndApproveOrRejectBulkOrders } from '../controllers/bulkController.js';
 import { AddPrivacyPolicy, deletePrivacyPolicyById, getALLPrivacyPolicy, updatePrivacyPolicyById } from '../controllers/PrivacyPoliciesController.js';
 import { getAllReturnsForAdmin, getSingleReturn, updateReturnStatus } from '../controllers/returnController.js';
-import { getAllReplacementsForAdmin, getSingleReplacement } from '../controllers/replaceController.js';
+import { getAllReplacementsForAdmin, getSingleReplacement, updateReplacementStatus } from '../controllers/replaceController.js';
 
 
 const router = express.Router();
@@ -51,12 +51,14 @@ router.get('/return/get-return/:returnId', getSingleReturn);
 
 
 
+// update return status
+router.put('/replacement/update-status/:replacementId', updateReplacementStatus);                                                                             
 
 // get single replacement for admin
-router.get('/get-return/:replaceId', getSingleReplacement);
+router.get('/replacement/get-replacement/:replacementId', getSingleReplacement);
 
 // get all replacements for admin
-router.get('/get-all-replacements', getAllReplacementsForAdmin);
+router.get('/replacement/get-all-replacements', getAllReplacementsForAdmin);
 
 
 

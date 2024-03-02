@@ -9,7 +9,11 @@ export const addProductToCart = async (req, res) => {
     // console.log(req.session);
     req.session.isStorePickup = false;
     req.session.isCod = false;
-
+    req.session.coupons = [];
+    req.session.coupon_discount = {
+        discount: 0,
+        is_free_shipping: false
+    };
 
     // console.log(productId, quantity);
 

@@ -92,3 +92,11 @@ export const getAllReplacementProducts = async () => {
 
     return replacements;
 };
+
+
+
+export const updateReplacementStatusByAdmin = async (replaceId, replaceStatus) => {
+    return await db('replace_products')
+        .where({ id: replaceId })
+        .update({ replace_status: replaceStatus });
+};

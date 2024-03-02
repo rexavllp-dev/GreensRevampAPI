@@ -1,5 +1,5 @@
 import session from 'session';
-import { createACoupon, deleteACoupon, getACoupon, getCoupons, updateACoupon } from "../models/couponModel.js";
+import { createACoupon, deleteACoupon, getACoupon, getCouponByCode, getCoupons, updateACoupon } from "../models/couponModel.js";
 import { calculatePrice } from "../helpers/calculatePrice.js";
 
 export const createCoupon = async (req, res) => {
@@ -163,32 +163,36 @@ export const applyCoupon = async (req, res) => {
         }
 
         const coupons = session.coupons;
+ 
+        // Check coupon limit reached if we have previously applied coupon in the session
+        if(!coupons === undefined){
 
-        // Check coupon limit reached
-        if (coupons.length > 2) {
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: "Coupon limit reached"
-            })
-        }
-
-        // Check coupon type limit reached (normal)
-        if (coupons.length === 1 && coupons[0].coupon_type === 'normal' && coupon.coupon_type === 'normal') {
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: "Normal coupon limit reached. You can only apply refund coupon"
-            })
-        }
-
-        // Check coupon type limit reached (refund)
-        if (coupons.length === 1 && coupons[0].coupon_type === 'refund' && coupon.coupon_type === 'refund') {
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: "Refund coupon limit reached"
-            })
+            // Check coupon limit reached
+            if (coupons.length > 2) {
+                return res.status(404).json({
+                    status: 404,
+                    success: false,
+                    message: "Coupon limit reached"
+                })
+            }
+    
+            // Check coupon type limit reached (normal)
+            if (coupons.length === 1 && coupons[0].coupon_type === 'normal' && coupon.coupon_type === 'normal') {
+                return res.status(404).json({
+                    status: 404,
+                    success: false,
+                    message: "Normal coupon limit reached. You can only apply refund coupon"
+                })
+            }
+    
+            // Check coupon type limit reached (refund)
+            if (coupons.length === 1 && coupons[0].coupon_type === 'refund' && coupon.coupon_type === 'refund') {
+                return res.status(404).json({
+                    status: 404,
+                    success: false,
+                    message: "Refund coupon limit reached"
+                })
+            }
         }
 
         coupons.push(coupon);
