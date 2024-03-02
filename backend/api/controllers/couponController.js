@@ -1,4 +1,4 @@
-import session from 'session';
+// import session from 'session';
 import { createACoupon, deleteACoupon, getACoupon, getCouponByCode, getCoupons, updateACoupon } from "../models/couponModel.js";
 import { calculatePrice } from "../helpers/calculatePrice.js";
 
@@ -162,13 +162,14 @@ export const applyCoupon = async (req, res) => {
             })
         }
 
-        const coupons = session.coupons;
- 
+        let coupons = req.session.coupons;
+        console.log(coupons);
+
         // Check coupon limit reached if we have previously applied coupon in the session
-        if(!coupons === undefined){
+        if(coupons === undefined || !coupons?.length) {
 
             // Check coupon limit reached
-            if (coupons.length > 2) {
+            if (coupons?.length > 2) {
                 return res.status(404).json({
                     status: 404,
                     success: false,
@@ -177,7 +178,7 @@ export const applyCoupon = async (req, res) => {
             }
     
             // Check coupon type limit reached (normal)
-            if (coupons.length === 1 && coupons[0].coupon_type === 'normal' && coupon.coupon_type === 'normal') {
+            if (coupons?.length === 1 && coupons[0].coupon_type === 'normal' && coupon.coupon_type === 'normal') {
                 return res.status(404).json({
                     status: 404,
                     success: false,
@@ -186,7 +187,7 @@ export const applyCoupon = async (req, res) => {
             }
     
             // Check coupon type limit reached (refund)
-            if (coupons.length === 1 && coupons[0].coupon_type === 'refund' && coupon.coupon_type === 'refund') {
+            if (coupons?.length === 1 && coupons[0].coupon_type === 'refund' && coupon.coupon_type === 'refund') {
                 return res.status(404).json({
                     status: 404,
                     success: false,
@@ -195,8 +196,8 @@ export const applyCoupon = async (req, res) => {
             }
         }
 
-        coupons.push(coupon);
-        session.coupons = coupons;
+        coupons?.push(coupon);
+        req.session.coupons = coupons;
 
         // Sort the coupon type based on the coupon type to calculate the percentage discount first
         function sortByCouponType(a, b) {
@@ -209,10 +210,10 @@ export const applyCoupon = async (req, res) => {
             return 0; // Keep the order unchanged for other cases
         }
 
-        coupons = coupons.sort(sortByCouponType);
+        coupons = coupons?.sort(sortByCouponType);
 
         const { totals } = calculatePrice({
-            session: session,
+            session: req.session,
             calculateCouponDiscount: false
         })
 
@@ -330,8 +331,8 @@ export const applyCoupon = async (req, res) => {
             is_free_shipping: is_free_shipping
         }
 
-        session.coupon_discount = discountData;
-        await session.save();
+        req.session.coupon_discount = discountData;
+        // await session.save();
 
         res.status(200).json({
             status: 200,
