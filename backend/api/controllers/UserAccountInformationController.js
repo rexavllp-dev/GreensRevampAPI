@@ -67,7 +67,7 @@ export const updateUserAccountInformations = async (req, res) => {
 
 export const ChangeUserPassword = async (req, res) => {
 
-    const userId = req.params.userId;
+    const userId = req.user.userId;
 
     const { oldPassword, newPassword, confirmPassword } = req.body;
 
@@ -106,7 +106,7 @@ export const ChangeUserPassword = async (req, res) => {
                 return res.status(400).json({
                     status: 400,
                     success: false,
-                    message: "confirm Password does not match"
+                    message: "Confirm Password does not match"
                 })
             }
 

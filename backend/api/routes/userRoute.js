@@ -116,7 +116,7 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', { failur
 router.put('/update-user-account', verifyToken, updateUserAccountInformations);
 
 // change user password 
-router.post('/change-password/:userId', verifyToken, ChangeUserPassword);
+router.post('/change-password', verifyToken, ChangeUserPassword);
 
 // update user account to company account
 
