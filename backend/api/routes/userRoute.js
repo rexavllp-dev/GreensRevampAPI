@@ -24,7 +24,7 @@ import {
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
 import passport from 'passport';
 import { facebookAuth, googleAuth } from '../controllers/facebookAndGmailController.js';
-import { ChangeUserPassword, updateUserAccountInformations, updateUserAccountToCompany } from '../controllers/UserAccountInformationController.js';
+import { ChangeUserPassword, updateUserAccountInformations, updateUserAccountToCompany, updateUserCompany } from '../controllers/UserAccountInformationController.js';
 import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
@@ -115,6 +115,9 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', { failur
 
 router.put('/update-user-account', verifyToken, updateUserAccountInformations);
 
+// update company in user dashboard 
+router.put('/update-company', verifyToken, updateUserCompany);
+
 // change user password 
 router.post('/change-password', verifyToken, ChangeUserPassword);
 
@@ -127,6 +130,7 @@ router.post('/return-product', verifyToken, returnProduct);
 
 // user communication and privacy
 router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunicationAndPrivacy);
+
 // user replacement products routes
 router.post('/replace-product', verifyToken, replaceAProduct);
 
