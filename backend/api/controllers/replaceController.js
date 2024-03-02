@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import aws from 'aws-sdk';
-import { addReplaceImage, createReplacePrd } from "../models/replaceModel.js";
+import { addReplaceImage, createReplacePrd, getAllReplacementProducts, getReplacementById } from "../models/replaceModel.js";
 
 
 const awsConfig = ({
@@ -25,7 +25,7 @@ export const replaceAProduct = async (req, res) => {
 
         // Check if files are uploaded
         if (!files || !files.length) {
-            return res.status(400).json({
+            res.status(400).json({
                 status: 400,
                 success: false,
                 message: "File are required for replacement request."
@@ -92,3 +92,60 @@ export const replaceAProduct = async (req, res) => {
 };
 
 
+// admin controllers replacements
+
+
+// get single replacements
+export const getSingleReplacement = async (req, res) => {
+
+    const replacementId = req.params.replacementId;
+
+    try {
+
+        const replacementData = await getReplacementById(replacementId);
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched replacements successfully",
+            result: replacementData
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch replacements",
+            result: error
+        });
+
+    }
+};
+
+
+// get all replacements for admin 
+export const getAllReplacementsForAdmin = async (req, res) => {
+
+    try {
+        
+        const replacements = await getAllReplacementProducts();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'replacements fetched successfully',
+            result: replacements
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: 'Failed to get replacements. Please try again later.',
+            error: error
+
+        });
+    }
+};

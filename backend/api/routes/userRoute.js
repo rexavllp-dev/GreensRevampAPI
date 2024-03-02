@@ -130,7 +130,10 @@ router.post('/return-product', verifyToken, returnProduct);
 // user communication and privacy
 router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunicationAndPrivacy);
 // user replacement products routes
-router.post('/replace-product', verifyToken, replaceAProduct)
+router.post('/replace-product', verifyToken, replaceAProduct);
+
+
+
 
 export default router;
 
