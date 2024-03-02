@@ -423,9 +423,9 @@ export const updateUserCompany = async (req, res) => {
             company_landline: Joi.string().allow('').label("Landline"),
             company_landline_country_code: Joi.number().allow('').label("Country Code"),
 
-            company_vat_certificate: Joi.string().label("Vat Certificate"),
+            // company_vat_certificate: Joi.string().label("Vat Certificate"),
             company_trn_number: Joi.number().required().label("Trn Number"),
-            company_trade_license: Joi.string().label("Trade License"),
+            // company_trade_license: Joi.string().label("Trade License"),
             // company_trade_license_expiry: JoiExtended.date().raw().format("DD/MM/YYYY").required().label("Trade License Expiry Date"),
 
         });
