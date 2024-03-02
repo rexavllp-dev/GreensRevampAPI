@@ -1,4 +1,4 @@
-import { addReturnImage, createReturnPrd, getAllReturnProducts, getReturnById } from "../models/returnModel.js";
+import { addReturnImage, createReturnPrd, getAllReturnProducts, getReturnById, updateReturnStatusByAdmin } from "../models/returnModel.js";
 import sharp from "sharp";
 import aws from 'aws-sdk';
 
@@ -152,16 +152,18 @@ export const getAllReturnsForAdmin = async (req, res) => {
 // admin return status update
 export const updateReturnStatus = async (req, res) => {
 
-    const returnData = req.body;
+    const { return_status } = req.body;
     const returnId = req.params.returnId;
 
+    console.log(return_status);
     try {
-        const updatedData = await getReturnById(returnId, returnData);
+        const updatedData = await updateReturnStatusByAdmin(returnId, return_status);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Updated return status successfully",
+            result: updatedData
         });
     } catch (error) {
         console.log(error);

@@ -88,8 +88,8 @@ export const getAllReturnProducts = async () => {
 
 
 
-export const updateReturnStatusByAdmin = async (returnId, status) => {
+export const updateReturnStatusByAdmin = async (returnId, returnStatus) => {
     return await db('return_products')
         .where({ id: returnId })
-        .update({ return_status: status });
+        .update({ return_status: returnStatus });
 };
