@@ -132,7 +132,7 @@ export const applyCoupon = async (req, res) => {
 
     try {
 
-        const coupon = await getACoupon(couponCode);
+        const coupon = await getCouponByCode(couponCode);
 
         if (!coupon) {
             return res.status(404).json({
