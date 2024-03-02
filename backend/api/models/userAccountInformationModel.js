@@ -42,6 +42,7 @@ export const updateCompany = async (companyId, data) => {
 
 
 
+
 export const getCurrentUserCompanyTrn = async (userId) => {
   const companyTrn = await db('users')
     .leftJoin('company', 'users.usr_company', 'company.id')

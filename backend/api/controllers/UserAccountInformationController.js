@@ -402,7 +402,7 @@ export const updateUserCompany = async (req, res) => {
                success: false,
                message: "Cannot update TRN number. TRN number must remain the same.",
            });
-       }
+       };
 
 
         if (req.file) {
@@ -416,14 +416,6 @@ export const updateUserCompany = async (req, res) => {
         const schema = Joi.object({
             usr_firstname: Joi.string().required().label("First Name"),
             usr_lastname: Joi.string().required().label("Last Name"),
-            usr_mobile_number: Joi.string().required().label("Mobile Number"),
-            usr_mobile_country_code: Joi.number().required().label("Country Code"),
-            usr_email: Joi.string().required().label("Email"),
-            usr_designation: Joi.string().label("Designation"),
-            usr_tos_accepted: Joi.boolean().required().label("Term Of Use"),
-            usr_newsletter_accepted: Joi.boolean().required().label("Newsletter"),
-            email_verified: Joi.boolean(),
-
             // company field
 
             company_name: Joi.string().required().label("Company Name"),
@@ -444,13 +436,7 @@ export const updateUserCompany = async (req, res) => {
         const validate_data = {
             usr_firstname,
             usr_lastname,
-            usr_mobile_number,
-            usr_mobile_country_code,
-            usr_email,
-            usr_designation,
-            usr_tos_accepted,
-            usr_newsletter_accepted,
-            email_verified,
+           
 
             company_name,
             company_landline,
