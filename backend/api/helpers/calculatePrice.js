@@ -17,9 +17,9 @@ export const calculatePrice = async ({
     let productCount = 0;
     let nonActiveProductsCount = 0;
 
-     // Retrieve flags directly from the session
-     const isStorePickup = session.isStorePickup || false;
-     const isCod = session.isCod || false;
+    // Retrieve flags directly from the session
+    const isStorePickup = session.isStorePickup || false;
+    const isCod = session.isCod || false;
 
 
     for (let i = 0; i < cart?.length; i++) {
@@ -103,7 +103,8 @@ export const calculatePrice = async ({
             cart[i].price = price;
             cart[i].priceVat = price + (price * vatPercentage);
             cart[i].totalPrice = price * parseInt(cart[i].quantity);
-            cart[i].totalPriceWithVat = price * parseInt(cart[i].quantity) + (price * vatPercentage);
+            // cart[i].totalPriceWithVat = price * parseInt(cart[i].quantity) + (price * vatPercentage);
+            cart[i].totalPriceWithVat = parseInt(cart[i].quantity) * (price + (price * vatPercentage));
             totalProductPrice += cart[i].totalPrice;
             totalProductPriceVat += cart[i].totalPriceWithVat;
 
