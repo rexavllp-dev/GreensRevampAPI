@@ -33,6 +33,7 @@ export const createOrder = async (req, res) => {
     } = req.body;
 
     // console.log(req.body);
+    console.log(orderItems);
 
     const customerId = req.user.userId;
     // const customerId = 85;

@@ -80,13 +80,10 @@ router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 
 
-// get single user
-router.get('/:id', getSingleUser);
-
-router.get('/getuserinfo/:token', getUserInformation);
-
 // get user details by middleware
 router.get('/user-details', verifyToken, getUserDetails);
+
+router.get('/getuserinfo/:token', getUserInformation);
 
 // update using email  using token
 router.put('/update_email/:token', updateEmailUsingToken);
@@ -116,14 +113,14 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', { failur
 
 // update user account information in user dashboard
 
-router.put('/update-user-account-information/:userId', updateUserAccountInformations);
+router.put('/update-user-account', verifyToken, updateUserAccountInformations);
 
 // change user password 
 router.post('/change-password/:userId', verifyToken, ChangeUserPassword);
 
 // update user account to company account
 
-router.put('/update-user-account-to-company/:userId', updateUserAccountToCompany);
+router.put('/update-user-account-to-company', verifyToken, updateUserAccountToCompany);
 
 // user return products routes 
 router.post('/return-product', verifyToken, returnProduct);
@@ -131,7 +128,14 @@ router.post('/return-product', verifyToken, returnProduct);
 // user communication and privacy
 router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunicationAndPrivacy);
 // user replacement products routes
-router.post('/replace-product', verifyToken, replaceAProduct)
+router.post('/replace-product', verifyToken, replaceAProduct);
+
+
+
+
+
+// get single user
+router.get('/:id', getSingleUser);
 
 // notify product
 

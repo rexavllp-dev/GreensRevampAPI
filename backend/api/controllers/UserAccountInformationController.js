@@ -28,10 +28,10 @@ const s3 = new aws.S3(awsConfig)
 // update user account information
 export const updateUserAccountInformations = async (req, res) => {
 
-    const userId = req.params.userId;
-    const newData = req.body;
-
     try {
+        const userId = req.user?.userId;
+        const newData = req.body;
+
         const existingUser = await getUserById(userId);
         if (!existingUser) {
 
@@ -138,28 +138,29 @@ export const ChangeUserPassword = async (req, res) => {
 
 export const updateUserAccountToCompany = async (req, res) => {
 
-    const userId = req.params.userId;
-
-    const {
-        company_name,
-        company_landline,
-        company_landline_country_code,
-        company_trn_number,
-        company_trade_license,
-        // company_trade_license_expiry
-    } = req.body;
-
-    const user = await getUserById(userId);
-
-
-
-
-    let company_trade_license_expiry = dayjs.utc(req.body.company_trade_license_expiry).utc(true).format();
-
-    const files = req.files;
-
-
     try {
+
+        const userId = req.user.userId;
+
+        const {
+            company_name,
+            company_landline,
+            company_landline_country_code,
+            company_trn_number,
+            usr_designation
+            // company_trade_license,
+            // company_trade_license_expiry
+        } = req.body;
+
+        const user = await getUserById(userId);
+
+
+
+
+        let company_trade_license_expiry = dayjs.utc(req.body.company_trade_license_expiry).utc(true).format();
+
+        const files = req.files;
+
 
         const existingCompany = await checkCompanyExist(company_trn_number);
         if (existingCompany.length) {
@@ -171,14 +172,10 @@ export const updateUserAccountToCompany = async (req, res) => {
             });
         }
 
-
-
-
         if (req.file) {
             const resizedUrl = await resizeAndUpload(req.file);
             company_trade_license = resizedUrl;
         }
-
 
         const schema = Joi.object({
 
@@ -295,7 +292,8 @@ export const updateUserAccountToCompany = async (req, res) => {
 
         // Update user with the new company ID
         const updatedUser = await updateUserAccountInformation(userId, {
-            usr_company: newCompany[0].id
+            usr_company: newCompany[0].id,
+            usr_designation: usr_designation
         });
 
         await UpdateUserAccountToCompany(user.usr_email, user.usr_firstname, 'company');

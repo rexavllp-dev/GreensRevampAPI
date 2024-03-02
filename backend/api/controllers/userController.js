@@ -1190,10 +1190,9 @@ export const getSingleUser = async (req, res) => {
 // get user by middleware
 export const getUserDetails = async (req, res) => {
 
-    const userId = req.user.userId;
-    console.log(userId);
-
     try {
+
+        const userId = req.user.userId;
 
         const userDetails = await getUserById(userId);
 
