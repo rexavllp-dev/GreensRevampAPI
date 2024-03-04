@@ -17,20 +17,12 @@ const s3 = new aws.S3(awsConfig);
 export const returnProduct = async (req, res) => {
 
     const returnData = req.body;
-    const userId = req.user.userId;
     let files = req.files?.files;
+    const userId = req.user.userId;
 
+    console.log(files)
 
     try {
-
-        // Check if files are uploaded
-        if (!files || !files.length) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: "File are required for return request."
-            });
-        };
 
         if (!files?.length) {
             files = [files]
@@ -38,15 +30,15 @@ export const returnProduct = async (req, res) => {
 
         let returnImages = [];
 
-        const newReturn = await createReturnPrd(1, returnData);
+        const newReturn = await createReturnPrd(userId, returnData);
         const returnId = newReturn[0].id;
         console.log(returnId);
 
         for (let i = 0; i < files?.length; i++) {
             const file = files[i];
+            console.log(file?.data)
 
-
-            const resizedBuffer = await sharp(file.data)
+            const resizedBuffer = await sharp(file?.data)
                 .resize({ width: 300, height: 300 })
                 .toBuffer();
 

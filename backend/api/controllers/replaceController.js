@@ -24,14 +24,14 @@ export const replaceAProduct = async (req, res) => {
 
     try {
 
-        // Check if files are uploaded
-        if (!files || !files.length) {
-            res.status(400).json({
-                status: 400,
-                success: false,
-                message: "File are required for replacement request."
-            });
-        };
+        // // Check if files are uploaded
+        // if (!files || !files.length) {
+        //     res.status(400).json({
+        //         status: 400,
+        //         success: false,
+        //         message: "File are required for replacement request."
+        //     });
+        // };
 
         if (!files?.length) {
             files = [files]
@@ -39,7 +39,7 @@ export const replaceAProduct = async (req, res) => {
 
         let replaceImages = [];
 
-        const newReplace = await createReplacePrd(1, replaceData);
+        const newReplace = await createReplacePrd(userId, replaceData);
         const replaceId = newReplace[0].id;
         console.log(replaceId);
 

@@ -16,7 +16,7 @@ import {
     updateEmailUsingToken,
     updateMobileUsingToken,
     updateUserDetails,
-    verifyEmail, 
+    verifyEmail,
     verifyLoginOtp,
     verifyOtp
 } from '../controllers/userController.js';
@@ -30,6 +30,8 @@ import verifyToken from '../middleware/verifyToken.js';
 import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
 import { getNotifyProduct, notifyProduct } from '../controllers/notifyProductController.js';
+import multer from 'multer';
+const upload = multer();
 
 
 
@@ -133,10 +135,6 @@ router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunica
 
 // user replacement products routes
 router.post('/replace-product', verifyToken, replaceAProduct);
-
-
-
-
 
 // get single user
 router.get('/:id', getSingleUser);
