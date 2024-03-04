@@ -15,6 +15,9 @@ export const getAllUsersData = async () => {
 
 };
 
+
+
+
 // creating a function createUser for register a user 
 export const createUser = async (data) => {
     const newUser = await db("users").insert(data).returning('*');

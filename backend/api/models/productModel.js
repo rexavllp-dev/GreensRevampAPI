@@ -332,8 +332,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
 
-
-
     // Sorting by featured products
     //  if (sortFeatured) {
     //     query.orderBy('product_badge.id', 'asc'); // Assuming featured products are identified by the presence of badges
