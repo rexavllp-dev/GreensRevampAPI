@@ -11,6 +11,15 @@ export const createWishlist = async (req, res) => {
 
         const userWishlist = await getUserWishlist(userId);
 
+        if (userWishlist) {
+            
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Product in your Wishlist already exists'
+            })
+        }
+
         const newWishlist = await addWishlist(userId, wishlistData);
 
         res.status(200).json({

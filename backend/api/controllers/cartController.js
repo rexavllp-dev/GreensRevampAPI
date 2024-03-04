@@ -487,3 +487,4 @@ export const updateFlags = async (req, res) => {
         });
     }
 };
+

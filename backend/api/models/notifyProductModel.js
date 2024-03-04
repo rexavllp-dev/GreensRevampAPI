@@ -27,11 +27,11 @@ export const getNotifyProducts = async (userId) => {
 
 // get all notify product
 
-export const getAllNotifyProducts = async () => {
+export const getAllNotifyProducts = async (userId) => {
 
     try {
         const allNotifyProducts = await db("notify_products")
-            .leftJoin('products', 'wishlist.product_id', 'products.id')
+            .leftJoin('products', 'notify_products.product_id', 'products.id')
             .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
             .leftJoin('product_category', 'products.id', 'product_category.product_id')
             .leftJoin('categories', 'product_category.category_id', 'categories.id')
@@ -41,15 +41,15 @@ export const getAllNotifyProducts = async () => {
             .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
             .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
             .crossJoin('vat')
-            .where('wishlist.user_id', userId)
-            .whereNot('wishlist.product_id', null)
+            .where('notify_products.user_id', userId)
+            .whereNot('notify_products.product_id', null)
             .select(
                 'products.*',
                 'products.id as product_id',
                 'brands.*',
                 'brands.id as brand_id',
-                'wishlist.*',
-                'wishlist.id as wishlistId',
+                'notify_products.*',
+                'notify_products.id as notifyProductsId',
                 'categories.*',
                 "categories.id as category_id",
                 "products_price.*",
@@ -93,7 +93,7 @@ export const getAllNotifyProducts = async () => {
                 'product_seo.id',
                 'product_badge.id',
                 'product_category.id',
-                'wishlist.id',
+                'notify_products.id',
                 'vat.id'
             );
 
