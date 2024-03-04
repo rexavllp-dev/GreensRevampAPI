@@ -317,7 +317,7 @@ export const sendVerificationBulkApproved = async (usr_email, usr_firstname, pro
             <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
         </div>
     
-            <h2> Your Bulk order request rejected </h2>
+            <h2> Your Bulk order request approved </h2>
     
             <p> Hello, <b> ${usr_firstname} </b></p>
     
@@ -369,7 +369,7 @@ export const sendVerificationBulkRejected = async (usr_email, usr_firstname, pro
             <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
         </div>
     
-            <h2> Your bulk order Rejected  </h2>
+            <h2> Your bulk order rejected  </h2>
     
             <p> Hello, <b> ${usr_firstname} </b></p>
     
