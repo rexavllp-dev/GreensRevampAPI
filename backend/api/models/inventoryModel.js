@@ -21,7 +21,6 @@ export const getProductInventoryById = async (productId) => {
   return inventory;
 };
 
-
 // export const addStock = async (productId, stockData) => {
 //     const newStock = await db('product_inventory').where({ product_id: productId }).update(stockData).returning('*');
 //     return newStock;
