@@ -285,12 +285,14 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             DESC
         `);
     } else if (sort === 'newest') {
-        query.orderBy('products.created_at', 'desc'); // Assuming 'created_at' is the timestamp field for product creation
+        query.orderBy('products.created_at', 'desc'); 
     } else if (sort === 'oldest') {
-        query.orderBy('products.created_at', 'asc'); // Assuming 'created_at' is the timestamp field for product creation
+        query.orderBy('products.created_at', 'asc'); 
     } else if (sort === 'bestsellers') {
-        query.orderBy('product_inventory.best_seller', 'desc'); // Assuming best_seller is a boolean field
+        query.where('product_inventory.best_seller', true)
+        .orderBy('product_inventory.best_seller', 'desc'); 
     }
+    
 
 
 
