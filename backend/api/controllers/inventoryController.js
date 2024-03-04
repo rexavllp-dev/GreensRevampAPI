@@ -74,10 +74,13 @@ export const createProductInventory = async (req, res) => {
 
     let updatedStockAvailability = stock_availability;
 
-    // If product_quantity is 0, update stock_availability to "out of stock"
-    if (product_quantity === 0) {
+    if (product_quantity > 0) {
+      updatedStockAvailability = "In stock";
+    } else if (product_quantity === 0) {
+      // If product_quantity is 0, update stock_availability to "Out of stock"
       updatedStockAvailability = "Out of stock";
     }
+
 
 
     // create a product
@@ -169,10 +172,12 @@ export const updateProductInventory = async (req, res) => {
 
      let updatedStockAvailability = stock_availability;
 
-     // If product_quantity is 0, update stock_availability to "out of stock"
-     if (product_quantity === 0) {
-       updatedStockAvailability = "Out of stock";
-     }
+     if (product_quantity > 0) {
+      updatedStockAvailability = "In stock";
+    } else if (product_quantity === 0) {
+      // If product_quantity is 0, update stock_availability to "Out of stock"
+      updatedStockAvailability = "Out of stock";
+    }
 
 
     //  update the inventory
@@ -187,6 +192,7 @@ export const updateProductInventory = async (req, res) => {
       max_qty,
       min_qty
     });
+
     const updatedProduct = await updateAProduct(productId, {
       ein_code,
       item_code
@@ -209,7 +215,6 @@ export const updateProductInventory = async (req, res) => {
     });
   }
 };
-
 
 
 
@@ -270,3 +275,5 @@ export const modifyStock = async (req, res) => {
     });
   }
 };
+
+
