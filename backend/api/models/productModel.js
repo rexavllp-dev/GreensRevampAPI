@@ -315,7 +315,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                             this.where('product_inventory.inventory_management', true)
                                 .andWhere('product_inventory.product_quantity', '=', 0);
                         })
-                        .orWhereNull('product_inventory.id'); // Add condition to check if product_inventory ID is null
+                        .orWhereNull('product_inventory.id');
                 });
             }
         } else {
