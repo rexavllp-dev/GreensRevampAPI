@@ -24,13 +24,13 @@ export const returnProduct = async (req, res) => {
     try {
 
         // Check if files are uploaded
-        if (!files || !files.length) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: "File are required for return request."
-            });
-        };
+        // if (!files || !files.length) {
+        //     return res.status(400).json({
+        //         status: 400,
+        //         success: false,
+        //         message: "File are required for return request."
+        //     });
+        // };
 
         if (!files?.length) {
             files = [files]
@@ -38,7 +38,7 @@ export const returnProduct = async (req, res) => {
 
         let returnImages = [];
 
-        const newReturn = await createReturnPrd(1, returnData);
+        const newReturn = await createReturnPrd(userId, returnData);
         const returnId = newReturn[0].id;
         console.log(returnId);
 
@@ -92,8 +92,8 @@ export const returnProduct = async (req, res) => {
 };
 
 
-// admin controllers returns
 
+// admin controllers returns
 
 // get single returns
 export const getSingleReturn = async (req, res) => {
