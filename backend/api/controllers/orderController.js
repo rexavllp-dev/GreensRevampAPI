@@ -7,6 +7,7 @@ import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUser
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
+import { getUserDashboardOrders } from '../models/userOrderDashboardModel.js';
 
 
 export const createOrder = async (req, res) => {
@@ -322,6 +323,33 @@ export const getAllOrders = async (req, res) => {
     }
 };
 
+export const getUserDashBoardStatus = async (req, res) => {
+
+    const userId = req.user?.userId;
+    
+    try {
+
+        const orders = await getUserDashboardOrders(userId);
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched orders successfully",
+            result: orders
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch orders",
+
+        })
+    }
+};
 
 
 

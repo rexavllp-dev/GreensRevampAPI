@@ -1302,7 +1302,7 @@ export const updateEmailUsingToken = async (req, res) => {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to update email' });
     }
-}
+};
 
 
 
@@ -1455,7 +1455,5 @@ export const sendMessage = (req, res) => {
 
     res.json({ success: true });
 };
-
-
 
 

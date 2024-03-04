@@ -24,7 +24,7 @@ export const replaceAProduct = async (req, res) => {
 
     try {
 
-        // // Check if files are uploaded
+        // Check if files are uploaded
         // if (!files || !files.length) {
         //     res.status(400).json({
         //         status: 400,

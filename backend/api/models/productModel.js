@@ -52,7 +52,7 @@ export const getProductById = async (productId) => {
 
             db.raw(`COALESCE(product_inventory.stock_availability, 'Out of stock') as stock_availability`),
 
-            
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -185,7 +185,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             ) as product_img
         `),
 
-          
 
         )
         .distinct('products.id')
@@ -205,7 +204,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
     //   search query
     if (search) {
-      
+
         query.where(function () {
             this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
                 .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
@@ -238,6 +237,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                 BETWEEN :minPrice AND :maxPrice
             `, { minPrice, maxPrice });
         })
+
         // .orderByRaw(`
         //     CASE 
         //         WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
@@ -285,16 +285,17 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             DESC
         `);
     } else if (sort === 'newest') {
-        query.orderBy('products.created_at', 'desc'); // Assuming 'created_at' is the timestamp field for product creation
+        query.orderBy('products.created_at', 'desc');
     } else if (sort === 'oldest') {
-        query.orderBy('products.created_at', 'asc'); // Assuming 'created_at' is the timestamp field for product creation
+        query.orderBy('products.created_at', 'asc');
     } else if (sort === 'bestsellers') {
-        query.orderBy('product_inventory.best_seller', 'desc'); // Assuming best_seller is a boolean field
+        query.where('product_inventory.best_seller', true)
+            .orderBy('product_inventory.best_seller', 'desc');
     }
 
 
-
     // Apply availability filters
+
     filters?.forEach(filter => {
         if (filter.column === 'product_inventory.stock_availability') {
             if (filter.value === 'In stock') {
@@ -302,8 +303,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                     this.where('product_inventory.stock_availability', '=', 'In stock')
                         .andWhere(function () {
                             this.where('product_inventory.inventory_management', true)
-                                .andWhere('product_inventory.product_quantity', '>', 0);
-                        }).orWhere(function () {
+                                .orWhere('product_inventory.product_quantity', '>', 0);
+                        }).andWhere(function () {
                             this.where('product_inventory.inventory_management', false);
                         })
                 });
@@ -313,7 +314,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                         .orWhere(function () {
                             this.where('product_inventory.inventory_management', true)
                                 .andWhere('product_inventory.product_quantity', '=', 0);
-                        });
+                        })
+                        .orWhereNull('product_inventory.id');
                 });
             }
         } else {
@@ -329,15 +331,12 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     });
 
 
-
-
-
     // Sorting by featured products
     //  if (sortFeatured) {
     //     query.orderBy('product_badge.id', 'asc'); // Assuming featured products are identified by the presence of badges
     // };
 
-    const totalCountQuery =  query.clone().clearSelect().count('products.id as total');
+    const totalCountQuery = query.clone().clearSelect().count('products.id as total');
 
     console.log(totalCountQuery.toString())
 

@@ -24,6 +24,15 @@ export const returnProduct = async (req, res) => {
 
     try {
 
+        // Check if files are uploaded
+        // if (!files || !files.length) {
+        //     return res.status(400).json({
+        //         status: 400,
+        //         success: false,
+        //         message: "File are required for return request."
+        //     });
+        // };
+
         if (!files?.length) {
             files = [files]
         }
@@ -84,8 +93,8 @@ export const returnProduct = async (req, res) => {
 };
 
 
-// admin controllers returns
 
+// admin controllers returns
 
 // get single returns
 export const getSingleReturn = async (req, res) => {
@@ -168,3 +177,6 @@ export const updateReturnStatus = async (req, res) => {
         });
     }
 };
+
+
+// 

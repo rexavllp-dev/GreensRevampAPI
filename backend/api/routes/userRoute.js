@@ -136,8 +136,7 @@ router.put('/user-communication-and-privacy/:userId', verifyToken, userCommunica
 // user replacement products routes
 router.post('/replace-product', verifyToken, replaceAProduct);
 
-// get single user
-router.get('/:id', getSingleUser);
+
 
 // notify product
 
@@ -146,6 +145,17 @@ router.post('/notify-product', verifyToken, notifyProduct);
 
 // get notify product
 router.get('/get-notify-product', verifyToken, getNotifyProduct);
+
+
+
+
+
+
+// ==================================================
+// get single user put it last
+// ==================================================
+router.get('/:id', getSingleUser);
+// ==================================================
 
 export default router;
 

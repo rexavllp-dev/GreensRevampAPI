@@ -11,11 +11,11 @@ export const createProductOption = async (optionData) => {
 export const updateOptionLabel = async (product_optionId, option_label) => {
 
     const updatedOption = await db('product_options')
-    .where({
-        id: product_optionId
-    })
-    .update({ option_label })
-    .returning('*');
+        .where({
+            id: product_optionId
+        })
+        .update({ option_label })
+        .returning('*');
     return updatedOption;
 };
 
