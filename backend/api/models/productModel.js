@@ -202,6 +202,21 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         )
         .whereNull('products.deleted_at')
 
+
+
+    // Count query to get total number of products
+    const countQuery = db('products')
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .crossJoin('vat')
+        .countDistinct('products.id as total')
+        .whereNull('products.deleted_at');
+
     //   search query
     if (search) {
 
@@ -210,7 +225,15 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                 .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
                 .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
         });
+
     };
+
+    // Execute count query for search results
+    const [{ total: searchResultCount }] = await countQuery.clone().where(function () {
+        this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
+            .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]);
+    });
 
     // Get the total product count for the search
     // const totalCount = await query.clone().clearSelect().clearOrder().count('* as total').first();
@@ -294,6 +317,9 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     }
 
 
+
+
+
     // Apply availability filters
 
     filters?.forEach(filter => {
@@ -302,11 +328,11 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                 query.where(function () {
                     this.where('product_inventory.stock_availability', '=', 'In stock')
                         .andWhere(function () {
-                            this.where('product_inventory.inventory_management', true)
-                                .orWhere('product_inventory.product_quantity', '>', 0);
-                        }).andWhere(function () {
-                            this.where('product_inventory.inventory_management', false);
-                        })
+                            this.where(function () {
+                                this.where('product_inventory.inventory_management', true)
+                                    .andWhere('product_inventory.product_quantity', '>', 0);
+                            }).orWhere('product_inventory.inventory_management', false);
+                        });
                 });
             } else if (filter.value === 'Out of stock') {
                 query.where(function () {
@@ -336,9 +362,15 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     //     query.orderBy('product_badge.id', 'asc'); // Assuming featured products are identified by the presence of badges
     // };
 
-    const totalCountQuery = query.clone().clearSelect().count('products.id as total');
+    // Execute count query
+    const [{ total }] = await countQuery;
 
-    console.log(totalCountQuery.toString())
+    // Execute main query with pagination
+    query.limit(per_page).offset((page - 1) * per_page);
+
+    // Execute the main query
+    const products = await query;
+
 
     // pagination 
     if (per_page && page) {
@@ -347,12 +379,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         query.limit(limit)
             .offset(offsetValue)
     }
-
-
-
-
-    const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
-    console.log("totalCountResult", totalCountResult);
 
     // Integrate getPrdPrice for each product
     const productsWithPrice = await Promise.all(products.map(async (product) => {
@@ -364,11 +390,10 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
     return {
         products: productsWithPrice,
-        totalCount: totalCountResult.length > 0 ? totalCountResult?.length : 0,
-        // totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
+        searchResultCount: searchResultCount || 0,
         per_page: per_page,
         page: page
-    }
+    };
 
 };
 
