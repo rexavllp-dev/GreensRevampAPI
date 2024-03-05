@@ -65,6 +65,7 @@ export const calculatePrice = async ({
             cart[i].name = product.prd_name;
             cart[i].image = product.image_url;
             cart[i].description = product.prd_description;
+            cart[i].product_price = product.product_price;
             productCount++;
             nonActiveProductsCount++;
             const basePrice = parseFloat(product.product_price);
@@ -113,6 +114,9 @@ export const calculatePrice = async ({
 
             // Apply VAT to regular and special prices if within the offer period
             const vatPercentage = vat.vat / 100;
+
+            const productOriginalPriceWithVAT = parseFloat(product.product_price) + (parseFloat(product.product_price) * vatPercentage);
+            cart[i].product_price = productOriginalPriceWithVAT.toFixed(2);
             cart[i].price = price;
             cart[i].priceVat = price + (price * vatPercentage);
             cart[i].totalPrice = price * parseInt(cart[i].quantity);
