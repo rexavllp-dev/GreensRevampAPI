@@ -465,7 +465,7 @@ export const addProductImages = async (req, res) => {
         const savedImages = await createProductGallery(productImages);
 
         if (isBaseImage && savedImages.length > 0) {
-            const imageUrl = savedImages[0]?.url; // Assuming the URL is stored in the 'url' property
+            const imageUrl = savedImages?.find(item=> item.is_baseimage === true).url; // Assuming the URL is stored in the 'url' property
             if (imageUrl) {
                 // Update the image_url column using the imageUpdater module
                 await saveImageUrl(productId, imageUrl);
