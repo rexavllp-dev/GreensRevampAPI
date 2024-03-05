@@ -464,11 +464,11 @@ export const addProductImages = async (req, res) => {
         // Save product images to the database
         const savedImages = await createProductGallery(productImages);
 
-        if (isBaseImage && savedImages.length > 0) {
-            const imageUrl = savedImages?.find(item=> item.is_baseimage === true).url; // Assuming the URL is stored in the 'url' property
-            if (imageUrl) {
+        if (savedImages && savedImages.length > 0) {
+            const baseImage = savedImages.find(item => item.is_baseimage === true);
+            if (baseImage && baseImage.url) {
                 // Update the image_url column using the imageUpdater module
-                await saveImageUrl(productId, imageUrl);
+                await saveImageUrl(productId, baseImage.url);
             }
         }
 

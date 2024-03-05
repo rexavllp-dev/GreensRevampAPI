@@ -74,12 +74,12 @@ export const createProductInventory = async (req, res) => {
 
     let updatedStockAvailability = stock_availability;
 
-    if (product_quantity > 0) {
-      updatedStockAvailability = "In stock";
-    } else if (product_quantity === 0) {
-      // If product_quantity is 0, update stock_availability to "Out of stock"
-      updatedStockAvailability = "Out of stock";
-    }
+    // if (product_quantity > 0) {
+    //   updatedStockAvailability = "In stock";
+    // } else if (product_quantity === 0) {
+    //   // If product_quantity is 0, update stock_availability to "Out of stock"
+    //   updatedStockAvailability = "Out of stock";
+    // }
 
 
 
@@ -172,12 +172,12 @@ export const updateProductInventory = async (req, res) => {
 
      let updatedStockAvailability = stock_availability;
 
-     if (product_quantity > 0) {
-      updatedStockAvailability = "In stock";
-    } else if (product_quantity === 0) {
-      // If product_quantity is 0, update stock_availability to "Out of stock"
-      updatedStockAvailability = "Out of stock";
-    }
+    //  if (product_quantity > 0) {
+    //   updatedStockAvailability = "In stock";
+    // } else if (product_quantity === 0) {
+    //   // If product_quantity is 0, update stock_availability to "Out of stock"
+    //   updatedStockAvailability = "Out of stock";
+    // }
 
 
     //  update the inventory
