@@ -186,7 +186,17 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         `),
 
 
+        
+
+    
+
         )
+
+
+
+
+
+
         .distinct('products.id')
         .groupBy(
             'products.id',
@@ -201,8 +211,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
         )
         .whereNull('products.deleted_at')
-
-
+    
 
     // Count query to get total number of products
     const countQuery = db('products')
@@ -225,6 +234,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                 .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
                 .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
         });
+
 
     };
 
