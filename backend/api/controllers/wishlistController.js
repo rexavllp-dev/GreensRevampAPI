@@ -9,7 +9,31 @@ export const createWishlist = async (req, res) => {
 
     try {
 
-        const userWishlist = await getUserWishlist(userId);
+        // check if product is already in wishlist
+
+        if (!wishlistData.product_id) {
+            
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Product ID is required'
+            })
+        }
+
+        // check if userId is already in wishlist
+
+        if (!userId) {
+            
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'User ID is required'
+            })
+        }
+
+
+
+        const userWishlist = await getUserWishlist(userId, wishlistData.product_id);
 
         if (userWishlist) {
             

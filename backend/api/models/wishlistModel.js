@@ -12,9 +12,9 @@ export const addWishlist = async (userId, wishlistData) => {
 }
 
 // get user ID wishlist
-export const getUserWishlist = async (userId) => {
+export const getUserWishlist = async (userId,productId) => {
     const wishlistData = await db('wishlist')
-        .where({ user_id: userId })
+        .where({ user_id: userId, product_id: productId })
         .select('*')
         .first();
     return wishlistData;
