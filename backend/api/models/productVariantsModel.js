@@ -33,7 +33,9 @@ export const getVariantValuesByVariantId = async (variantId) => {
         .leftJoin('products', 'product_variants.product_id', 'products.id')
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .select(
+            
             'product_variants.*',
+            'product_variants.id as productVariantId',
             'variants.*',
             'variants.id as variant_id',
             'products.*',
@@ -91,3 +93,7 @@ export const getVariantsByProductId = async (productId) => {
 
     return variants;
 };
+
+
+
+
