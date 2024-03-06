@@ -1,10 +1,12 @@
 import { calculatePrice } from "../helpers/calculatePrice.js";
-import { getProductById } from "../models/productModel.js";
+import { getBulkQuantity, getProductById } from "../models/productModel.js";
 
 // add product to the session cart and save it in the session
 export const addProductToCart = async (req, res) => {
 
     const { productId, quantity } = req.body;
+
+    const userId = req.user.userId;
 
     // console.log(req.session);
     req.session.isStorePickup = false;
@@ -15,9 +17,21 @@ export const addProductToCart = async (req, res) => {
         is_free_shipping: false
     };
 
+
     // console.log(productId, quantity);
 
     try {
+
+        // if user is there then only call getBulk
+
+        if (userId) {
+            
+            const getBulk = await getBulkQuantity(userId, productId);
+
+            return getBulk;
+
+        }
+
 
         // await addToCart(req.session, productId, quantity);
         const product = await getProductById(productId);
@@ -81,26 +95,26 @@ export const addProductToCart = async (req, res) => {
 
                 // check bulk price 
 
-                if (product.quantity <parseInt(quantity)) {
+                if (getBulk.quantity < parseInt(newAddedQuantity)) {
 
                     return res.status(400).json({
                         status: 400,
                         success: false,
                         message: 'max bulk quantity exceeded approved by admin',
                     })
-                    
+
                 }
             }
 
 
-            if (product.quantity <parseInt(quantity)) {
+            if (getBulk.quantity < parseInt(newAddedQuantity)) {
 
                 return res.status(400).json({
                     status: 400,
                     success: false,
                     message: 'max bulk quantity exceeded approved by admin',
                 })
-                
+
             }
 
             if (product.max_qty < (parseInt(quantity) + parseInt(newAddedQuantity))) {
@@ -201,26 +215,26 @@ export const addProductToCart = async (req, res) => {
 
                 // check bulk price
 
-                if (product.quantity <parseInt(quantity)) {
+                if (product.quantity < parseInt(quantity)) {
 
                     return res.status(400).json({
                         status: 400,
                         success: false,
                         message: 'max bulk quantity exceeded approved by admin',
                     })
-                    
+
                 }
 
             }
 
-            if (product.quantity <parseInt(quantity)) {
+            if (product.quantity < parseInt(quantity)) {
 
                 return res.status(400).json({
                     status: 400,
                     success: false,
                     message: 'max bulk quantity exceeded approved by admin',
                 })
-                
+
             }
 
             if (product.max_qty < parseInt(quantity)) {
