@@ -40,6 +40,11 @@ export const getProductById = async (productId) => {
             'product_category.id as product_category_id',
             "products_bulks.*",
             "products_bulks.id as product_bulks_id",
+            "bulk_above_max_orders.*",
+            "bulk_above_max_orders.id as bulkAboveMaxOrderId",
+
+
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -75,6 +80,7 @@ export const getProductById = async (productId) => {
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .leftJoin('products_bulks', 'products.id', 'products_bulks.product_id')
+        .leftJoin('bulk_above_max_orders', 'products.id', 'bulk_above_max_orders.product_id')
         .where('products.id', productId)
         .whereNull('products.deleted_at')
         .groupBy(
@@ -86,7 +92,8 @@ export const getProductById = async (productId) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
-            'products_bulks.id'
+            'products_bulks.id',
+            'bulk_above_max_orders.id'
         )
 
         .first()
@@ -104,6 +111,18 @@ export const getProductById = async (productId) => {
     return products;
 };
 
+
+// get bulk quantity
+
+export const getBulkQuantity = async (userId, productId) => {
+
+    const bulk = await db('bulk_above_max_orders')
+        .where({ user_id: userId, product_id: productId })
+        .first();
+
+    return bulk;
+}
+
 // get all products
 
 export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice) => {
@@ -118,6 +137,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .leftJoin('wishlist', 'products.id', 'wishlist.product_id')
         .crossJoin('vat')
 
 
@@ -133,6 +153,10 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             "categories.id as category_id",
             'categories.updated_at as category_updated_at',
             'categories.created_at as category_created_at',
+            "wishlist.*",
+            "wishlist.id as wishlist_id",
+            "wishlist.created_at as wishlist_created_at",
+            "wishlist.updated_at as wishlist_updated_at",
             "products_price.*",
             "products_price.id as products_price_id",
             'products_price.created_at as product_price_created_at',
@@ -187,7 +211,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         `),
 
 
-        db.raw(`
+            db.raw(`
         jsonb_agg(
             jsonb_build_object(
                 'productOptionId', product_options.id,
@@ -197,7 +221,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         ) as productOptions
     `),
 
-     
+
 
         )
 
@@ -206,6 +230,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             'products.id',
             'brands.id',
             'categories.id',
+            'wishlist.id',
             // 'product_options.id',
             'products_price.id',
             'product_inventory.id',
