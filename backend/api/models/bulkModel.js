@@ -175,7 +175,7 @@ export const approveBulkMaxOrder = async (bulkId) => {
         .update({ approved_status: "Accept" })
 
 
-};
+};                           
 
 export const rejectBulkMaxOrder = async (bulkId) => {
     return db('bulk_above_max_orders')
