@@ -40,6 +40,11 @@ export const getProductById = async (productId) => {
             'product_category.id as product_category_id',
             "products_bulks.*",
             "products_bulks.id as product_bulks_id",
+            "bulk_above_max_orders.*",
+            "bulk_above_max_orders.id as bulkAboveMaxOrderId",
+
+
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -75,6 +80,7 @@ export const getProductById = async (productId) => {
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .leftJoin('products_bulks', 'products.id', 'products_bulks.product_id')
+        .leftJoin('bulk_above_max_orders', 'products.id', 'bulk_above_max_orders.product_id')
         .where('products.id', productId)
         .whereNull('products.deleted_at')
         .groupBy(
@@ -86,7 +92,8 @@ export const getProductById = async (productId) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
-            'products_bulks.id'
+            'products_bulks.id',
+            'bulk_above_max_orders.id'
         )
 
         .first()
