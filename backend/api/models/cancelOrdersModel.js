@@ -297,7 +297,9 @@ export const getOrderItemsByItemId = async (orderId) => {
         .leftJoin('products', 'order_items.product_id', 'products.id')
         // .leftJoin('product_inventory', 'order_items.product_id', 'product_inventory.product_id')
         .leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('return_products', 'order_items.id', 'return_products.order_item_id')
         // .leftJoin('product_price', 'order_items.product_id', 'product_price.product_id')
+        .leftJoin('replace_products', 'order_items.id', 'replace_products.order_item_id')
 
         
         .select(
@@ -307,6 +309,12 @@ export const getOrderItemsByItemId = async (orderId) => {
             'products.id as productId',
             'user_orders.*',
             'user_orders.id as orderId',
+            'return_products.*',
+            'return_products.id as returnId',
+            'replace_products.*',
+            'replace_products.id as replaceId'
+
+
         ).first();
 
     return orderItems;
