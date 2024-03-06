@@ -30,13 +30,16 @@ export const addProductToCart = async (req, res) => {
         if (existingProduct) {
             const productPrice = parseFloat(product.product_price);
 
-            existingProduct.quantity += parseInt(quantity);
-            existingProduct.price = product.product_price;
+            // existingProduct.quantity += parseInt(quantity);
+            // existingProduct.price = product.product_price;
+
+            const newAddedQuantity = parseInt(quantity) + parseInt(existingProduct.quantity);
+            const newAddedPrice = product.product_price;
 
             // Check if the product is active
             if (product.inventory_management === true) {
 
-                if (product.max_qty < (parseInt(quantity) + parseInt(existingProduct.quantity))) {
+                if (product.max_qty < (parseInt(quantity) + parseInt(newAddedQuantity))) {
                     return res.status(400).json({
                         status: 400,
                         success: false,
@@ -45,7 +48,7 @@ export const addProductToCart = async (req, res) => {
                     });
                 }
 
-                if (product.product_quantity < (parseInt(quantity) + parseInt(existingProduct.quantity))) {
+                if (product.product_quantity < (parseInt(quantity) + parseInt(newAddedQuantity))) {
                     return res.status(400).json({
                         status: 400,
                         success: false,
@@ -77,7 +80,7 @@ export const addProductToCart = async (req, res) => {
                 }
             }
 
-            if (product.max_qty < (parseInt(quantity) + parseInt(existingProduct.quantity))) {
+            if (product.max_qty < (parseInt(quantity) + parseInt(newAddedQuantity))) {
                 return res.status(400).json({
                     status: 400,
                     success: false,
@@ -108,6 +111,13 @@ export const addProductToCart = async (req, res) => {
                     result: req.session.cart
                 });
             }
+
+
+            // existingProduct.quantity += parseInt(quantity);
+            // existingProduct.price = product.product_price;
+
+            existingProduct.quantity += newAddedQuantity;
+            existingProduct.price = newAddedPrice;
 
             // If the product already exists, increase the quantity instead of returning an error
             // existingProduct.quantity += parseInt(quantity);
@@ -201,11 +211,11 @@ export const addProductToCart = async (req, res) => {
 
 
             // If the product doesn't exist, add it to the cart
-            req.session.cart.push({ 
+            req.session.cart.push({
                 productId,
-                 quantity,
-                 price: product.product_price, // Set the price 
-                 });
+                quantity,
+                price: product.product_price, // Set the price 
+            });
 
             return res.status(200).json({
                 status: 200,
@@ -402,7 +412,7 @@ export const getProductFromCart = async (req, res) => {
             error: error,
             message: 'Failed to get cart. Please try again later.',
         })
-        
+
     }
 }
 
@@ -449,19 +459,19 @@ export const removeProductFromCart = async (req, res) => {
 
 // API route to update isStorePickup
 export const updateFlags = async (req, res) => {
-    const { isStorePickup , isCod } = req.body;
+    const { isStorePickup, isCod } = req.body;
 
     try {
-            // Update session values
-            if (isStorePickup !== undefined) {
-                req.session.isStorePickup = isStorePickup;
-            }
-    
-            if (isCod !== undefined) {
-                req.session.isCod = isCod;
-            }
+        // Update session values
+        if (isStorePickup !== undefined) {
+            req.session.isStorePickup = isStorePickup;
+        }
 
-            console.log('Updated flags:', req.session.isStorePickup, req.session.isCod);
+        if (isCod !== undefined) {
+            req.session.isCod = isCod;
+        }
+
+        console.log('Updated flags:', req.session.isStorePickup, req.session.isCod);
 
         // Calculate price with updated isStorePickup
         const data = await calculatePrice({
