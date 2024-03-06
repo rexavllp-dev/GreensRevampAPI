@@ -43,6 +43,7 @@ export const getAllReturnProducts = async () => {
         .leftJoin('reasons', 'return_products.reason_id', 'reasons.id')
         .leftJoin('return_gallery', 'return_products.id', 'return_gallery.return_id')
         .leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
+        
         .select(
 
 
