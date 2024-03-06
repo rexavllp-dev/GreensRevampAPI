@@ -120,6 +120,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
         .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_options', 'products.id', 'product_options.product_id')
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
@@ -193,12 +194,26 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         `),
 
 
+        db.raw(`
+        jsonb_agg(
+            jsonb_build_object(
+                'productOptionId', product_options.id,
+                'optionId', product_options.option_id,
+                'optionLabel', product_options.option_label
+            )
+        ) as productOptions
+    `),
+
+     
+
         )
+
         .distinct('products.id')
         .groupBy(
             'products.id',
             'brands.id',
             'categories.id',
+            // 'product_options.id',
             'products_price.id',
             'product_inventory.id',
             'product_seo.id',
@@ -208,7 +223,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
         )
         .whereNull('products.deleted_at')
-
 
 
     // Count query to get total number of products
@@ -232,6 +246,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                 .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
                 .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
         });
+
 
     };
 
