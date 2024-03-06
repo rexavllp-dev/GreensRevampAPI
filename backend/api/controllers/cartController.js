@@ -78,29 +78,6 @@ export const addProductToCart = async (req, res) => {
                         result: req.session.cart
                     });
                 }
-
-                // check bulk price 
-
-                if (product.quantity <parseInt(quantity)) {
-
-                    return res.status(400).json({
-                        status: 400,
-                        success: false,
-                        message: 'max bulk quantity exceeded approved by admin',
-                    })
-                    
-                }
-            }
-
-
-            if (product.quantity <parseInt(quantity)) {
-
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: 'max bulk quantity exceeded approved by admin',
-                })
-                
             }
 
             if (product.max_qty < (parseInt(quantity) + parseInt(newAddedQuantity))) {
@@ -198,29 +175,6 @@ export const addProductToCart = async (req, res) => {
                         result: req.session.cart
                     });
                 }
-
-                // check bulk price
-
-                if (product.quantity <parseInt(quantity)) {
-
-                    return res.status(400).json({
-                        status: 400,
-                        success: false,
-                        message: 'max bulk quantity exceeded approved by admin',
-                    })
-                    
-                }
-
-            }
-
-            if (product.quantity <parseInt(quantity)) {
-
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: 'max bulk quantity exceeded approved by admin',
-                })
-                
             }
 
             if (product.max_qty < parseInt(quantity)) {
