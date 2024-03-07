@@ -1,4 +1,4 @@
-import { addRelatedProduct, deleteARelatedProduct, getRelatedProductsByProductId } from "../models/relatedProductModel.js";
+import { addRelatedProduct, deleteARelatedProduct, getAllRelatedProducts, getProductsFromRelatedProducts, getRelatedProductsByProductId } from "../models/relatedProductModel.js";
 
 // creates related products
 
@@ -17,10 +17,18 @@ export const createRelatedProduct = async (req, res) => {
         }
 
         // Check if related product already exists
-        const existingRelatedProducts = await getRelatedProductsByProductId(product_id);
+        const existingRelatedProducts = await getAllRelatedProducts(product_id);
+        const existingProductsRelatedProducts = await getProductsFromRelatedProducts(product_id);
+
+
         console.log("Existing Related Products:", existingRelatedProducts);
 
-        const existingRelatedProductIds = existingRelatedProducts.relatedProducts.map(product => product.related_product_id);
+        const existingRelatedProductIds = existingRelatedProducts.map(product => parseInt(product.related_product_id));
+
+        const existingProductsOfRelatedProductIds = existingProductsRelatedProducts.map(product => parseInt(product.product_id));
+
+        console.log(existingProductsOfRelatedProductIds, "related_productId");
+        console.log(existingRelatedProductIds, "productId");
 
 
         const newData = [];
@@ -28,20 +36,20 @@ export const createRelatedProduct = async (req, res) => {
 
         //  Check each related product ID if it exists in the database
         for (const relatedProduct of relatedProductData) {
-            if (!existingRelatedProductIds.includes(relatedProduct.id)) {
+            if (!existingRelatedProductIds.includes(parseInt(relatedProduct.id))) {
                 if (product_id != relatedProduct.id) {
                     newData.push({
                         product_id: product_id,
                         related_product_id: relatedProduct.id,
                     });
 
-
-                    // Add bidirectional relationship
-                    newData.push({
-                        product_id: relatedProduct.id,
-                        related_product_id: product_id,
-                    });
-
+                    if (!existingProductsOfRelatedProductIds.includes(parseInt(relatedProduct.id))) {
+                        // Add bidirectional relationship
+                        newData.push({
+                            product_id: relatedProduct.id,
+                            related_product_id: product_id,
+                        });
+                    }
                 }
             } else {
                 nonExistingProductIds.push(relatedProduct.id);
