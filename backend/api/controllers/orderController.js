@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
@@ -350,6 +350,123 @@ export const getUserDashBoardStatus = async (req, res) => {
         })
     }
 };
+
+
+export const getAllDashboardOrders = async (req, res) => {
+
+    const userId = req.body.userId;
+
+    //console.log(userId);
+
+    const role   = req.body.role;
+    const orders = await getDashboardOrders(userId, role);
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Fetched orders successfully",
+        result: orders
+    });
+
+};
+
+
+export const assignPickers = async (req, res) => {
+
+
+    const orderId  = req.body.orderId;
+    const pickerId = req.body.pickerId;
+    
+    const pickers = await assignPicker(orderId, pickerId);
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Picker assigned successfully",
+        result: pickers
+    });
+
+};
+
+
+
+export const getAllAssinedOrders = async (req, res) => {
+
+    const userId = req.body.userId;
+
+    //console.log(userId);
+
+    const role   = req.body.role;
+    const orders = await getAssinedOrders(userId, role);
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Fetched orders successfully",
+        result: orders
+    });
+
+};
+
+
+export const verifyItems = async (req, res) => {
+
+
+    const orderId  = req.body.orderId;
+    const orders   = await verifyItem(orderId);
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Items Verified successfully",
+        result: orders
+    });
+
+};
+
+
+export const assignDrivers = async (req, res) => {
+
+
+
+    
+    const userId   = req.body.userId;
+    const orderId  = req.body.orderId;
+    const driverId = req.body.driverId;
+    const boxes    = req.body.boxes;
+
+    const drivers  = await assignDriver(userId, orderId, driverId, boxes);
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Driver assigned successfully",
+        result: drivers
+    });
+
+};
+
+
+export const downloadTripsheet = async (req, res) => {
+
+
+    const driverId = req.body.driverId;
+    const drivers  = await ordersByDriver(driverId);
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Tripsheet Generated Successfully",
+        result: drivers
+    });
+
+};
+
+
+
+
+
+
+
 
 
 

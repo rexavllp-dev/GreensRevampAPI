@@ -22,6 +22,8 @@ import {
     updateRegisterOtp,
     updateUser,
     updateUserVerificationStatus,
+    getPickers,
+    getDrivers,
 } from "../models/userModel.js";
 
 import Joi from 'joi';
@@ -1455,5 +1457,33 @@ export const sendMessage = (req, res) => {
 
     res.json({ success: true });
 };
+
+
+export const getAllPickers = async (req, res) => {
+
+    const pickers = await getPickers();
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Fetched pickers successfully",
+        result: pickers
+    });
+};
+
+
+
+export const getAllDrivers = async (req, res) => {
+
+    const drivers = await getDrivers();
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Fetched pickers successfully",
+        result: drivers
+    });
+};
+
 
 
