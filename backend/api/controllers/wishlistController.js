@@ -9,7 +9,40 @@ export const createWishlist = async (req, res) => {
 
     try {
 
-        const userWishlist = await getUserWishlist(userId);
+        // check if product is already in wishlist
+
+        if (!wishlistData.product_id) {
+            
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Product ID is required'
+            })
+        }
+
+        // check if userId is already in wishlist
+
+        if (!userId) {
+            
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'User ID is required'
+            })
+        }
+
+
+
+        const userWishlist = await getUserWishlist(userId, wishlistData.product_id);
+
+        if (userWishlist) {
+            
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Product in your Wishlist already exists'
+            })
+        }
 
         const newWishlist = await addWishlist(userId, wishlistData);
 
@@ -67,11 +100,11 @@ export const getAllWishlistProduct = async (req, res) => {
 
 export const removedWishlist = async (req, res) => {
 
-    const wishlistId = req.params.wishlistId;
+    const productId = req.params.productId;
 
     try {
 
-        const removedWishlist = await removeWishlist(wishlistId);
+        const removedWishlist = await removeWishlist(productId);
 
         res.status(200).json({
             status: 200,

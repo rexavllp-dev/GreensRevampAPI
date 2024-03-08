@@ -14,6 +14,16 @@ export const addSaveForLater = async (userId, saveForLaterData) => {
     return newSaveForLater;
 }
 
+// check if product is in save for later is more than 20 
+
+export const checkSaveForLater = async (userId, productId) => {
+    const saveForLaterData = await db('save_for_later')
+        .where({ user_id: userId, product_id: productId })
+        .select('*')
+        .first();
+    return saveForLaterData;
+}
+
 
 export const getUserSaveForLater = async (userId) => {
     const saveForLaterData = await db('save_for_later')

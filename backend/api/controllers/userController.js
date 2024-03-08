@@ -1334,7 +1334,6 @@ export const updateMobileUsingToken = async (req, res) => {
             });
         }
 
-
         if (!user) {
             return res.status(404).json({
                 status: 404,
@@ -1343,33 +1342,22 @@ export const updateMobileUsingToken = async (req, res) => {
             });
         }
 
-        // Check if the user is changing the country code
-        if (userInfo.usr_mobile_country_code !== usr_mobile_country_code) {
-            // Update the mobile number and country code
-            await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
+        // Update the mobile number and country code
+        await updateMobile(userInfo.id, usr_mobile_country_code, usr_mobile_number);
 
-            // Update the OTP and send a new verification code
-            await updateRegisterOtp(userInfo.id, otp, otpExpiry);
-            const country = await getCountryDialCode(userInfo.id)
-            const countryDialCode = country?.country_dial_code;
+        // Update the OTP and send a new verification code
+        await updateRegisterOtp(userInfo.id, otp, otpExpiry);
+        const country = await getCountryDialCode(userInfo.id)
+        const countryDialCode = country?.country_dial_code;
 
-            await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
+        await sendVerificationCode(userInfo.usr_mobile_number, otp, countryDialCode, otpExpiry);
 
-            return res.status(200).json({
-                status: 200,
-                success: true,
-                message: "Mobile number and country code updated successfully, verify your OTP",
-            });
-        } else {
-            // User is not changing the country code, only update the mobile number
-            await updateMobile(userInfo.id, null, usr_mobile_number);
+        return res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Mobile number updated successfully, verify your OTP",
+        });
 
-            return res.status(200).json({
-                status: 200,
-                success: true,
-                message: "Mobile number updated successfully, verify your OTP",
-            });
-        }
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Failed to update mobile' });

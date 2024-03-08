@@ -1,29 +1,60 @@
 
-import {  createProductVariant, deleteAVariantLabel, getVariantValuesByVariantId, getVariantsByProductId, updateVariantLabel } from "../models/productVariantsModel.js";
+import {  createProductVariant, deleteAVariantLabel, getProductVariantsByIDs, getVariantValuesByVariantId, getVariantsByProductId, updateVariantLabel } from "../models/productVariantsModel.js";
 
 
 
 
 export const addProductVariantValues = async (req, res) => {
-
     try {
         const data = req.body;
-            let productVariants = [];
+        let productVariantsToSave = [];
+        let existingProductVariants = [];
 
-            for (let i = 0; i < data.length; i++) {
-                const product_id = data[i].variant_id;
-                const variant_id = data[i].product_id;
-                productVariants.push({ variant_id, product_id });
-            }
+        // Check if variants already exist
+        const existingVariants = await getProductVariantsByIDs(data);
+        if (existingVariants.length > 0) {
+            existingProductVariants = existingVariants.map(variant => ({
+                product_id: variant.product_id,
+                variant_id: variant.variant_id
+            }));
+        }
 
-        const newVariant = await createProductVariant(data);
-        const reverseVariant = await createProductVariant(productVariants);
+     
+        // Filter out data that already exists or has product_id equal to variant_id
+        productVariantsToSave = data.filter(item => {
+            return !existingProductVariants.some(existingVariant =>
+                existingVariant.product_id == item.product_id &&
+                existingVariant.variant_id == item.variant_id
+            ) && item.product_id != item.variant_id;
+        });
+
+
+        
+
+        if (productVariantsToSave.length === 0) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "All variants already exist or have product_id equal to variant_id",
+                existingVariants: existingVariants,
+            });
+        }
+
+        const newVariants = await createProductVariant(productVariantsToSave);
+        
+        // Create reverse variants
+        const reverseVariantsToSave = productVariantsToSave.map(item => ({
+            product_id: item.variant_id,
+            variant_id: item.product_id
+        }));
+        const reverseVariants = await createProductVariant(reverseVariantsToSave);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Variant values added successfully",
-            data: newVariant,
+            data: newVariants,
+            reverseVariants: reverseVariants
         });
     } catch (error) {
         console.error(error);

@@ -72,6 +72,17 @@ export const createProductInventory = async (req, res) => {
     };
 
 
+    let updatedStockAvailability = stock_availability;
+
+    // if (product_quantity > 0) {
+    //   updatedStockAvailability = "In stock";
+    // } else if (product_quantity === 0) {
+    //   // If product_quantity is 0, update stock_availability to "Out of stock"
+    //   updatedStockAvailability = "Out of stock";
+    // }
+
+
+
     // create a product
     const newInventory = await createInventory({
 
@@ -79,7 +90,7 @@ export const createProductInventory = async (req, res) => {
       sku,
       inventory_management,
       product_quantity,
-      stock_availability,
+      stock_availability: updatedStockAvailability,
       show_out_of_stock_on_dashboard,
       back_in_stock,
       best_seller,
@@ -158,18 +169,30 @@ export const updateProductInventory = async (req, res) => {
        });
      }
 
+
+     let updatedStockAvailability = stock_availability;
+
+    //  if (product_quantity > 0) {
+    //   updatedStockAvailability = "In stock";
+    // } else if (product_quantity === 0) {
+    //   // If product_quantity is 0, update stock_availability to "Out of stock"
+    //   updatedStockAvailability = "Out of stock";
+    // }
+
+
     //  update the inventory
     await updateInventory(productId, {
       sku,
       inventory_management,
       product_quantity,
-      stock_availability,
+      stock_availability : updatedStockAvailability,
       show_out_of_stock_on_dashboard,
       back_in_stock,
       best_seller,
       max_qty,
       min_qty
     });
+
     const updatedProduct = await updateAProduct(productId, {
       ein_code,
       item_code
@@ -192,7 +215,6 @@ export const updateProductInventory = async (req, res) => {
     });
   }
 };
-
 
 
 
@@ -253,3 +275,5 @@ export const modifyStock = async (req, res) => {
     });
   }
 };
+
+

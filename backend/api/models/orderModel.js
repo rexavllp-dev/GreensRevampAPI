@@ -53,9 +53,9 @@ export const createOrderItems = async (trx, orderId, orderItems) => {
                 .insert(item)
                 .returning('*');
 
-                const getProduct = await trx('products').select('*').where({id: insertedItem[0].product_id}).first();
-                console.log("products",getProduct);
-                insertedItem.push(getProduct);
+            const getProduct = await trx('products').select('*').where({ id: insertedItem[0].product_id }).first();
+            console.log("products", getProduct);
+            insertedItem.push(getProduct);
             insertedOrderItems.push(insertedItem);
         }
 
@@ -174,6 +174,8 @@ export const getAOrder = async (orderId) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .leftJoin('return_products', 'return_products.order_item_id', 'order_items.id')
+        .leftJoin('replace_products', 'replace_products.order_item_id', 'order_items.id')
 
         .select(
 
@@ -184,7 +186,11 @@ export const getAOrder = async (orderId) => {
             'products.*',
             'products.id as productId',
             'address.*',
-            'address.id as addressId'
+            'address.id as addressId',
+            'return_products.*',
+            'return_products.id as returnProductId',
+            'replace_products.*',
+            'replace_products.id as replaceProductId',
         );
 
     return order;

@@ -16,7 +16,7 @@ import {
     updateEmailUsingToken,
     updateMobileUsingToken,
     updateUserDetails,
-    verifyEmail, 
+    verifyEmail,
     verifyLoginOtp,
     verifyOtp,
     getAllPickers,
@@ -32,6 +32,8 @@ import verifyToken from '../middleware/verifyToken.js';
 import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
 import { getNotifyProduct, notifyProduct } from '../controllers/notifyProductController.js';
+import multer from 'multer';
+const upload = multer();
 
 
 
@@ -156,9 +158,11 @@ router.get('/drivers', getAllDrivers);
 
 
 
-// get single user
+// ==================================================
+// get single user put it last
+// ==================================================
 router.get('/:id', getSingleUser);
-
+// ==================================================
 
 export default router;
 

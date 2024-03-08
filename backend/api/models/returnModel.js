@@ -42,11 +42,14 @@ export const getAllReturnProducts = async () => {
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('reasons', 'return_products.reason_id', 'reasons.id')
         .leftJoin('return_gallery', 'return_products.id', 'return_gallery.return_id')
+        .leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
+        
         .select(
 
 
             'order_items.id as orderItemId',
             'order_items.created_at as orderItemCreatedAt',
+            'user_orders.id as orderId',
 
 
             'products.prd_name',
@@ -54,6 +57,9 @@ export const getAllReturnProducts = async () => {
             'return_products.return_comment',
 
             'reasons.clr_reason',
+            
+
+
 
             db.raw(`
             jsonb_agg(

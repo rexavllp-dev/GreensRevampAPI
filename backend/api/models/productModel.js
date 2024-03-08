@@ -40,6 +40,11 @@ export const getProductById = async (productId) => {
             'product_category.id as product_category_id',
             "products_bulks.*",
             "products_bulks.id as product_bulks_id",
+            "bulk_above_max_orders.*",
+            "bulk_above_max_orders.id as bulkAboveMaxOrderId",
+
+
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -52,7 +57,7 @@ export const getProductById = async (productId) => {
 
             db.raw(`COALESCE(product_inventory.stock_availability, 'Out of stock') as stock_availability`),
 
-            
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -75,6 +80,7 @@ export const getProductById = async (productId) => {
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .leftJoin('products_bulks', 'products.id', 'products_bulks.product_id')
+        .leftJoin('bulk_above_max_orders', 'products.id', 'bulk_above_max_orders.product_id')
         .where('products.id', productId)
         .whereNull('products.deleted_at')
         .groupBy(
@@ -86,7 +92,8 @@ export const getProductById = async (productId) => {
             'product_seo.id',
             'product_badge.id',
             'product_category.id',
-            'products_bulks.id'
+            'products_bulks.id',
+            'bulk_above_max_orders.id'
         )
 
         .first()
@@ -104,6 +111,18 @@ export const getProductById = async (productId) => {
     return products;
 };
 
+
+// get bulk quantity
+
+export const getBulkQuantity = async (userId, productId) => {
+
+    const bulk = await db('bulk_above_max_orders')
+        .where({ user_id: userId, product_id: productId })
+        .first();
+
+    return bulk;
+}
+
 // get all products
 
 export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice) => {
@@ -113,10 +132,12 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
         .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_options', 'products.id', 'product_options.product_id')
         .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .leftJoin('wishlist', 'products.id', 'wishlist.product_id')
         .crossJoin('vat')
 
 
@@ -132,6 +153,10 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             "categories.id as category_id",
             'categories.updated_at as category_updated_at',
             'categories.created_at as category_created_at',
+            "wishlist.*",
+            "wishlist.id as wishlist_id",
+            "wishlist.created_at as wishlist_created_at",
+            "wishlist.updated_at as wishlist_updated_at",
             "products_price.*",
             "products_price.id as products_price_id",
             'products_price.created_at as product_price_created_at',
@@ -185,14 +210,28 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             ) as product_img
         `),
 
-          
+
+            db.raw(`
+        jsonb_agg(
+            jsonb_build_object(
+                'productOptionId', product_options.id,
+                'optionId', product_options.option_id,
+                'optionLabel', product_options.option_label
+            )
+        ) as productOptions
+    `),
+
+
 
         )
+
         .distinct('products.id')
         .groupBy(
             'products.id',
             'brands.id',
             'categories.id',
+            'wishlist.id',
+            // 'product_options.id',
             'products_price.id',
             'product_inventory.id',
             'product_seo.id',
@@ -203,15 +242,38 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         )
         .whereNull('products.deleted_at')
 
+
+    // Count query to get total number of products
+    const countQuery = db('products')
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .crossJoin('vat')
+        .countDistinct('products.id as total')
+        .whereNull('products.deleted_at');
+
     //   search query
     if (search) {
-      
+
         query.where(function () {
             this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
                 .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
                 .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
         });
+
+
     };
+
+    // Execute count query for search results
+    const [{ total: searchResultCount }] = await countQuery.clone().where(function () {
+        this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
+            .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]);
+    });
 
     // Get the total product count for the search
     // const totalCount = await query.clone().clearSelect().clearOrder().count('* as total').first();
@@ -238,6 +300,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                 BETWEEN :minPrice AND :maxPrice
             `, { minPrice, maxPrice });
         })
+
         // .orderByRaw(`
         //     CASE 
         //         WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
@@ -285,29 +348,31 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             DESC
         `);
     } else if (sort === 'newest') {
-        query.orderBy('products.created_at', 'desc'); 
+        query.orderBy('products.created_at', 'desc');
     } else if (sort === 'oldest') {
-        query.orderBy('products.created_at', 'asc'); 
+        query.orderBy('products.created_at', 'asc');
     } else if (sort === 'bestsellers') {
         query.where('product_inventory.best_seller', true)
-        .orderBy('product_inventory.best_seller', 'desc'); 
+            .orderBy('product_inventory.best_seller', 'desc');
     }
-    
+
+
 
 
 
     // Apply availability filters
+
     filters?.forEach(filter => {
         if (filter.column === 'product_inventory.stock_availability') {
             if (filter.value === 'In stock') {
                 query.where(function () {
                     this.where('product_inventory.stock_availability', '=', 'In stock')
                         .andWhere(function () {
-                            this.where('product_inventory.inventory_management', true)
-                                .andWhere('product_inventory.product_quantity', '>', 0);
-                        }).orWhere(function () {
-                            this.where('product_inventory.inventory_management', false);
-                        })
+                            this.where(function () {
+                                this.where('product_inventory.inventory_management', true)
+                                    .andWhere('product_inventory.product_quantity', '>', 0);
+                            }).orWhere('product_inventory.inventory_management', false);
+                        });
                 });
             } else if (filter.value === 'Out of stock') {
                 query.where(function () {
@@ -315,7 +380,8 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                         .orWhere(function () {
                             this.where('product_inventory.inventory_management', true)
                                 .andWhere('product_inventory.product_quantity', '=', 0);
-                        });
+                        })
+                        .orWhereNull('product_inventory.id');
                 });
             }
         } else {
@@ -331,15 +397,20 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     });
 
 
-
     // Sorting by featured products
     //  if (sortFeatured) {
     //     query.orderBy('product_badge.id', 'asc'); // Assuming featured products are identified by the presence of badges
     // };
 
-    const totalCountQuery =  query.clone().clearSelect().count('products.id as total');
+    // Execute count query
+    const [{ total }] = await countQuery;
 
-    console.log(totalCountQuery.toString())
+    // Execute main query with pagination
+    query.limit(per_page).offset((page - 1) * per_page);
+
+    // Execute the main query
+    const products = await query;
+
 
     // pagination 
     if (per_page && page) {
@@ -348,12 +419,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         query.limit(limit)
             .offset(offsetValue)
     }
-
-
-
-
-    const [products, totalCountResult] = await Promise.all([query, totalCountQuery]);
-    console.log("totalCountResult", totalCountResult);
 
     // Integrate getPrdPrice for each product
     const productsWithPrice = await Promise.all(products.map(async (product) => {
@@ -365,11 +430,10 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
     return {
         products: productsWithPrice,
-        totalCount: totalCountResult.length > 0 ? totalCountResult?.length : 0,
-        // totalPage: Math.ceil(totalCountResult[0]?.total / per_page),
+        searchResultCount: searchResultCount || 0,
         per_page: per_page,
         page: page
-    }
+    };
 
 };
 

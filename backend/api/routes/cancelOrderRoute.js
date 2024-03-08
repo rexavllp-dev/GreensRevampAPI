@@ -14,5 +14,4 @@ router.post('/cancel-individual-order', cancelIndividualItems);
 router.get('/all-order-items/:orderId', getOrderItem);
 
 
-
 export default router;

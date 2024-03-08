@@ -33,7 +33,9 @@ export const getVariantValuesByVariantId = async (variantId) => {
         .leftJoin('products', 'product_variants.product_id', 'products.id')
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .select(
+
             'product_variants.*',
+            'product_variants.id as productVariantId',
             'variants.*',
             'variants.id as variant_id',
             'products.*',
@@ -67,11 +69,14 @@ export const getVariantsByProductId = async (productId) => {
         .leftJoin('products', 'products.id', '=', 'product_variants.variant_id')
         .leftJoin('product_gallery', 'products.id', '=', 'product_gallery.product_id')
         .where('product_variants.product_id', productId)
+        
         .select(
             'product_variants.*',
             'product_variants.id as product_variant_id',
             'products.*',
             'products.id as product_id',
+
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -85,9 +90,26 @@ export const getVariantsByProductId = async (productId) => {
         )
         .distinct('product_variants.variant_id')
         .groupBy(
-            'product_variants.id', 'products.id')
+
+            'product_variants.id',
+            'products.id')
 
         .orderBy('product_variants.created_at', 'asc')
 
     return variants;
 };
+
+
+
+
+export const getProductVariantsByIDs = async (data) => {
+    const productIds = data.map(item => item.product_id);
+    const variantIds = data.map(item => item.variant_id);
+
+    const variants = await db('product_variants')
+        .whereIn('product_id', productIds)
+        .whereIn('variant_id', variantIds);
+
+    return variants;
+};
+

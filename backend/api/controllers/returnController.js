@@ -17,9 +17,10 @@ const s3 = new aws.S3(awsConfig);
 export const returnProduct = async (req, res) => {
 
     const returnData = req.body;
-    const userId = req.user.userId;
     let files = req.files?.files;
+    const userId = req.user.userId;
 
+    console.log(files)
 
     try {
 
@@ -44,9 +45,9 @@ export const returnProduct = async (req, res) => {
 
         for (let i = 0; i < files?.length; i++) {
             const file = files[i];
+            console.log(file?.data)
 
-
-            const resizedBuffer = await sharp(file.data)
+            const resizedBuffer = await sharp(file?.data)
                 .resize({ width: 300, height: 300 })
                 .toBuffer();
 
@@ -176,3 +177,6 @@ export const updateReturnStatus = async (req, res) => {
         });
     }
 };
+
+
+// 
