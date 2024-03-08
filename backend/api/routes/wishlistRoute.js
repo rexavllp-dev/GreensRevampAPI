@@ -15,7 +15,7 @@ router.get('/get-all-wishlist',verifyToken, getAllWishlistProduct);
 
 // remove save for later
 
-router.delete('/remove-wishlist/:productId', removedWishlist);
+router.delete('/remove-wishlist/:productId', verifyToken, removedWishlist);
 
 
 export default router;

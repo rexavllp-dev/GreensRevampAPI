@@ -110,8 +110,8 @@ export const getAllWishlist = async (userId) => {
 
 
 // remove wishlist
-export const removeWishlist = async (productId) => {
-    const removedWishlist = await db('wishlist').where({ product_id: productId }).del();
+export const removeWishlist = async (productId, userId) => {
+    const removedWishlist = await db('wishlist').where({ product_id: productId }).andWhere({ user_id: userId }).del();
     return removedWishlist;
 }
 

@@ -221,6 +221,8 @@ export const getAllProduct = async (req, res) => {
         let minPrice = req.query.min_price;
         let maxPrice = req.query.max_price;
 
+        let userId = req.user?.userId;
+
         // let sortFeatured = false;
 
         if (req.query.search_query !== null && req.query.search_query !== undefined && req.query.search_query !== 'undefined') {
@@ -228,11 +230,11 @@ export const getAllProduct = async (req, res) => {
         }
 
         if (req.query.page !== null && req.query.page !== undefined && req.query.page !== 'undefined') {
-            page = req.query.page;
+            page = parseInt(req.query.page);
         }
 
         if (req.query.per_page !== null && req.query.per_page !== undefined && req.query.per_page !== 'undefined') {
-            per_page = req.query.per_page;
+            per_page = parseInt(req.query.per_page);
         }
 
         if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
@@ -255,7 +257,7 @@ export const getAllProduct = async (req, res) => {
             filters = JSON.parse(filtersParam);
         };
 
-        const products = await getAllProducts(page, per_page, search_query, filters, sort, minPrice, maxPrice);
+        const products = await getAllProducts(page, per_page, search_query, filters, sort, minPrice, maxPrice, userId);
 
         res.status(200).json({
             status: 200,

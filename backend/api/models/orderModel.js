@@ -28,6 +28,7 @@ export const createUserOrder = async (trx, userId, orderData) => {
                 ord_zip_code: orderData.zip_code,
                 ord_payment_method: orderData.payment_method,
                 ord_shipping_method: orderData.shipping_method,
+                ord_accepted_by: 5, // hardcoded value for default warehouse user
             })
             .returning('*');
 

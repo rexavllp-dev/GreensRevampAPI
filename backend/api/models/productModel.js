@@ -125,7 +125,8 @@ export const getBulkQuantity = async (userId, productId) => {
 
 // get all products
 
-export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice) => {
+export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice, userId) => {
+    console.log(userId, 'userid')
 
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
@@ -137,7 +138,16 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
         .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-        .leftJoin('wishlist', 'products.id', 'wishlist.product_id')
+        // .leftJoin('wishlist', 'products.id', 'wishlist.product_id')
+        .leftJoin('wishlist', function () {
+            if (userId != undefined) {
+                this.on('products.id', '=', 'wishlist.product_id')
+                    .andOn('wishlist.user_id', '=', userId);
+            } else {
+                this.on('products.id', '=', 'wishlist.product_id')
+                    .andOnNull('wishlist.user_id');
+            }
+        })
         .crossJoin('vat')
 
 

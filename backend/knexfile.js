@@ -10,7 +10,7 @@ export default {
       host: '192.168.10.212',
       database: 'greens_international_server',
       user:     'postgres',
-      password: '12345',
+      password: 'password',
     }
   },
   // development: {

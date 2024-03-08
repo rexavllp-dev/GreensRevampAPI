@@ -2,20 +2,21 @@ import express from 'express';
 import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllOptionProducts, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
-import {  createProductInventory,  modifyStock,  updateProductInventory } from '../controllers/inventoryController.js';
+import { createProductInventory, modifyStock, updateProductInventory } from '../controllers/inventoryController.js';
 import { createProductBadge } from '../controllers/badgeController.js';
 import { createRelatedProduct, deleteRelatedProduct, getRelatedProductsWithProductId } from '../controllers/relatedProductController.js';
-import { addProductReview, approveReviewByAdmin, getAllProductReviews,  getAllReviewsForAdmin, getAllUserProductReviews, reviewLikeAndDislike, updateUserReview } from '../controllers/reviewsController.js';
+import { addProductReview, approveReviewByAdmin, getAllProductReviews, getAllReviewsForAdmin, getAllUserProductReviews, reviewLikeAndDislike, updateUserReview } from '../controllers/reviewsController.js';
 import { getAllProductPublic, getAllRelatedProductPublicByProductId, getSingleProductPublic } from '../controllers/publicProductController.js';
 import { createNewOption, deleteOption, getAllOptions, updateOption } from '../controllers/optionController.js';
-import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel  } from '../controllers/productOptionController.js';
-import { createProductLanguage,  deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
+import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOptionLabel } from '../controllers/productOptionController.js';
+import { createProductLanguage, deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkStatusWithProductStatus, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
+import verifyLogged from '../middleware/verifyLogged.js';
 
 
 
@@ -37,14 +38,14 @@ router.get('/get-product/:productId', getSingleProduct)
 router.delete('/delete-product', deleteProduct);
 
 // get all products.
-router.get('/get-products', getAllProduct);
+router.get('/get-products', verifyLogged, getAllProduct);
 
 router.get('/get-all-option-products', getAllOptionProducts);
 
 // _________________________________________________________________________________________________________________
 
 // products public routes 
-router.get('/public/getall-products',getAllProductPublic); 
+router.get('/public/getall-products', getAllProductPublic);
 
 // get a single products public
 router.get('/public/get-product/:productId', getSingleProductPublic);
@@ -249,7 +250,7 @@ router.delete('/delete-product-language/:languageId', deleteLanguage);
 // stock history route
 
 // get all stock history by product
-router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);  
+router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);
 
 
 // search history route
