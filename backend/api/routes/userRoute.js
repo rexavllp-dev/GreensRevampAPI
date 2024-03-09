@@ -18,7 +18,9 @@ import {
     updateUserDetails,
     verifyEmail,
     verifyLoginOtp,
-    verifyOtp
+    verifyOtp,
+    getAllPickers,
+    getAllDrivers
 } from '../controllers/userController.js';
 
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
@@ -138,6 +140,9 @@ router.post('/replace-product', verifyToken, replaceAProduct);
 
 
 
+
+
+
 // notify product
 
 // create notify product
@@ -147,7 +152,9 @@ router.post('/notify-product', verifyToken, notifyProduct);
 router.get('/get-notify-product', verifyToken, getNotifyProduct);
 
 
+router.get('/pickers', getAllPickers);
 
+router.get('/drivers', getAllDrivers);
 
 
 

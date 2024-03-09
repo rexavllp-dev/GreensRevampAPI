@@ -3,11 +3,15 @@ import { getAllUserOrders, getUserOrderDetails } from "../models/userOrderDashbo
 // get all order of a user
 export const getUserOrders = async (req, res) => {
 
-    const userId = req.user?.userId;
-
     try {
+        let sort = null;
+        const userId = req.user?.userId;
 
-        const orders = await getAllUserOrders(userId);
+        if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
+            sort = req.query.sort;
+        }
+
+        const orders = await getAllUserOrders(userId, sort);
 
 
         res.status(200).json({

@@ -40,7 +40,7 @@ const app = express();
 // const io = createSocketServer(server);
 // app.set('socketio', io);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 const corsOptions = {
     credentials: true,
     origin: true,

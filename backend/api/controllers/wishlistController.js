@@ -100,11 +100,12 @@ export const getAllWishlistProduct = async (req, res) => {
 
 export const removedWishlist = async (req, res) => {
 
-    const wishlistId = req.params.wishlistId;
+    const productId = req.params.productId;
+    const userId = req.user.userId;
 
     try {
 
-        const removedWishlist = await removeWishlist(wishlistId);
+        const removedWishlist = await removeWishlist(productId, userId);
 
         res.status(200).json({
             status: 200,

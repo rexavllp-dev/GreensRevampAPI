@@ -13,6 +13,7 @@ export const addRelatedProduct = async (relatedProductData) => {
 
 export const getRelatedProductsByProductId = async (productId) => {
     const relatedProducts = await db('related_products')
+        .distinct('products.id')
         .leftJoin('products', 'related_products.related_product_id', 'products.id')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -62,6 +63,7 @@ export const getRelatedProductsByProductId = async (productId) => {
     `),
 
 
+
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -96,14 +98,10 @@ export const getRelatedProductsByProductId = async (productId) => {
         return { ...product, prdPrice };
     }));
 
-
-
     return {
         relatedProducts: productsWithPrice,
     }
 };
-
-
 
 
 export const deleteARelatedProduct = async (relatedProductId) => {
@@ -114,3 +112,20 @@ export const deleteARelatedProduct = async (relatedProductId) => {
 };
 
 
+
+export const getAllRelatedProducts = async (productId) => {
+    const relatedProducts = await db('related_products')
+        .where({ product_id: productId })
+        .select('*');
+
+    return  relatedProducts;
+}
+
+
+
+export const getProductsFromRelatedProducts = async (productId) => {
+    const relatedProducts = await db('related_products')
+        .where({ related_product_id: productId })
+        .select('*');
+    return relatedProducts;
+}

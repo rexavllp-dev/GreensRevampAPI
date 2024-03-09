@@ -28,6 +28,7 @@ export const createUserOrder = async (trx, userId, orderData) => {
                 ord_zip_code: orderData.zip_code,
                 ord_payment_method: orderData.payment_method,
                 ord_shipping_method: orderData.shipping_method,
+                ord_accepted_by: 5, // hardcoded value for default warehouse user
             })
             .returning('*');
 
@@ -53,9 +54,9 @@ export const createOrderItems = async (trx, orderId, orderItems) => {
                 .insert(item)
                 .returning('*');
 
-                const getProduct = await trx('products').select('*').where({id: insertedItem[0].product_id}).first();
-                console.log("products",getProduct);
-                insertedItem.push(getProduct);
+            const getProduct = await trx('products').select('*').where({ id: insertedItem[0].product_id }).first();
+            console.log("products", getProduct);
+            insertedItem.push(getProduct);
             insertedOrderItems.push(insertedItem);
         }
 
@@ -174,6 +175,8 @@ export const getAOrder = async (orderId) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .leftJoin('return_products', 'return_products.order_item_id', 'order_items.id')
+        .leftJoin('replace_products', 'replace_products.order_item_id', 'order_items.id')
 
         .select(
 
@@ -184,7 +187,11 @@ export const getAOrder = async (orderId) => {
             'products.*',
             'products.id as productId',
             'address.*',
-            'address.id as addressId'
+            'address.id as addressId',
+            'return_products.*',
+            'return_products.id as returnProductId',
+            'replace_products.*',
+            'replace_products.id as replaceProductId',
         );
 
     return order;
@@ -285,5 +292,278 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
 
 
 
+// get all order of a user
+export const getDashboardOrders = async (userId, role) => {
+
+
+    const orders = await db("user_orders")
+        .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .select(
+
+            'user_orders.*',
+            'user_orders.id as orderId',
+            'order_items.*',
+            'order_items.id as orderItemId',
+            'order_items.product_id as orderProductId',
+            'products.*',
+            'products.id as productId',
+            'address.*',
+            'address.id as addressId',
+            db.raw('DATE(user_orders.created_at) AS order_date')
+        )
+        .where(builder => {
+            //Role 3 = Warehouse
+            //Role 4 = Picker
+            //Role 5 = QC
+            if (role == 3) {
+                builder.where('user_orders.ord_accepted_by', userId).whereNull('user_orders.ord_picker_accepted_by');
+            }
+            if (role == 4) {
+                builder.where('user_orders.ord_picker_accepted_by', userId).where('user_orders.picker_verified', false);
+            }
+
+            if (role == 5) {
+                builder.whereNull('user_orders.ord_qc_confirmed').whereNotNull('user_orders.picker_verified');
+            }
+        })
+
+        .groupBy('user_orders.id', 'order_items.id', 'products.id', 'address.id');
+
+
+    
+    var orderLoop = await orders;
+
+    
+    // Group orders by orderId
+    const groupedOrders = {};
+    orderLoop.forEach(order => {
+        if (!groupedOrders[order.orderId]) {
+
+            groupedOrders[order.orderId] = {
+                ...order,
+                products: [],
+                productTotalQty: 0,
+            };
+        }
+        if (order.productId) {
+            const opQty = parseInt(order.op_qty, 10) || 0;
+            groupedOrders[order.orderId].products.push({
+                ...order,
+            });
+
+            // Summing up the op_qty for each product
+            groupedOrders[order.orderId].productTotalQty += opQty;
+        }
+    });
+
+    // Convert the object back to an array of orders
+    const resultOrders = Object.values(groupedOrders);
+    resultOrders.forEach(order => {
+
+        order.order_date = new Date(order.order_date).toISOString().slice(0, 10);
+        var dateParts = order.order_date.split('-');
+        var formattedDate = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+        order.order_date = formattedDate;
+
+
+        var originalDate = new Date(order.order_date);
+        var hours = originalDate.getHours();
+        var minutes = originalDate.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // Handle midnight (0 hours)
+
+        var formattedTime = hours.toString().padStart(2, '0') + ':' +
+                        minutes.toString().padStart(2, '0') + ' ' +
+                        ampm;
+
+        order.order_time = formattedTime;
+
+    });
+
+    return resultOrders;
+};
+
+
+// get all assigned order of a user
+export const getAssinedOrders = async (userId, role) => {
+
+    const orders = await db("user_orders")
+        .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .select(
+
+            'user_orders.*',
+            'user_orders.id as orderId',
+            'order_items.*',
+            'order_items.id as orderItemId',
+            'order_items.product_id as orderProductId',
+            'products.*',
+            'products.id as productId',
+            'address.*',
+            'address.id as addressId',
+            db.raw('DATE(user_orders.created_at) AS order_date')
+        )
+        .where(builder => {
+            //Role 3 = Warehouse
+            //Role 4 = Picker
+            //Role 5 = QC
+            if (role == 3) {
+              builder.where('user_orders.ord_accepted_by', userId).whereNotNull('user_orders.ord_picker_accepted_by');
+            }
+            if (role == 4) {
+                builder.where('user_orders.ord_picker_accepted_by', userId).where('user_orders.picker_verified', true);
+            }
+
+            if (role == 5) {
+                builder.where('user_orders.ord_qc_confirmed', userId).whereNotNull('user_orders.ord_delivery_accepted_by');
+            }
+        })
+
+        .groupBy('user_orders.id', 'order_items.id', 'products.id', 'address.id');
+
+
+    
+    var orderLoop = await orders;
+
+    
+    // Group orders by orderId
+    const groupedOrders = {};
+    orderLoop.forEach(order => {
+        if (!groupedOrders[order.orderId]) {
+
+            groupedOrders[order.orderId] = {
+                ...order,
+                products: [],
+                productTotalQty: 0,
+            };
+        }
+        if (order.productId) {
+            const opQty = parseInt(order.op_qty, 10) || 0;
+            groupedOrders[order.orderId].products.push({
+                ...order,
+            });
+
+            // Summing up the op_qty for each product
+            groupedOrders[order.orderId].productTotalQty += opQty;
+        }
+    });
+
+    // Convert the object back to an array of orders
+    const resultOrders = Object.values(groupedOrders);
+    resultOrders.forEach(order => {
+
+        order.order_date = new Date(order.order_date).toISOString().slice(0, 10);
+        var dateParts = order.order_date.split('-');
+        var formattedDate = dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+        order.order_date = formattedDate;
+
+
+        var originalDate = new Date(order.order_date);
+        var hours = originalDate.getHours();
+        var minutes = originalDate.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // Handle midnight (0 hours)
+
+        var formattedTime = hours.toString().padStart(2, '0') + ':' +
+                        minutes.toString().padStart(2, '0') + ' ' +
+                        ampm;
+
+        order.order_time = formattedTime;
+
+    });
+
+    return resultOrders;
+};
+
+
+
+
+
+
+export const assignPicker = async (orderId, pickerId) => {
+
+    try {
+        
+        const updatePicker = await db('user_orders').where({ id: orderId })
+            .update({'ord_picker_accepted_by':pickerId, picker_verified:false}).returning('*')
+        return updatePicker;
+        
+
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        throw error; // Rethrow the error for the caller to handle
+    }
+   
+};
+
+
+
+export const verifyItem = async (orderId) => {
+
+    try {
+
+        //Updating Order status
+        await db('user_orders').where({ id: orderId })
+        .update({'ord_order_status':2}).returning('*')
+
+        //Updating Picker Verification
+        const verifyItem = await db('user_orders').where({ id: orderId })
+            .update({'picker_verified':true}).returning('*')
+        return verifyItem;
+
+        
+
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        throw error; // Rethrow the error for the caller to handle
+    }
+   
+};
+
+export const assignDriver = async (userId, orderId, driverId, boxes) => {
+
+    try {
+
+
+         //Updating Order status
+         await db('user_orders').where({ id: orderId })
+         .update({'ord_order_status':3}).returning('*')
+
+         // Assigning Driver to the Order
+        const updatePicker = await db('user_orders').where({ id: orderId })
+            .update({'ord_delivery_accepted_by':driverId, 'ord_qc_confirmed':userId, 'no_boxes': boxes}).returning('*')
+        return updatePicker;
+
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        throw error; // Rethrow the error for the caller to handle
+    }
+   
+};
+
+export const ordersByDriver = async (driverId) => {
+
+    try {
+
+        const driverOrders = await db('user_orders').leftJoin('address', 'user_orders.address_id', 'address.id').select('user_orders.*',
+        'user_orders.id as orderId',
+        'address.*').where('ord_delivery_accepted_by', driverId).where('ord_order_status', '!=', 5);
+        return driverOrders;
+
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        throw error; // Rethrow the error for the caller to handle
+    }
+   
+};
 
 

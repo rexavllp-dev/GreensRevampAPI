@@ -179,8 +179,8 @@ export const CancelIndividualItem = async (cancelOrderData, trx, itemId) => {
 
     try {
         const cancelOrderItem = await trx("order_items").where({ id: itemId, order_id: cancelOrderData.order_id }).update({ op_is_cancel: true }).returning('*');
-        const cancelOrder = await trx('reasons').insert({ ...cancelOrderData, cancel_type: "partial" }).returning('*');
-        return cancelOrder;
+        // const cancelOrder = await trx('reasons').insert({ ...cancelOrderData, cancel_type: "partial" }).returning('*');
+        return cancelOrderItem;
     } catch (error) {
         trx.rollback();
         throw error;
@@ -301,7 +301,7 @@ export const getOrderItemsByItemId = async (orderId) => {
         // .leftJoin('product_price', 'order_items.product_id', 'product_price.product_id')
         .leftJoin('replace_products', 'order_items.id', 'replace_products.order_item_id')
 
-        
+
         .select(
 
             'order_items.*',
@@ -316,6 +316,29 @@ export const getOrderItemsByItemId = async (orderId) => {
 
 
         ).first();
+
+    return orderItems;
+};
+
+
+
+
+
+
+export const getSingleOrderItem = async (itemId) => {
+
+    const orderItems = await db('order_items')
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('product_inventory', 'order_items.product_id', 'product_inventory.product_id')
+        .select(
+            'order_items.*',
+            'order_items.id as itemId',
+            'products.*',
+            'products.id as productId',
+            'product_inventory.*',
+            'product_inventory.id as inventoryId'
+        )
+        .where({ 'order_items.id': itemId }).first();
 
     return orderItems;
 };

@@ -323,3 +323,20 @@ export const updateLastResendTime = async (userId, currentTime) => {
     return updatedUser;
 };
 
+
+export const getPickers = async () => {
+    
+    const pickers = await db("users").where({ is_status: true }).where({ is_role: 4 });
+    return pickers;
+};  
+
+export const getDrivers = async () => {
+    
+    const drivers = await db("users").where({ is_status: true }).where({ is_role: 6 });
+    return drivers;
+};  
+
+
+
+
+

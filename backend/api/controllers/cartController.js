@@ -1,6 +1,7 @@
 import { calculatePrice } from "../helpers/calculatePrice.js";
 import { getBulkQuantity, getProductById } from "../models/productModel.js";
 
+
 // add product to the session cart and save it in the session
 export const addProductToCart = async (req, res) => {
     const { productId, quantity } = req.body;
@@ -251,7 +252,6 @@ export const addProductToCart = async (req, res) => {
                 });
             
         }
-
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -274,7 +274,6 @@ export const updateProductCartQuantity = async (req, res) => {
     try {
         // Check if the product is active
         const product = await getProductById(productId);
-
         if (!product) {
             return res.status(404).json({
                 status: 404,
@@ -282,14 +281,10 @@ export const updateProductCartQuantity = async (req, res) => {
                 message: 'Product not found',
             });
         }
-
         if (req.session.cart) {
             let index = req.session.cart.findIndex(item => parseInt(item.productId) === parseInt(productId));
-
-
             if (index !== -1) {
                 let updatedCart = req.session.cart[index];
-
                 // Calculate total quantity based on the operator
                 let totalQuantity;
                 if (operator === 'add') {
@@ -301,7 +296,6 @@ export const updateProductCartQuantity = async (req, res) => {
                     // Set the quantity directly to the newQuantity
                     totalQuantity = parseInt(newQuantity);
                 }
-
                 if (product.inventory_management === true) {
 
                     if (userId) {
@@ -346,7 +340,6 @@ export const updateProductCartQuantity = async (req, res) => {
                         }
     
                     }
-
                     if (product.product_quantity < totalQuantity) {
                         return res.status(400).json({
                             status: 400,
@@ -355,7 +348,6 @@ export const updateProductCartQuantity = async (req, res) => {
                             result: req.session.cart
                         });
                     }
-
                     // check product status
                     if (product.prd_status === false) {
                         return res.status(400).json({
@@ -365,7 +357,6 @@ export const updateProductCartQuantity = async (req, res) => {
                             result: req.session.cart
                         });
                     }
-
                     // check product stock availability
                     if (product.stock_availability === 'Out of stock') {
                         return res.status(400).json({
@@ -417,15 +408,10 @@ export const updateProductCartQuantity = async (req, res) => {
 
                 // Update the quantity
                 updatedCart.quantity = totalQuantity;
-
                 // Update the cart item in the session
                 req.session.cart[index] = updatedCart;
             }
-
-
         }
-
-
         res.status(200).json({
             status: 200,
             success: true,
@@ -434,7 +420,6 @@ export const updateProductCartQuantity = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-
         res.status(500).json({
             status: 500,
             success: false,

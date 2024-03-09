@@ -69,7 +69,7 @@ export const getVariantsByProductId = async (productId) => {
         .leftJoin('products', 'products.id', '=', 'product_variants.variant_id')
         .leftJoin('product_gallery', 'products.id', '=', 'product_gallery.product_id')
         .where('product_variants.product_id', productId)
-        
+
         .select(
             'product_variants.*',
             'product_variants.id as product_variant_id',
@@ -113,3 +113,22 @@ export const getProductVariantsByIDs = async (data) => {
     return variants;
 };
 
+
+
+
+export const getAllProductVariants = async (productId) => {
+    const relatedProducts = await db('product_variants')
+        .where({ product_id: productId })
+        .select('*');
+
+    return  relatedProducts;
+}
+
+
+// Function to retrieve all product variants associated with a given product_id
+export const getVariantsFromProductVariants = async (variantId) => {
+    const relatedProducts = await db('product_variants')
+        .where({ variant_id: variantId })
+        .select('*');
+    return relatedProducts;
+}
