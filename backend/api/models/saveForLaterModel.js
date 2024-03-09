@@ -51,6 +51,7 @@ export const getallSaveForLater = async (userId) => {
             .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
             .crossJoin('vat')
             .where('save_for_later.user_id', userId)
+            .whereNot('save_for_later.product_id', null)
             .select(
                 'save_for_later.*',
                 'save_for_later.id as save_for_later_id',
@@ -111,6 +112,7 @@ export const getallSaveForLater = async (userId) => {
             return { ...product, prdPrice };
         }));
 
+        console.log(savedProductsWithPrice)
         return {
             savedProducts: savedProductsWithPrice,
         };

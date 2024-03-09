@@ -6,7 +6,7 @@ dotenv.config()
 const checkIfLoggedIn = (req, res, next) => {
     // Extract the token from the Authorization header
     const token = req.header("Authorization")?.split(" ")[1]
- console.log(token)
+//  console.log(token)
     // If the token is not found, send a 401 Unauthorized response
     if (!token) {
         req.user = {

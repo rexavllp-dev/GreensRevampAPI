@@ -16,7 +16,7 @@ import { createNewSearchHistory, getAllSearchHistory } from '../controllers/sear
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkStatusWithProductStatus, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
-import verifyLogged from '../middleware/verifyLogged.js';
+
 
 
 
@@ -39,8 +39,8 @@ router.delete('/delete-product', deleteProduct);
 
 // get all products.
 router.get('/get-products',
- verifyLogged, 
- getAllProduct);
+//  verifyLogged, 
+getAllProduct);
 
 router.get('/get-all-option-products', getAllOptionProducts);
 

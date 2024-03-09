@@ -101,7 +101,7 @@ export const getProductById = async (productId) => {
             'products_bulks.id',
             'bulk_above_max_orders.id',
             'wishlist.id',
-            ''
+            
 
         )
 

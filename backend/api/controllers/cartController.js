@@ -175,6 +175,16 @@ export const addProductToCart = async (req, res) => {
 
 
                         }
+                    } else {
+
+                        if (product.max_qty <  parseInt(quantity)){
+                            return res.status(400).json({
+                                status: 400,
+                                success: false,
+                                message: 'Max quantity exceeded',
+                                result: req.session.cart
+                            });
+                        }
                     }
                    
                 }
@@ -208,12 +218,21 @@ export const addProductToCart = async (req, res) => {
 
             } else {
 
-                if (product.product_quantity < parseInt(quantity)) {
+                // if (product.product_quantity < parseInt(quantity)) {
+                //     return res.status(400).json({
+                //         status: 400,
+                //         success: false,
+                //         message: 'Product quantity exceeded',
+                //     })
+                // }
+
+                if (product.max_qty <  parseInt(quantity)){
                     return res.status(400).json({
                         status: 400,
                         success: false,
-                        message: 'Product quantity exceeded',
-                    })
+                        message: 'Max quantity exceeded',
+                        result: req.session.cart
+                    });
                 }
                 
 
@@ -369,14 +388,14 @@ export const updateProductCartQuantity = async (req, res) => {
 
                 } else {
 
-                    if (product.product_quantity < totalQuantity) {
-                        return res.status(400).json({
-                            status: 400,
-                            success: false,
-                            message: 'Product quantity exceeded',
-                            result: req.session.cart
-                        });
-                    }
+                    // if (product.product_quantity < totalQuantity) {
+                    //     return res.status(400).json({
+                    //         status: 400,
+                    //         success: false,
+                    //         message: 'Product quantity exceeded',
+                    //         result: req.session.cart
+                    //     });
+                    // }
 
 
                     // check product status
