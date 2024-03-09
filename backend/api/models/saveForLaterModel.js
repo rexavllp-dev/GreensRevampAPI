@@ -52,6 +52,8 @@ export const getallSaveForLater = async (userId) => {
             .crossJoin('vat')
             .where('save_for_later.user_id', userId)
             .select(
+                'save_for_later.*',
+                'save_for_later.id as save_for_later_id',
                 'products.*',
                 'products.id as product_id',
                 'brands.*',
@@ -91,6 +93,7 @@ export const getallSaveForLater = async (userId) => {
                 `),
             )
             .groupBy(
+                'save_for_later.id',
                 'products.id',
                 'brands.id',
                 'categories.id',
