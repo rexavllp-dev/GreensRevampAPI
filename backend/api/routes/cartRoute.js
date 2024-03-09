@@ -3,6 +3,7 @@ import { addProductToCart, getProductFromCart, removeProductFromCart, updateFlag
 import { createDeliveryEstimate, getSingleDeliveryEstimate, getsAllDeliveryEstimate, updateDeliveryEstimate } from '../controllers/deliveryEstimateController.js';
 import { createRegion, getSingleRegion, getsAllRegion, updateRegion } from '../controllers/regionController.js'
 import verifyProductPrice from '../middleware/verifyProductPrice.js';
+import checkIfLoggedIn from '../middleware/checkIfLoggedIn.js';
 
 
 
@@ -10,11 +11,11 @@ const router = express.Router();
 
 // add product to the session cart and save it in the session
 
-router.post('/add-to-cart', addProductToCart);
+router.post('/add-to-cart',checkIfLoggedIn, addProductToCart);
 
 // update cart quantity
 
-router.put('/update-cart-quantity', updateProductCartQuantity);
+router.put('/update-cart-quantity',checkIfLoggedIn, updateProductCartQuantity);
 
 // get cart
 
