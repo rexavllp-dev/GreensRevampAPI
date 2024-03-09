@@ -42,6 +42,11 @@ export const getProductById = async (productId) => {
             "products_bulks.id as product_bulks_id",
             "bulk_above_max_orders.*",
             "bulk_above_max_orders.id as bulkAboveMaxOrderId",
+            'wishlist.*',
+            'wishlist.id as wishlist_id',
+            
+
+
 
 
 
@@ -81,6 +86,7 @@ export const getProductById = async (productId) => {
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .leftJoin('products_bulks', 'products.id', 'products_bulks.product_id')
         .leftJoin('bulk_above_max_orders', 'products.id', 'bulk_above_max_orders.product_id')
+        .leftJoin('wishlist', 'products.id', 'wishlist.product_id')
         .where('products.id', productId)
         .whereNull('products.deleted_at')
         .groupBy(
@@ -93,7 +99,10 @@ export const getProductById = async (productId) => {
             'product_badge.id',
             'product_category.id',
             'products_bulks.id',
-            'bulk_above_max_orders.id'
+            'bulk_above_max_orders.id',
+            'wishlist.id',
+            ''
+
         )
 
         .first()
