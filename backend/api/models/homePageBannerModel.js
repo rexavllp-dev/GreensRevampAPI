@@ -28,7 +28,7 @@ export const getABanner = async (bannerId) => {
 };
 
 
-export const getAllBanners = async () => {
+export const getsAllBanners = async () => {
     const banners = await db('homepage_banners').select('*');
     return banners;
 };

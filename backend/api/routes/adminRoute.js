@@ -4,7 +4,7 @@ import {  updateAndApproveOrRejectBulkOrders } from '../controllers/bulkControll
 import { AddPrivacyPolicy, deletePrivacyPolicyById, getALLPrivacyPolicy, updatePrivacyPolicyById } from '../controllers/PrivacyPoliciesController.js';
 import { getAllReturnsForAdmin, getSingleReturn, updateReturnStatus } from '../controllers/returnController.js';
 import { getAllReplacementsForAdmin, getSingleReplacement, updateReplacementStatus } from '../controllers/replaceController.js';
-import { createBanner } from '../controllers/homePageBannerController.js';
+import { createBanner, getAllBanners, getSingleBanner, updateBanner } from '../controllers/homePageBannerController.js';
 
 
 const router = express.Router();
@@ -67,9 +67,14 @@ router.get('/replacement/get-all-replacements', getAllReplacementsForAdmin);
 // create banner
 router.post('/banner/create_banner', createBanner);
 
-// // update banner
-// router.put('/banner/update_banner/:bannerId', updateBanner);
+// update banner
+router.put('/banner/update_banner/:bannerId', updateBanner);
 
+// get a single banner
+router.get('/banner/get_banner/:bannerId', getSingleBanner);
+
+// get all banners
+router.get('/banner/get_all_banners', getAllBanners);
 
 
 export default router;

@@ -1,5 +1,5 @@
 import aws from 'aws-sdk';
-import { createABanner, updateABanner } from "../models/homePageBannerModel.js";
+import { createABanner, getABanner, getsAllBanners, updateABanner } from "../models/homePageBannerModel.js";
 
 
 const awsConfig = ({
@@ -38,7 +38,7 @@ export const createBanner = async (req, res) => {
 
         const imageUrl = s3Data.Location;
 
-      
+
         bannerData.banner_order = parseInt(bannerData.banner_order);
 
         // Add the image URL to the banner data
@@ -68,8 +68,8 @@ export const createBanner = async (req, res) => {
 // update a banner
 export const updateBanner = async (req, res) => {
     const bannerData = req.body;
-    const bannerId = req.params.id;
-    const file = req.files.file; // Use the first file in the array
+    const bannerId = req.params.bannerId;
+    const file = req.files.file;
 
     try {
 
@@ -92,8 +92,10 @@ export const updateBanner = async (req, res) => {
 
         const imageUrl = s3Data.Location;
 
-      
-        bannerData.banner_order = parseInt(bannerData.banner_order);
+
+        if (bannerData.banner_order) {
+            bannerData.banner_order = parseInt(bannerData.banner_order);
+        }
 
         // Add the image URL to the banner data
         bannerData.banner_image = imageUrl;
@@ -113,6 +115,55 @@ export const updateBanner = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed to create banner",
+            error: error
+        });
+    }
+};
+
+
+
+export const getSingleBanner = async (req, res) => {
+    const bannerId = req.params.bannerId;
+
+    try {
+
+        const banner = await getABanner(bannerId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched banner successfully",
+            result: banner
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch banner",
+            error: error
+        });
+    }
+};
+
+
+export const getAllBanners = async (req, res) => {
+    try {
+        const banners = await getsAllBanners();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched banners successfully",
+            result: banners
+        });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch banners",
             error: error
         });
     }

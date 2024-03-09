@@ -496,7 +496,7 @@ export const loginWithOtp = async (req, res) => {
                 message: !existingUser ? "Mobile number not found, please register your mobile number!" : "User not found with the provided country code and mobile number!"
             });
         };
-        
+
 
         // Check attempt  if the user is blocked by the admin
         if (existingUser.attempt_blocked) {
@@ -533,6 +533,7 @@ export const loginWithOtp = async (req, res) => {
                     success: false,
                     message: 'Please wait for company verification. Your account is pending for approval.'
                 });
+
             } else if (existingUser.usr_approval_id === 3) {
                 return res.status(403).json({
                     status: 403,
