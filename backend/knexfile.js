@@ -7,10 +7,10 @@ export default {
   development: {
     client: 'postgresql',
     connection: {
-      host: '192.168.10.212',
+      host: 'localhost',
       database: 'greens_international_server',
       user:     'postgres',
-      password: 'password',
+      password: '12345',
     }
   },
   // development: {

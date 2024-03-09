@@ -481,7 +481,7 @@ export const refreshAccessToken = async (req, res) => {
 
 // login with otp
 export const loginWithOtp = async (req, res) => {
-    const { usr_mobile_number } = req.body;
+    const { usr_mobile_country_code, usr_mobile_number } = req.body;
 
 
     try {
@@ -489,15 +489,14 @@ export const loginWithOtp = async (req, res) => {
         //check user exist with mobile number
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
 
-        if (!existingUser) {
-
+        if (!existingUser || existingUser.usr_mobile_country_code !== usr_mobile_country_code) {
             return res.status(404).json({
                 status: 404,
                 success: false,
-                message: "Mobile number not found , please register your mobile number!"
+                message: !existingUser ? "Mobile number not found, please register your mobile number!" : "User not found with the provided country code and mobile number!"
             });
-        }
-
+        };
+        
 
         // Check attempt  if the user is blocked by the admin
         if (existingUser.attempt_blocked) {
