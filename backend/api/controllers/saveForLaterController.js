@@ -1,4 +1,4 @@
-import { addSaveForLater, getUserSaveForLater, getallSaveForLater, removeSaveForLater } from "../models/saveForLaterModel.js";
+import { addSaveForLater, checkSaveForLaterById, getUserSaveForLater, getallSaveForLater, removeSaveForLater } from "../models/saveForLaterModel.js";
 
 
 
@@ -9,11 +9,29 @@ export const createSaveForLater = async (req, res) => {
     const userId = req.user.userId;
 
     try {
-        
+
+        // if product is already in save for later
+        const checkSaveForLater = await checkSaveForLaterById(userId, saveForLaterData.product_id);
+
+        // if (checkSaveForLater) {
+        //     return res.status(400).json({
+        //         status: 400,
+        //         success: false,
+        //         message: 'Product already in save for later'
+        //     })
+        // }
+
         const userSaveForLater = await getUserSaveForLater(userId);
+        console.log(userSaveForLater)
+
+
 
         // check if save for later is more than 20 products
-        if (userSaveForLater?.length >= 20) {
+        const saveForLaterLimit = 2;
+        console.log(userSaveForLater?.length, saveForLaterLimit)
+
+        if (userSaveForLater?.length >= saveForLaterLimit) {
+
             return res.status(400).json({
                 status: 400,
                 success: false,
@@ -53,7 +71,7 @@ export const getAllSaveForLaterProduct = async (req, res) => {
             status: 200,
             success: true,
             result: allSaveForLater,
-            message : 'All save for later products'
+            message: 'All save for later products'
         })
     } catch (error) {
         console.log(error)

@@ -29,7 +29,6 @@ export const getUserSaveForLater = async (userId) => {
     const saveForLaterData = await db('save_for_later')
         .where({ user_id: userId })
         .select('*')
-        .first();
     return saveForLaterData;
 }
 
@@ -52,6 +51,7 @@ export const getallSaveForLater = async (userId) => {
             .crossJoin('vat')
             .where('save_for_later.user_id', userId)
             .whereNot('save_for_later.product_id', null)
+            .distinct('products.id as product_id')
             .select(
                 'save_for_later.*',
                 'save_for_later.id as save_for_later_id',
@@ -122,6 +122,15 @@ export const getallSaveForLater = async (userId) => {
         throw error;
     }
 };
+
+// check save for later
+export const checkSaveForLaterById = async (userId, productId) => {
+    const saveForLaterData = await db('save_for_later')
+        .where({ user_id: userId, product_id: productId })
+        .select('*')
+        .first();
+    return saveForLaterData;
+}
 
 
 
