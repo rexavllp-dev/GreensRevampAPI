@@ -4,7 +4,10 @@ import {  updateAndApproveOrRejectBulkOrders } from '../controllers/bulkControll
 import { AddPrivacyPolicy, deletePrivacyPolicyById, getALLPrivacyPolicy, updatePrivacyPolicyById } from '../controllers/PrivacyPoliciesController.js';
 import { getAllReturnsForAdmin, getSingleReturn, updateReturnStatus } from '../controllers/returnController.js';
 import { getAllReplacementsForAdmin, getSingleReplacement, updateReplacementStatus } from '../controllers/replaceController.js';
-import { createBanner, getAllBanners, getSingleBanner, updateBanner } from '../controllers/homePageBannerController.js';
+import { createBanner, deleteBanner, getAllBanners, getSingleBanner, updateBanner } from '../controllers/homePageBannerController.js';
+import { createSeason, deleteSeason, getAllSeasons, getSingleSeason, updateSeason } from '../controllers/seasonController.js';
+import { createFeed, deleteFeed, getAllfeeds, getSingleFeed, updateFeed } from '../controllers/feedController.js';
+import { createAds, deleteAds, getAllAds, getSingleAds, updateAds } from '../controllers/adsController.js';
 import { getAllActivityOfUser } from '../controllers/generateAcitivityLogContoller.js';
 
 
@@ -76,6 +79,65 @@ router.get('/banner/get_banner/:bannerId', getSingleBanner);
 
 // get all banners
 router.get('/banner/get_all_banners', getAllBanners);
+
+//delete banner
+router.delete('/banner/delete_banner/:bannerId', deleteBanner); 
+
+
+// Home page  seasons
+// create a season
+router.post('/seasons/create_season', createSeason);
+
+// update season
+router.put('/seasons/update_season/:seasonId', updateSeason);
+
+// get a single season
+router.get('/seasons/get_season/:seasonId', getSingleSeason);
+
+// get all seasons
+router.get('/seasons/get_all_seasons', getAllSeasons);
+
+//delete seasons
+router.delete('/seasons/delete_season/:seasonId', deleteSeason);
+
+
+
+// Home page  feeds
+// create a feed
+router.post('/feeds/create_feed', createFeed);
+
+// update feed
+router.put('/feeds/update_feed/:feedId', updateFeed);
+
+// get a single feed
+router.get('/feeds/get_feed/:feedId', getSingleFeed);
+
+// get all feed
+router.get('/feeds/get_all_feeds', getAllfeeds);
+
+//delete feed
+router.delete('/feeds/delete_feed/:feedId', deleteFeed);
+
+
+
+
+// Home page  ads
+// create a feed
+router.post('/ads/create_ads', createAds);
+
+// update feed
+router.put('/ads/update_ads/:adsId', updateAds);
+
+// get a single feed
+router.get('/ads/get_ads/:adsId', getSingleAds);
+
+// get all feed
+router.get('/ads/get_all_ads', getAllAds);
+
+//delete feed
+router.delete('/ads/delete_ads/:adsId',deleteAds);
+
+
 
 
 
