@@ -16,7 +16,7 @@ export const createWishlist = async (req, res) => {
             return res.status(400).json({
                 status: 400,
                 success: false,
-                message: 'Product ID is required'
+                message: 'Product not found'
             })
         }
 
@@ -27,7 +27,7 @@ export const createWishlist = async (req, res) => {
             return res.status(400).json({
                 status: 400,
                 success: false,
-                message: 'User ID is required'
+                message: 'User not found'
             })
         }
 

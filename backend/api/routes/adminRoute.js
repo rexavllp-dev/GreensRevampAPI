@@ -5,6 +5,7 @@ import { AddPrivacyPolicy, deletePrivacyPolicyById, getALLPrivacyPolicy, updateP
 import { getAllReturnsForAdmin, getSingleReturn, updateReturnStatus } from '../controllers/returnController.js';
 import { getAllReplacementsForAdmin, getSingleReplacement, updateReplacementStatus } from '../controllers/replaceController.js';
 import { createBanner, getAllBanners, getSingleBanner, updateBanner } from '../controllers/homePageBannerController.js';
+import { getAllActivityOfUser } from '../controllers/generateAcitivityLogContoller.js';
 
 
 const router = express.Router();
@@ -76,6 +77,10 @@ router.get('/banner/get_banner/:bannerId', getSingleBanner);
 // get all banners
 router.get('/banner/get_all_banners', getAllBanners);
 
+
+
+// get all activity of user
+router.get('/generate_activity', getAllActivityOfUser);
 
 export default router;
 

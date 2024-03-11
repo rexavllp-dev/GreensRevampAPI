@@ -9,3 +9,4 @@ export const generateActivityLog = async ({ userId, comment }) => {
 
     return newActivity;
 }
+
