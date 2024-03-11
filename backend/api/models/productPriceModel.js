@@ -1,4 +1,5 @@
 import db from '../../config/dbConfig.js';
+import { generateActivityLog } from '../utils/generateActivityLog.js';
 
 
 
@@ -15,6 +16,11 @@ export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) =
                 prd_status: prdStatus,
                 prd_dashboard_status: prdDashboardStatus
             });
+
+            await generateActivityLog({
+                userId: updatedData?.user_id,
+                comment: `Updated product ${updatedData?.prd_name}`
+            })
 
     return price;
 };

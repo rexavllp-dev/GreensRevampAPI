@@ -162,6 +162,7 @@ export const registerUser = async (req, res) => {
             usr_mobile_number,
             usr_mobile_country_code,
             usr_email,
+            is_role:2,//default role is user
 
             //  hashed password initialize to usr_password
             usr_password: hashedPassword,
