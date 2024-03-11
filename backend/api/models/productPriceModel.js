@@ -17,10 +17,10 @@ export const createPrdPrice = async (priceData, prdStatus, prdDashboardStatus) =
                 prd_dashboard_status: prdDashboardStatus
             });
 
-            await generateActivityLog({
-                userId: updatedData?.user_id,
-                comment: `Updated product ${updatedData?.prd_name}`
-            })
+            // await generateActivityLog({
+            //     userId: updatedData?.user_id,
+            //     comment: `Updated product ${updatedData?.prd_name}`
+            // })
 
     return price;
 };
