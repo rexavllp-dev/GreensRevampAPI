@@ -15,10 +15,8 @@ import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVari
 import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkStatusWithProductStatus, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
+import verifyLogged from '../middleware/verifyLogged.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
-
-
-
 
 
 
@@ -39,7 +37,7 @@ router.delete('/delete-product', deleteProduct);
 
 // get all products.
 router.get('/get-products',
-//  verifyLogged, 
+ verifyLogged, 
 getAllProduct);
 
 router.get('/get-all-option-products', getAllOptionProducts);

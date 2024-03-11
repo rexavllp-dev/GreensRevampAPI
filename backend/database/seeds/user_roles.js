@@ -12,5 +12,6 @@ export async function seed(knex) {
     {id: 4, role_name: 'picker'},
     {id: 5, role_name: 'qc'},
     {id: 6, role_name: 'delivery'},
+    {id: 7, role_name: 'superadmin'}
   ]);
 }

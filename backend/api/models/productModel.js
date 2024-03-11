@@ -1,21 +1,30 @@
 
 import db from '../../config/dbConfig.js';
+import { generateActivityLog } from '../utils/generateActivityLog.js';
 import { getPrdPrice } from './productPriceModel.js';
 
 
 // create product
 export const createAProduct = async (productData) => {
     const newProduct = await db("products").insert(productData).returning('*');
+    await generateActivityLog({
+        userId: productData.user_id,
+        comment: `Created product ${productData.prd_name}`
+    })
     return newProduct;
 };
 
 
 // update product
-
 export const updateAProduct = async (productId, updatedData) => {
     const updatedProduct = await db('products').where({ id: productId })
         .update(updatedData)
         .returning('*'); // Return the updated product
+
+        await generateActivityLog({
+            userId: updatedData?.user_id,
+            comment: `Updated product ${updatedData?.prd_name}`
+        })
     return updatedProduct;
 };
 
