@@ -1,5 +1,5 @@
 import aws from 'aws-sdk';
-import { createABanner, getABanner, getsAllBanners, updateABanner } from "../models/homePageBannerModel.js";
+import { createABanner, deleteABanner, getABanner, getsAllBanners, updateABanner } from "../models/homePageBannerModel.js";
 
 
 const awsConfig = ({
@@ -167,4 +167,30 @@ export const getAllBanners = async (req, res) => {
             error: error
         });
     }
+};
+
+
+export const deleteBanner = async (req, res) => {
+    const bannerId = req.params.bannerId;
+    try {
+        
+        const deletedBanner = await deleteABanner(bannerId);
+
+        res.status(200).json({
+          status:200,
+          success:true,
+          message:"Deleted banner successfully",
+          result: deletedBanner
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+          status:500,
+          success:false,
+          error:error,
+          message:"Failed to delete banner",
+        });
+    }
+
 };
