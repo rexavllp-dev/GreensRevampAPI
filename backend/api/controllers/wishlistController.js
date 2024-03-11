@@ -111,7 +111,7 @@ export const removedWishlist = async (req, res) => {
             status: 200,
             success: true,
             result: removedWishlist,
-            message: 'Wishlist removed successfully'
+            message: 'Product removed from your wishlist'
         })
 
     } catch (error) {
