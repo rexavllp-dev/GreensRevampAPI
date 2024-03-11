@@ -1,4 +1,4 @@
-import { getAllActivity } from "../models/generateActivityLogModel";
+import { getAllActivity } from "../models/generateActivityLogModel.js";
 
 
 // get all activity
