@@ -14,6 +14,6 @@ export const getAllActivity = async () => {
          'users.id as user_id'
         )
         
-    return allActivity
+    return allActivity;
         
 }
