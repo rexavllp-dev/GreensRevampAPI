@@ -13,13 +13,13 @@ export const createSaveForLater = async (req, res) => {
         // if product is already in save for later
         const checkSaveForLater = await checkSaveForLaterById(userId, saveForLaterData.product_id);
 
-        // if (checkSaveForLater) {
-        //     return res.status(400).json({
-        //         status: 400,
-        //         success: false,
-        //         message: 'Product already in save for later'
-        //     })
-        // }
+        if (checkSaveForLater) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: 'Product already in save for later'
+            })
+        }
 
         const userSaveForLater = await getUserSaveForLater(userId);
         console.log(userSaveForLater)
@@ -27,7 +27,7 @@ export const createSaveForLater = async (req, res) => {
 
 
         // check if save for later is more than 20 products
-        const saveForLaterLimit = 2;
+        const saveForLaterLimit = 20;
         console.log(userSaveForLater?.length, saveForLaterLimit)
 
         if (userSaveForLater?.length >= saveForLaterLimit) {
