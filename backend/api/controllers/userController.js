@@ -162,7 +162,7 @@ export const registerUser = async (req, res) => {
             usr_mobile_number,
             usr_mobile_country_code,
             usr_email,
-            is_role:2,//default role is user
+            is_role: 2,//default role is user
 
             //  hashed password initialize to usr_password
             usr_password: hashedPassword,
@@ -412,6 +412,7 @@ export const loginWithPassword = async (req, res) => {
                     usr_email: existingUser.usr_email,
                     usr_firstname: existingUser.usr_firstname,
                     usr_lastname: existingUser.usr_lastname,
+                    is_role: existingUser.is_role,
 
                 }
             }
@@ -975,6 +976,7 @@ export const verifyOtp = async (req, res) => {
                         usr_email: existingUser.usr_email,
                         usr_firstname: existingUser.usr_firstname,
                         usr_lastname: existingUser.usr_lastname,
+                        is_role: existingUser.is_role,
                     },
                     accessToken,
                     refreshToken
@@ -1142,6 +1144,7 @@ export const verifyLoginOtp = async (req, res) => {
                         usr_email: existingUser.usr_email,
                         usr_firstname: existingUser.usr_firstname,
                         usr_lastname: existingUser.usr_lastname,
+                        is_role: existingUser.is_role,
                     }
                 }
             });

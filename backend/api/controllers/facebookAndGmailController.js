@@ -50,7 +50,7 @@ export const googleAuth = async (req, res) => {
         //   message:"success",
         //   result:{ accessToken, refreshToken }
         // });
-        return res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}`);
+        return res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}&is_role=${req.user.is_role}`);
     } catch (error) {
         console.log(error);
     }
@@ -94,7 +94,7 @@ export const facebookAuth = async (req, res) => {
         const refreshToken = generateRefreshToken(existingUser);
 
 
-        return res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}`);
+        return res.redirect(`${process.env.BASE_URL}/auth/success?access_token=${accessToken}&refresh_token=${refreshToken}&usr_firstname=${req.user.usr_firstname}&usr_lastname=${req.user.usr_lastname}&usr_email=${req.user.usr_email}&is_role=${req.user.is_role}`);
         // res.status(201).json({
         //   status:201,
         //   success:true,
