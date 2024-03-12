@@ -583,3 +583,17 @@ export const ordersByDriver = async (driverId) => {
 };
 
 
+
+// cancel order by admin
+
+// export const cancelOrderbyAdmin = async (orderId) => {
+
+//     const cancelOrder = await db('user_orders').where({ id: orderId })
+//         .update({ 'ord_order_status': 6 }).returning('*')
+     
+        
+
+//     return cancelOrder;
+
+    
+// }
