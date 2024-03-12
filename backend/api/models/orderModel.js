@@ -250,16 +250,27 @@ export const getAOrderData = async (orderId) => {
 
 
 
-export const getAllUserOrders = async (order_status_id, search_query, order_date) => {
+export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage) => {
     let orders = await db("user_orders")
         .select(
             'user_orders.*',
             'user_orders.id as orderId'
-        );
+        )
+        .offset((page - 1) * perPage)
+        .limit(perPage);
+
+    // const offset = (page - 1) * perPage;
+    // orders.offset(offset).limit(perPage);
 
     if (order_status_id !== null) {
         orders.where({ 'user_orders.ord_order_status': order_status_id });
     };
+
+    // search divers by name
+    if (driverId !== null) {
+        orders.where({ 'user_orders.ord_delivery_accepted_by': driverId });
+    };
+
 
     if (search_query !== null) {
         orders.where(function () {
@@ -272,6 +283,8 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
     if (order_date !== null) {
         orders.where({ 'user_orders.created_at': order_date });
     };
+
+    console.log(orders.toString());
 
     for (let order of orders) {
         let products = await db("order_items")
@@ -332,10 +345,10 @@ export const getDashboardOrders = async (userId, role) => {
         .groupBy('user_orders.id', 'order_items.id', 'products.id', 'address.id');
 
 
-    
+
     var orderLoop = await orders;
 
-    
+
     // Group orders by orderId
     const groupedOrders = {};
     orderLoop.forEach(order => {
@@ -376,8 +389,8 @@ export const getDashboardOrders = async (userId, role) => {
         hours = hours ? hours : 12; // Handle midnight (0 hours)
 
         var formattedTime = hours.toString().padStart(2, '0') + ':' +
-                        minutes.toString().padStart(2, '0') + ' ' +
-                        ampm;
+            minutes.toString().padStart(2, '0') + ' ' +
+            ampm;
 
         order.order_time = formattedTime;
 
@@ -412,7 +425,7 @@ export const getAssinedOrders = async (userId, role) => {
             //Role 4 = Picker
             //Role 5 = QC
             if (role == 3) {
-              builder.where('user_orders.ord_accepted_by', userId).whereNotNull('user_orders.ord_picker_accepted_by');
+                builder.where('user_orders.ord_accepted_by', userId).whereNotNull('user_orders.ord_picker_accepted_by');
             }
             if (role == 4) {
                 builder.where('user_orders.ord_picker_accepted_by', userId).where('user_orders.picker_verified', true);
@@ -426,10 +439,10 @@ export const getAssinedOrders = async (userId, role) => {
         .groupBy('user_orders.id', 'order_items.id', 'products.id', 'address.id');
 
 
-    
+
     var orderLoop = await orders;
 
-    
+
     // Group orders by orderId
     const groupedOrders = {};
     orderLoop.forEach(order => {
@@ -470,8 +483,8 @@ export const getAssinedOrders = async (userId, role) => {
         hours = hours ? hours : 12; // Handle midnight (0 hours)
 
         var formattedTime = hours.toString().padStart(2, '0') + ':' +
-                        minutes.toString().padStart(2, '0') + ' ' +
-                        ampm;
+            minutes.toString().padStart(2, '0') + ' ' +
+            ampm;
 
         order.order_time = formattedTime;
 
@@ -488,18 +501,18 @@ export const getAssinedOrders = async (userId, role) => {
 export const assignPicker = async (orderId, pickerId) => {
 
     try {
-        
+
         const updatePicker = await db('user_orders').where({ id: orderId })
-            .update({'ord_picker_accepted_by':pickerId, picker_verified:false}).returning('*')
+            .update({ 'ord_picker_accepted_by': pickerId, picker_verified: false }).returning('*')
         return updatePicker;
-        
+
 
         // Commit the transaction if everything is successful
     } catch (error) {
         // Rollback the transaction if there's an error
         throw error; // Rethrow the error for the caller to handle
     }
-   
+
 };
 
 
@@ -510,21 +523,21 @@ export const verifyItem = async (orderId) => {
 
         //Updating Order status
         await db('user_orders').where({ id: orderId })
-        .update({'ord_order_status':2}).returning('*')
+            .update({ 'ord_order_status': 2 }).returning('*')
 
         //Updating Picker Verification
         const verifyItem = await db('user_orders').where({ id: orderId })
-            .update({'picker_verified':true}).returning('*')
+            .update({ 'picker_verified': true }).returning('*')
         return verifyItem;
 
-        
+
 
         // Commit the transaction if everything is successful
     } catch (error) {
         // Rollback the transaction if there's an error
         throw error; // Rethrow the error for the caller to handle
     }
-   
+
 };
 
 export const assignDriver = async (userId, orderId, driverId, boxes) => {
@@ -532,13 +545,13 @@ export const assignDriver = async (userId, orderId, driverId, boxes) => {
     try {
 
 
-         //Updating Order status
-         await db('user_orders').where({ id: orderId })
-         .update({'ord_order_status':3}).returning('*')
+        //Updating Order status
+        await db('user_orders').where({ id: orderId })
+            .update({ 'ord_order_status': 3 }).returning('*')
 
-         // Assigning Driver to the Order
+        // Assigning Driver to the Order
         const updatePicker = await db('user_orders').where({ id: orderId })
-            .update({'ord_delivery_accepted_by':driverId, 'ord_qc_confirmed':userId, 'no_boxes': boxes}).returning('*')
+            .update({ 'ord_delivery_accepted_by': driverId, 'ord_qc_confirmed': userId, 'no_boxes': boxes }).returning('*')
         return updatePicker;
 
         // Commit the transaction if everything is successful
@@ -546,7 +559,7 @@ export const assignDriver = async (userId, orderId, driverId, boxes) => {
         // Rollback the transaction if there's an error
         throw error; // Rethrow the error for the caller to handle
     }
-   
+
 };
 
 export const ordersByDriver = async (driverId) => {
@@ -554,8 +567,8 @@ export const ordersByDriver = async (driverId) => {
     try {
 
         const driverOrders = await db('user_orders').leftJoin('address', 'user_orders.address_id', 'address.id').select('user_orders.*',
-        'user_orders.id as orderId',
-        'address.*').where('ord_delivery_accepted_by', driverId).where('ord_order_status', '!=', 5);
+            'user_orders.id as orderId',
+            'address.*').where('ord_delivery_accepted_by', driverId).where('ord_order_status', '!=', 5);
         return driverOrders;
 
         // Commit the transaction if everything is successful
@@ -563,7 +576,7 @@ export const ordersByDriver = async (driverId) => {
         // Rollback the transaction if there's an error
         throw error; // Rethrow the error for the caller to handle
     }
-   
+
 };
 
 

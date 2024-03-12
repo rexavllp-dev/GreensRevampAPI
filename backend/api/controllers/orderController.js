@@ -290,21 +290,28 @@ export const getASingleOrder = async (req, res) => {
 
 // get all orders
 export const getAllOrders = async (req, res) => {
+
+
     try {
 
+        let driverId = req.query.driverId || null;
         let order_status_id = req.query.order_status_id || null;
         let search_query = req.query.search_query || null;
         let order_date = req.query.order_date || null;
+        let page = req.query.page || 1;
+        let perPage = req.query.perPage || 10;
 
         order_status_id = order_status_id === "null" ? null : order_status_id;
         search_query = search_query === "null" ? null : search_query;
         order_date = order_date === "null" ? null : order_date;
+        driverId = driverId === "null" ? null : driverId;
+        page = page === "null" ? 1 : parseInt(page);
 
         if (order_date !== null) {
             order_date = new Date(order_date);
         }
 
-        const orders = await getAllUserOrders(order_status_id, search_query, order_date);
+        const orders = await getAllUserOrders(order_status_id, search_query, order_date, driverId, page, perPage);
 
         res.status(200).json({
             status: 200,
@@ -326,7 +333,7 @@ export const getAllOrders = async (req, res) => {
 export const getUserDashBoardStatus = async (req, res) => {
 
     const userId = req.user?.userId;
-    
+
     try {
 
         const orders = await getUserDashboardOrders(userId);
@@ -358,7 +365,7 @@ export const getAllDashboardOrders = async (req, res) => {
 
     //console.log(userId);
 
-    const role   = req.body.role;
+    const role = req.body.role;
     const orders = await getDashboardOrders(userId, role);
 
     res.status(200).json({
@@ -374,9 +381,9 @@ export const getAllDashboardOrders = async (req, res) => {
 export const assignPickers = async (req, res) => {
 
 
-    const orderId  = req.body.orderId;
+    const orderId = req.body.orderId;
     const pickerId = req.body.pickerId;
-    
+
     const pickers = await assignPicker(orderId, pickerId);
 
     res.status(200).json({
@@ -396,7 +403,7 @@ export const getAllAssinedOrders = async (req, res) => {
 
     //console.log(userId);
 
-    const role   = req.body.role;
+    const role = req.body.role;
     const orders = await getAssinedOrders(userId, role);
 
     res.status(200).json({
@@ -412,8 +419,8 @@ export const getAllAssinedOrders = async (req, res) => {
 export const verifyItems = async (req, res) => {
 
 
-    const orderId  = req.body.orderId;
-    const orders   = await verifyItem(orderId);
+    const orderId = req.body.orderId;
+    const orders = await verifyItem(orderId);
     res.status(200).json({
         status: 200,
         success: true,
@@ -428,13 +435,13 @@ export const assignDrivers = async (req, res) => {
 
 
 
-    
-    const userId   = req.body.userId;
-    const orderId  = req.body.orderId;
-    const driverId = req.body.driverId;
-    const boxes    = req.body.boxes;
 
-    const drivers  = await assignDriver(userId, orderId, driverId, boxes);
+    const userId = req.body.userId;
+    const orderId = req.body.orderId;
+    const driverId = req.body.driverId;
+    const boxes = req.body.boxes;
+
+    const drivers = await assignDriver(userId, orderId, driverId, boxes);
 
     res.status(200).json({
         status: 200,
@@ -450,7 +457,7 @@ export const downloadTripsheet = async (req, res) => {
 
 
     const driverId = req.body.driverId;
-    const drivers  = await ordersByDriver(driverId);
+    const drivers = await ordersByDriver(driverId);
 
     res.status(200).json({
         status: 200,
@@ -460,6 +467,7 @@ export const downloadTripsheet = async (req, res) => {
     });
 
 };
+
 
 
 
