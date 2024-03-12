@@ -3,11 +3,13 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
 import { getUserDashboardOrders } from '../models/userOrderDashboardModel.js';
+import { generatePDF } from '../utils/pdfGenerator.js';
+import { sendOrderInvoices } from '../utils/emailer.js';
 
 
 export const createOrder = async (req, res) => {
@@ -418,7 +420,6 @@ export const getAllAssinedOrders = async (req, res) => {
 
 export const verifyItems = async (req, res) => {
 
-
     const orderId = req.body.orderId;
     const orders = await verifyItem(orderId);
     res.status(200).json({
@@ -432,9 +433,6 @@ export const verifyItems = async (req, res) => {
 
 
 export const assignDrivers = async (req, res) => {
-
-
-
 
     const userId = req.body.userId;
     const orderId = req.body.orderId;
@@ -466,6 +464,94 @@ export const downloadTripsheet = async (req, res) => {
         result: drivers
     });
 
+};
+
+
+// Admin Order details 
+// add remarks
+
+export const addRemarks = async (req, res) => {
+
+    const remarks = req.body.ord_remarks;
+    const orderId = req.params.orderId;
+
+    try {
+        const newRemarks = await addARemarks(orderId, remarks);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Added remarks successfully",
+            result: newRemarks
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to add remarks",
+            error: error
+        });
+    }
+};
+
+
+export const sendOrderInvoiceMailByAdmin = async (req, res) => {
+
+    const orderId = req.params.orderId;
+
+    try {
+
+        const orderData = await getAOrderData(orderId);
+
+        const pdfData = await generatePDF(orderData);
+
+        // Send email with the PDF attachment
+        await sendOrderInvoices(orderData, pdfData);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Order invoice sent successfully",
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to send order invoice",
+            error: error
+        });
+    }
+};
+
+
+// get invoice by admin
+export const getInvoicesByAdmin = async (req, res) => {
+
+    const orderId = req.params.orderId;
+
+    try {
+
+        const orderData = await getAOrderData(orderId);
+        const invoiceData = await generatePDF(orderData);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Order invoice generated successfully",
+            result: invoiceData
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to generate invoice",
+            error: error
+        });
+    }
 };
 
 
