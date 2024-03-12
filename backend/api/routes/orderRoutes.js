@@ -1,5 +1,5 @@
 import express from "express";
-import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin } from "../controllers/orderController.js";
+import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin, updateOrderItemQty } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
 
@@ -54,6 +54,9 @@ router.post('/send_order_invoices/:orderId', sendOrderInvoiceMailByAdmin);
 
 // get invoice by admin
 router.get('/get_invoice/:orderId', getInvoicesByAdmin);
+
+// update order item qty  by admin
+router.put('/update_order_item_qty', updateOrderItemQty);
 
 
 

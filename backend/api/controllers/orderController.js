@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks, updateItemQty } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
@@ -549,6 +549,35 @@ export const getInvoicesByAdmin = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed to generate invoice",
+            error: error
+        });
+    }
+};
+
+
+// update order item qty
+export const updateOrderItemQty = async (req, res) => {
+
+    const { orderItemId, opQty } = req.body;
+
+
+    try {
+
+        const updateQty = await updateItemQty(orderItemId, opQty);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: " Quantity updated successfully",
+            result: updateQty
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to update quantity",
             error: error
         });
     }
