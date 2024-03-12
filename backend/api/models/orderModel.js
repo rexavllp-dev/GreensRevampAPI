@@ -252,7 +252,10 @@ export const getAOrderData = async (orderId) => {
 
 export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage) => {
     let orders = await db("user_orders")
+    .leftJoin('users', 'user_orders.customer_id ', 'users.id')
         .select(
+            'users.*',
+            'users.id as userId',
             'user_orders.*',
             'user_orders.id as orderId'
         )
