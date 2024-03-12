@@ -1,14 +1,14 @@
 import express from 'express';
-import { adminUserRegister,  approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin,  rejectCompanyByAdmin } from '../controllers/adminController.js';
-import {  updateAndApproveOrRejectBulkOrders } from '../controllers/bulkController.js';
+import { adminUserRegister, approveCompanyByAdmin, isActiveByAdmin, isNotActiveByAdmin, rejectCompanyByAdmin } from '../controllers/adminController.js';
+import { updateAndApproveOrRejectBulkOrders } from '../controllers/bulkController.js';
 import { AddPrivacyPolicy, deletePrivacyPolicyById, getALLPrivacyPolicy, updatePrivacyPolicyById } from '../controllers/PrivacyPoliciesController.js';
 import { getAllReturnsForAdmin, getSingleReturn, updateReturnStatus } from '../controllers/returnController.js';
 import { getAllReplacementsForAdmin, getSingleReplacement, updateReplacementStatus } from '../controllers/replaceController.js';
 import { createBanner, deleteBanner, getAllBanners, getSingleBanner, updateBanner } from '../controllers/homePageBannerController.js';
 import { createSeason, deleteSeason, getAllSeasons, getSingleSeason, updateSeason } from '../controllers/seasonController.js';
-import { createFeed, deleteFeed, getAllfeeds, getSingleFeed, updateFeed } from '../controllers/feedController.js';
+import { createFeed, deleteFeed, getAllFeeds, getSingleFeed, updateFeed } from '../controllers/feedController.js';
 import { createAds, deleteAds, getAllAds, getSingleAds, updateAds } from '../controllers/adsController.js';
-import { getAllActivityOfUser } from '../controllers/generateAcitivityLogContoller.js';
+import { getAllActivityOfUser } from '../controllers/generateActivityLogController.js';
 
 
 const router = express.Router();
@@ -57,7 +57,7 @@ router.get('/return/get-return/:returnId', getSingleReturn);
 
 
 // update replacement status
-router.put('/replacement/update-status/:replacementId', updateReplacementStatus);                                                                             
+router.put('/replacement/update-status/:replacementId', updateReplacementStatus);
 
 // get single replacement for admin
 router.get('/replacement/get-replacement/:replacementId', getSingleReplacement);
@@ -81,7 +81,7 @@ router.get('/banner/get_banner/:bannerId', getSingleBanner);
 router.get('/banner/get_all_banners', getAllBanners);
 
 //delete banner
-router.delete('/banner/delete_banner/:bannerId', deleteBanner); 
+router.delete('/banner/delete_banner/:bannerId', deleteBanner);
 
 
 // Home page  seasons
@@ -113,7 +113,7 @@ router.put('/feeds/update_feed/:feedId', updateFeed);
 router.get('/feeds/get_feed/:feedId', getSingleFeed);
 
 // get all feed
-router.get('/feeds/get_all_feeds', getAllfeeds);
+router.get('/feeds/get_all_feeds', getAllFeeds);
 
 //delete feed
 router.delete('/feeds/delete_feed/:feedId', deleteFeed);
@@ -135,7 +135,7 @@ router.get('/ads/get_ads/:adsId', getSingleAds);
 router.get('/ads/get_all_ads', getAllAds);
 
 //delete feed
-router.delete('/ads/delete_ads/:adsId',deleteAds);
+router.delete('/ads/delete_ads/:adsId', deleteAds);
 
 
 
