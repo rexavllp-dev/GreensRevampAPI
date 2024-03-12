@@ -168,9 +168,8 @@ export const updateAnOrder = async (orderId, updatedData) => {
     return updatedOrder;
 };
 
-
 export const getAOrder = async (orderId) => {
-    const order = await db("user_orders")
+    const orders = await db("user_orders")
         .where({ 'user_orders.id': orderId })
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
@@ -178,8 +177,8 @@ export const getAOrder = async (orderId) => {
         .leftJoin('return_products', 'return_products.order_item_id', 'order_items.id')
         .leftJoin('replace_products', 'replace_products.order_item_id', 'order_items.id')
 
-        .select(
 
+        .select(
             'user_orders.*',
             'user_orders.id as orderId',
             'order_items.*',
@@ -194,8 +193,52 @@ export const getAOrder = async (orderId) => {
             'replace_products.id as replaceProductId',
         );
 
-    return order;
+    const groupedOrders = [];
+
+    orders.forEach((order) => {
+        const existingOrder = groupedOrders.find((o) => o.orderId === order.orderId);
+
+        if (existingOrder) {
+            // Check if the order item with the same ID already exists in the orderItems array
+            const existingOrderItem = existingOrder.orderItems.find((item) => item.id === order.orderItemId);
+
+            if (!existingOrderItem) {
+                // If the order item doesn't exist, push it to the orderItems array
+                existingOrder.orderItems.push({
+                    id: order.orderItemId,
+                    order_id: order.orderId,
+                    product_id: order.productId,
+                    product_name: order.prd_name,
+                    order_actual_price: order.op_actual_price,
+                    order_op_unit_price: order.op_unit_price,
+                    order_op_line_total: order.op_line_total,
+                });
+            }
+        } else {
+            // If the order doesn't exist in the accumulator, create a new order object
+            groupedOrders.push({
+                ...order,
+                orderItems: [
+                    {
+                        id: order.orderItemId,
+                        order_id: order.orderId,
+                        product_id: order.productId,
+                        product_name: order.prd_name,
+                        order_actual_price: order.op_actual_price,
+                        order_op_unit_price: order.op_unit_price,
+                        order_op_line_total: order.op_line_total,
+                        order_op_qty: order.op_qty
+
+                    },
+                ],
+            });
+        }
+    });
+
+    return groupedOrders;
 };
+
+
 
 
 
@@ -498,9 +541,6 @@ export const getAssinedOrders = async (userId, role) => {
 
 
 
-
-
-
 export const assignPicker = async (orderId, pickerId) => {
 
     try {
@@ -565,6 +605,8 @@ export const assignDriver = async (userId, orderId, driverId, boxes) => {
 
 };
 
+
+
 export const ordersByDriver = async (driverId) => {
 
     try {
@@ -597,3 +639,23 @@ export const ordersByDriver = async (driverId) => {
 
     
 // }
+// Add remarks to the order by admin
+export const addARemarks = async (orderId, remark) => {
+
+    const remarks = await db('user_orders')
+        .where({ id: orderId })
+        .update({
+            ord_remarks: remark
+        })
+        .returning('*');
+
+    return remarks;
+};
+
+// send mail by admin for order invoices
+export const sendOrderInvoiceMail = async (orderId) => {
+
+    
+
+}
+
