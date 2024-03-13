@@ -20,7 +20,8 @@ import {
     verifyLoginOtp,
     verifyOtp,
     getAllPickers,
-    getAllDrivers
+    getAllDrivers,
+    getAllWarehouseUsers
 } from '../controllers/userController.js';
 
 import { forgotPassword, resetPassword } from '../controllers/forgotPasswordController.js';
@@ -31,7 +32,7 @@ import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
-import { getNotifyProduct, notifyProduct } from '../controllers/notifyProductController.js';
+import { getNotifyProduct, notifyProduct, removeNotifiedProduct } from '../controllers/notifyProductController.js';
 import multer from 'multer';
 const upload = multer();
 
@@ -112,12 +113,12 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 
 router.get("/auth/facebook", passport.authenticate('facebook', { scope: ['profile', 'email'] }));
 
-router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), facebookAuth);
+router.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), facebookAuth);  
 
 
 // update user account information in user dashboard
 
-router.put('/update-user-account', verifyToken, updateUserAccountInformations);
+router.put('/update-user-account', verifyToken, updateUserAccountInformations); 
 
 // update company in user dashboard 
 router.put('/update-company', verifyToken, updateUserCompany);
@@ -151,8 +152,13 @@ router.post('/notify-product', verifyToken, notifyProduct);
 // get notify product
 router.get('/get-notify-product', verifyToken, getNotifyProduct);
 
+// delete notify product
+router.delete('/delete-notify-product/:id', verifyToken, removeNotifiedProduct);
+
 
 router.get('/pickers', getAllPickers);
+
+router.get('/warehouse-users', getAllWarehouseUsers);
 
 router.get('/drivers', getAllDrivers);
 

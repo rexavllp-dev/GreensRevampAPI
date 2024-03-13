@@ -37,6 +37,7 @@ export const getReturnById = async (returnId) => {
 
 
 export const getAllReturnProducts = async () => {
+
     const returns = await db('return_products')
         .leftJoin('order_items', 'return_products.order_item_id', 'order_items.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
@@ -59,8 +60,6 @@ export const getAllReturnProducts = async () => {
             'reasons.clr_reason',
             
 
-
-
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -77,6 +76,8 @@ export const getAllReturnProducts = async () => {
 
             'order_items.id',
             'order_items.created_at',
+
+            'user_orders.id', 
 
             'products.prd_name',
 

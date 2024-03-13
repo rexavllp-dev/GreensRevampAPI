@@ -144,8 +144,7 @@ export const getBulkQuantity = async (userId, productId) => {
 // get all products
 
 export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice, userId) => {
-    console.log(userId, 'userid')
-
+  
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')

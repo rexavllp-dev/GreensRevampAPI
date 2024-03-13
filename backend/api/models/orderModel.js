@@ -1,4 +1,6 @@
 import db from '../../config/dbConfig.js';
+import { createStockHistory } from './stockHistoryModel.js';
+
 
 
 
@@ -168,9 +170,8 @@ export const updateAnOrder = async (orderId, updatedData) => {
     return updatedOrder;
 };
 
-
 export const getAOrder = async (orderId) => {
-    const order = await db("user_orders")
+    const orders = await db("user_orders")
         .where({ 'user_orders.id': orderId })
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
@@ -178,10 +179,11 @@ export const getAOrder = async (orderId) => {
         .leftJoin('return_products', 'return_products.order_item_id', 'order_items.id')
         .leftJoin('replace_products', 'replace_products.order_item_id', 'order_items.id')
 
-        .select(
 
+        .select(
             'user_orders.*',
             'user_orders.id as orderId',
+            'user_orders.created_at as orderDate',
             'order_items.*',
             'order_items.id as orderItemId',
             'products.*',
@@ -194,8 +196,52 @@ export const getAOrder = async (orderId) => {
             'replace_products.id as replaceProductId',
         );
 
-    return order;
+    const groupedOrders = [];
+
+    orders.forEach((order) => {
+        const existingOrder = groupedOrders.find((o) => o.orderId === order.orderId);
+
+        if (existingOrder) {
+            // Check if the order item with the same ID already exists in the orderItems array
+            const existingOrderItem = existingOrder.orderItems.find((item) => item.id === order.orderItemId);
+
+            if (!existingOrderItem) {
+                // If the order item doesn't exist, push it to the orderItems array
+                existingOrder.orderItems.push({
+                    id: order.orderItemId,
+                    order_id: order.orderId,
+                    product_id: order.productId,
+                    product_name: order.prd_name,
+                    order_actual_price: order.op_actual_price,
+                    order_op_unit_price: order.op_unit_price,
+                    order_op_line_total: order.op_line_total,
+                });
+            }
+        } else {
+            // If the order doesn't exist in the accumulator, create a new order object
+            groupedOrders.push({
+                ...order,
+                orderItems: [
+                    {
+                        id: order.orderItemId,
+                        order_id: order.orderId,
+                        product_id: order.productId,
+                        product_name: order.prd_name,
+                        order_actual_price: order.op_actual_price,
+                        order_op_unit_price: order.op_unit_price,
+                        order_op_line_total: order.op_line_total,
+                        order_op_qty: order.op_qty
+
+                    },
+                ],
+            });
+        }
+    });
+
+    return groupedOrders;
 };
+
+
 
 
 
@@ -252,12 +298,20 @@ export const getAOrderData = async (orderId) => {
 
 export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage) => {
     let orders = await db("user_orders")
-    .leftJoin('users', 'user_orders.customer_id ', 'users.id')
+        .leftJoin('users', 'user_orders.customer_id ', 'users.id')
+        .leftJoin('users as deliveryboy', 'user_orders.ord_delivery_accepted_by', 'deliveryboy.id')
+        .leftJoin('users as warehouse', 'user_orders.ord_accepted_by', 'warehouse.id')
+        .leftJoin('order_statuses', 'user_orders.ord_order_status', 'order_statuses.id')
         .select(
             'users.*',
             'users.id as userId',
+            'deliveryboy.usr_firstname as delivery_boy_firstname',
+            'deliveryboy.usr_lastname as delivery_boy_lastname',
+            'warehouse.usr_firstname as warehouse_firstname',
+            'warehouse.usr_lastname as warehouse_lastname',
             'user_orders.*',
-            'user_orders.id as orderId'
+            'user_orders.id as orderId',
+            'order_statuses.status_name'
         )
         .offset((page - 1) * perPage)
         .limit(perPage);
@@ -507,9 +561,6 @@ export const getAssinedOrders = async (userId, role) => {
 
 
 
-
-
-
 export const assignPicker = async (orderId, pickerId) => {
 
     try {
@@ -574,6 +625,8 @@ export const assignDriver = async (userId, orderId, driverId, boxes) => {
 
 };
 
+
+
 export const ordersByDriver = async (driverId) => {
 
     try {
@@ -591,4 +644,118 @@ export const ordersByDriver = async (driverId) => {
 
 };
 
+
+
+// cancel order by admin
+
+export const cancelOrderbyAdmin = async (cancelOrderData) => {
+
+        try {
+            const cancelOrder = await db('cancel_orders').insert({ ...cancelOrderData, cancel_type: "full" }).returning('*');
+            return cancelOrder;
+
+            
+        } catch (error) {
+    
+        }
+    };
+
+
+
+     
+    
+
+//     const cancelOrder = await db('user_orders').where({ id: orderId })
+//         .update({ 'ord_order_status': 6 }).returning('*')
+
+
+
+//     return cancelOrder;
+
+
+// }
+// Add remarks to the order by admin
+export const addARemarks = async (orderId, remark) => {
+
+    const remarks = await db('user_orders')
+        .where({ id: orderId })
+        .update({
+            ord_remarks: remark
+        })
+        .returning('*');
+
+    return remarks;
+};
+
+// update order items qty and update product inventory
+export const updateItemQty = async (orderItemId, opQty, orderId) => {
+
+    // Retrieve the current op_qty and product_id from the order_items table
+    const currentOrderItem = await db('order_items')
+        .select('op_qty', 'product_id')
+        .where({ id: orderItemId })
+        .first();
+
+
+    // Calculate the difference between the new op_qty and the previous op_qty
+    const qtyDifference = opQty - currentOrderItem.op_qty;
+
+
+    // Update the op_qty in the order_items table
+    const updatedOrderItem = await db('order_items')
+        .where({ id: orderItemId })
+        .update({ op_qty: opQty })
+        .returning('*');
+
+
+    // Retrieve the product_quantity before updating
+    const productInventory = await db('product_inventory')
+        .select('product_quantity')
+        .where({ product_id: currentOrderItem.product_id })
+        .first();
+
+
+    // Update the product_quantity in the product_inventory table
+    await db('product_inventory')
+        .where({ product_id: currentOrderItem.product_id })
+        .increment('product_quantity', -qtyDifference);
+
+    const productNewQty = await db('product_inventory')
+        .select('product_quantity')
+        .where({ product_id: currentOrderItem.product_id })
+        .first();
+
+    const updatedNewQty = parseInt(productNewQty.product_quantity);
+
+    
+
+
+    // Create stock history record
+    await createStockHistory({
+
+        product_id: currentOrderItem.product_id,
+        previous_stock: productInventory.product_quantity,
+        qty: Math.abs(qtyDifference),
+        remaining_stock: updatedNewQty,
+        order_id: orderId,
+        action: qtyDifference > 0 ? 'reduced' : 'added',
+        comment: 'Updated Order Quantity',
+        created_at: new Date(),
+        updated_at: new Date(),
+
+    });
+
+    return updatedOrderItem;
+
+};
+
+
+export const getOrderIdByOrderItems = async (orderItemId) => {
+    const result = await db('order_items')
+        .select('order_id')
+        .where({ id: orderItemId })
+        .first();
+
+        return result ? result.order_id : null;
+};
 

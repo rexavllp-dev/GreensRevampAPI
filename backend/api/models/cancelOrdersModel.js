@@ -39,6 +39,7 @@ export const updateOrderStatus = async (orderId, trx) => {
     console.log(orderId);
 
     try {
+        
         const updatedOrder = await trx('user_orders')
             .where({ id: orderId })
             .select('ord_order_status')
@@ -69,44 +70,7 @@ export const updateOrderStatus = async (orderId, trx) => {
 
 
 
-// update product quantities
-export const updateProductQuantities = async (orderId, trx) => {
 
-    try {
-        const productsInOrder = await trx('order_items')
-            .where({ order_id: orderId })
-            .select('product_id', 'op_qty');
-        console.log(productsInOrder)
-
-        const promises = productsInOrder.map(async ({ product_id, op_qty }) => {
-            console.log(product_id)
-            const currentQuantity = await trx('product_inventory')
-                .where('product_id', product_id)
-                .select('product_quantity')
-                .first();
-
-            console.log(op_qty)
-            console.log(currentQuantity)
-
-
-
-            const newQuantity = parseInt(currentQuantity?.product_quantity) + parseInt(op_qty);
-
-            console.log(newQuantity)
-            await trx('product_inventory')
-                .where({ product_id: product_id })
-                .update({ product_quantity: newQuantity });
-
-            return { productId: product_id, newQuantity };
-        });
-
-        const updatedQuantities = await Promise.all(promises);
-        return updatedQuantities;
-    } catch (error) {
-        trx.rollback();
-        throw error;
-    }
-};
 
 // get all order items
 
@@ -318,6 +282,25 @@ export const getOrderItemsByItemId = async (orderId) => {
         ).first();
 
     return orderItems;
+};
+
+export const getAllCancelledOrders = async () => {
+
+    const cancelledOrders = await db('cancel_orders')
+        .leftJoin('user_orders', 'cancel_orders.order_id', 'user_orders.id')
+        .leftJoin('reasons', 'reasons.id', 'cancel_orders.cancel_reason_id')
+        .select(
+            'cancel_orders.*',
+            'cancel_orders.id as cancelOrderId',
+            'cancel_orders.created_at as cancelOrderDate',
+            'user_orders.*',
+            'user_orders.id as orderId',
+            'user_orders.created_at as orderDate',
+            'reasons.clr_reason',
+            'reasons.clr_status'
+        );
+
+    return cancelledOrders;
 };
 
 

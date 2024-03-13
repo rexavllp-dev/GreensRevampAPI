@@ -24,6 +24,7 @@ import {
     updateUserVerificationStatus,
     getPickers,
     getDrivers,
+    getWarehouseUsers,
 } from "../models/userModel.js";
 
 import Joi from 'joi';
@@ -1460,6 +1461,19 @@ export const getAllPickers = async (req, res) => {
         success: true,
         message: "Fetched pickers successfully",
         result: pickers
+    });
+};
+
+
+export const getAllWarehouseUsers = async (req, res) => {
+
+    const warehouseUsers = await getWarehouseUsers();
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: "Fetched Warehouse Users Successfully",
+        result: warehouseUsers
     });
 };
 

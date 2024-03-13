@@ -1,7 +1,10 @@
 import express from "express";
-import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet } from "../controllers/orderController.js";
+import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin, updateOrderItemQty } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
+import { getCancelledOrders } from "../controllers/cancelOrderController.js";
+import { cancelIndividualItemsByAdmin, createCancelOrdersByAdmin } from "../controllers/cancelOrderController.js";
+
 
 
 
@@ -41,6 +44,33 @@ router.post('/verify-item', verifyItems);
 router.post('/assigndriver', assignDrivers);
 
 router.post('/download_tripsheet', downloadTripsheet);
+
+
+
+// admin order details
+// add remarks by admin
+router.put('/add_remarks/:orderId', addRemarks);
+
+// send mail by admin for order invoices
+router.post('/send_order_invoices/:orderId', sendOrderInvoiceMailByAdmin);
+
+// get invoice by admin
+router.get('/get_invoice/:orderId', getInvoicesByAdmin);
+
+// update order item qty  by admin
+router.put('/update_order_item_qty', updateOrderItemQty);
+
+//get cancelled orders
+router.get('/cancelled-orders', verifyToken, getCancelledOrders)
+
+
+// cancel order by admin
+router.post('/cancel-order', createCancelOrdersByAdmin);
+
+// cancel individual order
+router.post('/cancel-individual-order', cancelIndividualItemsByAdmin);
+
+
 
 
 export default router;
