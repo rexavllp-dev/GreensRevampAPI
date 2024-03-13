@@ -2,6 +2,7 @@ import db from '../../config/dbConfig.js';
 
 
 
+
 // Function to create a user order
 export const createUserOrder = async (trx, userId, orderData) => {
 
@@ -295,7 +296,7 @@ export const getAOrderData = async (orderId) => {
 
 export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage) => {
     let orders = await db("user_orders")
-    .leftJoin('users', 'user_orders.customer_id ', 'users.id')
+        .leftJoin('users', 'user_orders.customer_id ', 'users.id')
         .select(
             'users.*',
             'users.id as userId',
@@ -658,10 +659,33 @@ export const addARemarks = async (orderId, remark) => {
     return remarks;
 };
 
-// send mail by admin for order invoices
-export const sendOrderInvoiceMail = async (orderId) => {
+// update order items qty and update product inventory
+export const updateItemQty = async (orderItemId, opQty) => {
+
+    // Retrieve the current op_qty and product_id from the order_items table
+    const currentOrderItem = await db('order_items')
+        .select('op_qty', 'product_id')
+        .where({ id: orderItemId })
+        .first();
 
 
+    // Calculate the difference between the new op_qty and the previous op_qty
+    const qtyDifference = opQty - currentOrderItem.op_qty;
 
-}
+
+    // Update the op_qty in the order_items table
+    const updatedOrderItem = await db('order_items')
+        .where({ id: orderItemId })
+        .update({ op_qty: opQty })
+        .returning('*');
+
+
+    // Update the product_quantity in the product_inventory table
+    await db('product_inventory')
+        .where({ product_id: currentOrderItem.product_id })
+        .increment('product_quantity', -qtyDifference);
+
+    return updatedOrderItem;
+
+};
 
