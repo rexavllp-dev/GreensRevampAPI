@@ -336,6 +336,12 @@ export const getDrivers = async () => {
     return drivers;
 };  
 
+export const getWarehouseUsers = async () => {
+    
+    const drivers = await db("users").where({ is_status: true }).where({ is_role: 3 });
+    return drivers;
+};  
+
 
 
 

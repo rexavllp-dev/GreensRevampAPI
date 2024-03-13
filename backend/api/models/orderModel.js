@@ -182,6 +182,7 @@ export const getAOrder = async (orderId) => {
         .select(
             'user_orders.*',
             'user_orders.id as orderId',
+            'user_orders.created_at as orderDate',
             'order_items.*',
             'order_items.id as orderItemId',
             'products.*',
@@ -297,11 +298,19 @@ export const getAOrderData = async (orderId) => {
 export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage) => {
     let orders = await db("user_orders")
         .leftJoin('users', 'user_orders.customer_id ', 'users.id')
+        .leftJoin('users as deliveryboy', 'user_orders.ord_delivery_accepted_by', 'deliveryboy.id')
+        .leftJoin('users as warehouse', 'user_orders.ord_accepted_by', 'warehouse.id')
+        .leftJoin('order_statuses', 'user_orders.ord_order_status', 'order_statuses.id')
         .select(
             'users.*',
             'users.id as userId',
+            'deliveryboy.usr_firstname as delivery_boy_firstname',
+            'deliveryboy.usr_lastname as delivery_boy_lastname',
+            'warehouse.usr_firstname as warehouse_firstname',
+            'warehouse.usr_lastname as warehouse_lastname',
             'user_orders.*',
-            'user_orders.id as orderId'
+            'user_orders.id as orderId',
+            'order_statuses.status_name'
         )
         .offset((page - 1) * perPage)
         .limit(perPage);
@@ -633,12 +642,12 @@ export const ordersByDriver = async (driverId) => {
 
 //     const cancelOrder = await db('user_orders').where({ id: orderId })
 //         .update({ 'ord_order_status': 6 }).returning('*')
-     
-        
+
+
 
 //     return cancelOrder;
 
-    
+
 // }
 // Add remarks to the order by admin
 export const addARemarks = async (orderId, remark) => {
