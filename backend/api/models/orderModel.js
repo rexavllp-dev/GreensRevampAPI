@@ -1,4 +1,5 @@
 import db from '../../config/dbConfig.js';
+import { createStockHistory } from './stockHistoryModel.js';
 
 
 
@@ -646,6 +647,15 @@ export const cancelOrderbyAdmin = async (cancelOrderData) => {
      
     
 
+//     const cancelOrder = await db('user_orders').where({ id: orderId })
+//         .update({ 'ord_order_status': 6 }).returning('*')
+
+
+
+//     return cancelOrder;
+
+
+// }
 // Add remarks to the order by admin
 export const addARemarks = async (orderId, remark) => {
 
@@ -660,7 +670,7 @@ export const addARemarks = async (orderId, remark) => {
 };
 
 // update order items qty and update product inventory
-export const updateItemQty = async (orderItemId, opQty) => {
+export const updateItemQty = async (orderItemId, opQty, orderId) => {
 
     // Retrieve the current op_qty and product_id from the order_items table
     const currentOrderItem = await db('order_items')
@@ -680,12 +690,54 @@ export const updateItemQty = async (orderItemId, opQty) => {
         .returning('*');
 
 
+    // Retrieve the product_quantity before updating
+    const productInventory = await db('product_inventory')
+        .select('product_quantity')
+        .where({ product_id: currentOrderItem.product_id })
+        .first();
+
+
     // Update the product_quantity in the product_inventory table
     await db('product_inventory')
         .where({ product_id: currentOrderItem.product_id })
         .increment('product_quantity', -qtyDifference);
 
+    const productNewQty = await db('product_inventory')
+        .select('product_quantity')
+        .where({ product_id: currentOrderItem.product_id })
+        .first();
+
+    const updatedNewQty = parseInt(productNewQty.product_quantity);
+
+    
+
+
+    // Create stock history record
+    await createStockHistory({
+
+        product_id: currentOrderItem.product_id,
+        previous_stock: productInventory.product_quantity,
+        qty: Math.abs(qtyDifference),
+        remaining_stock: updatedNewQty,
+        order_id: orderId,
+        action: qtyDifference > 0 ? 'reduced' : 'added',
+        comment: 'Updated Order Quantity',
+        created_at: new Date(),
+        updated_at: new Date(),
+
+    });
+
     return updatedOrderItem;
 
+};
+
+
+export const getOrderIdByOrderItems = async (orderItemId) => {
+    const result = await db('order_items')
+        .select('order_id')
+        .where({ id: orderItemId })
+        .first();
+
+        return result ? result.order_id : null;
 };
 
