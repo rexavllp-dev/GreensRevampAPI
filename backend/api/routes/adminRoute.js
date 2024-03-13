@@ -139,10 +139,10 @@ router.delete('/ads/delete_ads/:adsId', deleteAds);
 
 
 
-
-
 // get all activity of user
 router.get('/generate_activity', getAllActivityOfUser);
+
+
 
 export default router;
 

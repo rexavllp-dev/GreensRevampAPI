@@ -3,6 +3,7 @@ import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboar
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
 import { getCancelledOrders } from "../controllers/cancelOrderController.js";
+import { cancelIndividualItemsByAdmin, createCancelOrdersByAdmin } from "../controllers/cancelOrderController.js";
 
 
 
@@ -61,6 +62,13 @@ router.put('/update_order_item_qty', updateOrderItemQty);
 
 //get cancelled orders
 router.get('/cancelled-orders', verifyToken, getCancelledOrders)
+
+
+// cancel order by admin
+router.post('/cancel-order', createCancelOrdersByAdmin);
+
+// cancel individual order
+router.post('/cancel-individual-order', cancelIndividualItemsByAdmin);
 
 
 
