@@ -2,6 +2,7 @@ import express from "express";
 import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin, updateOrderItemQty } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
+import { cancelIndividualItemsByAdmin, createCancelOrdersByAdmin } from "../controllers/cancelOrderController.js";
 
 
 
@@ -57,6 +58,13 @@ router.get('/get_invoice/:orderId', getInvoicesByAdmin);
 
 // update order item qty  by admin
 router.put('/update_order_item_qty', updateOrderItemQty);
+
+
+// cancel order by admin
+router.post('/cancel-order', createCancelOrdersByAdmin);
+
+// cancel individual order
+router.post('/cancel-individual-order', cancelIndividualItemsByAdmin);
 
 
 
