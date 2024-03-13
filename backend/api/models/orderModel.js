@@ -628,17 +628,23 @@ export const ordersByDriver = async (driverId) => {
 
 // cancel order by admin
 
-// export const cancelOrderbyAdmin = async (orderId) => {
+export const cancelOrderbyAdmin = async (cancelOrderData) => {
 
-//     const cancelOrder = await db('user_orders').where({ id: orderId })
-//         .update({ 'ord_order_status': 6 }).returning('*')
-     
-        
+        try {
+            const cancelOrder = await db('cancel_orders').insert({ ...cancelOrderData, cancel_type: "full" }).returning('*');
+            return cancelOrder;
 
-//     return cancelOrder;
-
+            
+        } catch (error) {
     
-// }
+        }
+    };
+
+
+
+     
+    
+
 // Add remarks to the order by admin
 export const addARemarks = async (orderId, remark) => {
 
@@ -655,7 +661,7 @@ export const addARemarks = async (orderId, remark) => {
 // send mail by admin for order invoices
 export const sendOrderInvoiceMail = async (orderId) => {
 
-    
+
 
 }
 

@@ -31,7 +31,7 @@ import { returnProduct } from '../controllers/returnController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import { userCommunicationAndPrivacy } from '../controllers/userCommunicationAndPrivacyController.js';
 import { replaceAProduct } from '../controllers/replaceController.js';
-import { getNotifyProduct, notifyProduct } from '../controllers/notifyProductController.js';
+import { getNotifyProduct, notifyProduct, removeNotifiedProduct } from '../controllers/notifyProductController.js';
 import multer from 'multer';
 const upload = multer();
 
@@ -150,6 +150,9 @@ router.post('/notify-product', verifyToken, notifyProduct);
 
 // get notify product
 router.get('/get-notify-product', verifyToken, getNotifyProduct);
+
+// delete notify product
+router.delete('/delete-notify-product/:id', verifyToken, removeNotifiedProduct);
 
 
 router.get('/pickers', getAllPickers);

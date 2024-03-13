@@ -1,7 +1,10 @@
 import dbConfig from "../../config/dbConfig.js";
-import { CancelIndividualItem, createCancelOrder,
-     getSingleOrderItem, getOrderItems, getOrderItemsByItemId, updateIndividualOrderStatus, updateIndividualProductQuantity, 
-    updateInventoryQtyWhenCancel, updateOrderStatus, updateStockHistoryWhenCancel } from "../models/cancelOrdersModel.js";
+import {
+    CancelIndividualItem, createCancelOrder,
+    getSingleOrderItem, getOrderItems, getOrderItemsByItemId, updateIndividualOrderStatus, updateIndividualProductQuantity,
+    updateInventoryQtyWhenCancel, updateOrderStatus, updateStockHistoryWhenCancel
+} from "../models/cancelOrdersModel.js";
+import { reCalculateOrder } from "../utils/reCalculateOrder.js";
 
 // create cancel order and update order status with order id in  user_orders table
 export const createCancelOrders = async (req, res) => {
@@ -80,6 +83,8 @@ export const cancelIndividualItems = async (req, res) => {
 
     try {
         const item = await getSingleOrderItem(cancelOrderData.order_id);
+        await reCalculateOrder(orderId);
+
 
         const item_id = cancelOrderData?.order_id;
 
