@@ -296,12 +296,16 @@ export const getAllOrders = async (req, res) => {
 
     try {
 
-        let driverId = req.query.driverId || null;
+        let driverId = req.query.driver_id || null;
         let order_status_id = req.query.order_status_id || null;
         let search_query = req.query.search_query || null;
         let order_date = req.query.order_date || null;
         let page = req.query.page || 1;
         let perPage = req.query.perPage || 10;
+        let paymentMethod = req.query.payment_method || null;
+        let acceptedBy = req.query.accepted_by || null;
+        let sortBy = req.query.sort_by || null;
+
 
         order_status_id = order_status_id === "null" ? null : order_status_id;
         search_query = search_query === "null" ? null : search_query;
@@ -313,7 +317,7 @@ export const getAllOrders = async (req, res) => {
             order_date = new Date(order_date);
         }
 
-        const orders = await getAllUserOrders(order_status_id, search_query, order_date, driverId, page, perPage);
+        const orders = await getAllUserOrders(order_status_id, search_query, order_date, driverId, page, perPage, paymentMethod, acceptedBy, sortBy);
 
         res.status(200).json({
             status: 200,

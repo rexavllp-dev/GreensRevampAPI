@@ -39,7 +39,7 @@ export const updateOrderStatus = async (orderId, trx) => {
     console.log(orderId);
 
     try {
-        
+
         const updatedOrder = await trx('user_orders')
             .where({ id: orderId })
             .select('ord_order_status')
@@ -142,7 +142,7 @@ export const CancelIndividualItem = async (cancelOrderData, trx, itemId) => {
 
 
     try {
-        const cancelOrderItem = await trx("order_items").where({ id: itemId, order_id: cancelOrderData.order_id }).update({ op_is_cancel: true }).returning('*');
+        const cancelOrderItem = await trx("order_items").where({ id: itemId }).update({ op_is_cancel: true }).returning('*');
         // const cancelOrder = await trx('reasons').insert({ ...cancelOrderData, cancel_type: "partial" }).returning('*');
         return cancelOrderItem;
     } catch (error) {

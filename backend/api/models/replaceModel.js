@@ -42,6 +42,7 @@ export const getAllReplacementProducts = async () => {
 
     const replacements = await db('replace_products')
         .leftJoin('order_items', 'replace_products.order_item_id', 'order_items.id')
+        .leftJoin('user_orders', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('reasons', 'replace_products.reason_id', 'reasons.id')
         .leftJoin('replacement_gallery', 'replace_products.id', 'replacement_gallery.replace_id')
@@ -52,7 +53,8 @@ export const getAllReplacementProducts = async () => {
             'order_items.id as orderItemId',
             'order_items.op_qty',
             'order_items.created_at as orderItemCreatedAt',
-
+            'user_orders.id as orderId',
+            'user_orders.created_at as orderCreatedAt',
 
             'products.prd_name',
 
@@ -60,7 +62,7 @@ export const getAllReplacementProducts = async () => {
 
             'reasons.clr_reason',
 
-            db.raw(`
+            db.raw(`    
             jsonb_agg(
                 jsonb_build_object(
                     
@@ -85,6 +87,7 @@ export const getAllReplacementProducts = async () => {
             'replace_products.replace_comment',
 
             'reasons.clr_reason',
+            'user_orders.id'
 
 
         );
