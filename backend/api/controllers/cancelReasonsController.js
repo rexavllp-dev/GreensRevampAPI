@@ -3,9 +3,10 @@ import {
     deleteCancelReason,
     getCancelReasonById,
     getCancelReasons,
+    getCancelReasonsByType,
     updateCancelReason
-} 
-from "../models/cancelReasonsModel.js";
+}
+    from "../models/cancelReasonsModel.js";
 
 // create cancel reasons
 export const createCancelReasons = async (req, res) => {
@@ -62,14 +63,30 @@ export const updateCancelReasons = async (req, res) => {
 // get all cancel reasons
 export const getCancelReason = async (req, res) => {
     try {
-        const cancelReasons = await getCancelReasons();
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Cancel Reasons fetched successfully",
-            result: cancelReasons
-        })
+        let Reasons = [];
+        const type = req.query.type;
+        if (req.query.type) {
 
+            Reasons =  await getCancelReasonsByType(type);
+            res.status(200).json({
+                status: 200,
+                success: true,
+                message: "Reasons Type fetched successfully",
+                result: Reasons
+            })
+       
+        } else {
+
+            Reasons = await getCancelReasons();
+            res.status(200).json({
+                status: 200,
+                success: true,
+                message: " Reasons fetched successfully",
+                result: Reasons
+            })
+    
+        }
+      
     } catch (error) {
         console.log(error);
 
@@ -82,7 +99,6 @@ export const getCancelReason = async (req, res) => {
 
 }
 
-// get cancel reasons by id
 
 
 // get cancel reasons by id
@@ -110,6 +126,8 @@ export const getCancelReasonByIds = async (req, res) => {
     }
 
 }
+
+
 
 // delete cancel reasons
 export const deleteCancelReasons = async (req, res) => {

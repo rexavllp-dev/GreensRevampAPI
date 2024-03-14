@@ -23,12 +23,14 @@ export const reCalculateOrder = async (orderId,trx,isStorePickup,isCod) => {
 
             console.log('subTotal', 'totalProductPriceVat',subTotal, totalProductPriceVat)
 
-
         }
     }
     // shipping charge
 
     console.log((productTotal < 50))
+
+    // Add shipping charge if subtotal is less than 100 and an item has been canceled
+
 
     let storePickupCharge = 0;
     if (userOrders[0].ord_shipping_method === 'Store pickup'&& (productTotal < 50)) {
@@ -40,7 +42,7 @@ export const reCalculateOrder = async (orderId,trx,isStorePickup,isCod) => {
     console.log(userOrders[0].ord_shipping_method === "Shipping")
 
     let shippingCharge = 0;
-    if ( userOrders[0].ord_shipping_method === 'Shipping' && (productTotal < 100)) {
+    if ( userOrders[0].ord_shipping_method === 'Shipping' && (productTotal < 100) )  {
          shippingCharge = 30;
     }
 
@@ -62,7 +64,7 @@ export const reCalculateOrder = async (orderId,trx,isStorePickup,isCod) => {
     // Update the totals object with the recalculated values
     const totals = {
         subTotal: subTotal.toFixed(2),
-        grandTotal: grandTotalWithVAT,
+        grandTotal: grandTotalWithVAT.toFixed(2),
         totalProductPrice: (subTotal + totalProductPriceVat).toFixed(2), // Including VAT
         totalProductVAT: (totalProductVAT).toFixed(2),
         storePickupCharge: storePickupCharge.toFixed(2),
