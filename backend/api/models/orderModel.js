@@ -1,4 +1,5 @@
 import db from '../../config/dbConfig.js';
+import { createStockHistory } from './stockHistoryModel.js';
 
 
 
@@ -182,6 +183,7 @@ export const getAOrder = async (orderId) => {
         .select(
             'user_orders.*',
             'user_orders.id as orderId',
+            'user_orders.created_at as orderDate',
             'order_items.*',
             'order_items.id as orderItemId',
             'products.*',
@@ -297,11 +299,19 @@ export const getAOrderData = async (orderId) => {
 export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage) => {
     let orders = await db("user_orders")
         .leftJoin('users', 'user_orders.customer_id ', 'users.id')
+        .leftJoin('users as deliveryboy', 'user_orders.ord_delivery_accepted_by', 'deliveryboy.id')
+        .leftJoin('users as warehouse', 'user_orders.ord_accepted_by', 'warehouse.id')
+        .leftJoin('order_statuses', 'user_orders.ord_order_status', 'order_statuses.id')
         .select(
             'users.*',
             'users.id as userId',
+            'deliveryboy.usr_firstname as delivery_boy_firstname',
+            'deliveryboy.usr_lastname as delivery_boy_lastname',
+            'warehouse.usr_firstname as warehouse_firstname',
+            'warehouse.usr_lastname as warehouse_lastname',
             'user_orders.*',
-            'user_orders.id as orderId'
+            'user_orders.id as orderId',
+            'order_statuses.status_name'
         )
         .offset((page - 1) * perPage)
         .limit(perPage);
@@ -360,6 +370,8 @@ export const getDashboardOrders = async (userId, role) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id') // Corrected alias reference
+        .leftJoin({ delivery: 'users' }, 'user_orders.ord_delivery_accepted_by', 'delivery.id') // Corrected alias reference
         .select(
 
             'user_orders.*',
@@ -371,7 +383,10 @@ export const getDashboardOrders = async (userId, role) => {
             'products.id as productId',
             'address.*',
             'address.id as addressId',
+            db.raw('MAX(accepted.usr_firstname) as acceptedusername'),
+            db.raw('MAX(delivery.usr_firstname) as deliveryusername'),
             db.raw('DATE(user_orders.created_at) AS order_date')
+
         )
         .where(builder => {
             //Role 3 = Warehouse
@@ -454,6 +469,8 @@ export const getAssinedOrders = async (userId, role) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id') 
+        .leftJoin({ delivery: 'users' }, 'user_orders.ord_delivery_accepted_by', 'delivery.id')
         .select(
 
             'user_orders.*',
@@ -465,6 +482,8 @@ export const getAssinedOrders = async (userId, role) => {
             'products.id as productId',
             'address.*',
             'address.id as addressId',
+            db.raw('MAX(accepted.usr_firstname) as acceptedusername'),
+            db.raw('MAX(delivery.usr_firstname) as deliveryusername'),
             db.raw('DATE(user_orders.created_at) AS order_date')
         )
         .where(builder => {
@@ -646,6 +665,15 @@ export const cancelOrderbyAdmin = async (cancelOrderData) => {
      
     
 
+//     const cancelOrder = await db('user_orders').where({ id: orderId })
+//         .update({ 'ord_order_status': 6 }).returning('*')
+
+
+
+//     return cancelOrder;
+
+
+// }
 // Add remarks to the order by admin
 export const addARemarks = async (orderId, remark) => {
 
@@ -660,7 +688,7 @@ export const addARemarks = async (orderId, remark) => {
 };
 
 // update order items qty and update product inventory
-export const updateItemQty = async (orderItemId, opQty) => {
+export const updateItemQty = async (orderItemId, opQty, orderId) => {
 
     // Retrieve the current op_qty and product_id from the order_items table
     const currentOrderItem = await db('order_items')
@@ -680,12 +708,54 @@ export const updateItemQty = async (orderItemId, opQty) => {
         .returning('*');
 
 
+    // Retrieve the product_quantity before updating
+    const productInventory = await db('product_inventory')
+        .select('product_quantity')
+        .where({ product_id: currentOrderItem.product_id })
+        .first();
+
+
     // Update the product_quantity in the product_inventory table
     await db('product_inventory')
         .where({ product_id: currentOrderItem.product_id })
         .increment('product_quantity', -qtyDifference);
 
+    const productNewQty = await db('product_inventory')
+        .select('product_quantity')
+        .where({ product_id: currentOrderItem.product_id })
+        .first();
+
+    const updatedNewQty = parseInt(productNewQty.product_quantity);
+
+    
+
+
+    // Create stock history record
+    await createStockHistory({
+
+        product_id: currentOrderItem.product_id,
+        previous_stock: productInventory.product_quantity,
+        qty: Math.abs(qtyDifference),
+        remaining_stock: updatedNewQty,
+        order_id: orderId,
+        action: qtyDifference > 0 ? 'reduced' : 'added',
+        comment: 'Updated Order Quantity',
+        created_at: new Date(),
+        updated_at: new Date(),
+
+    });
+
     return updatedOrderItem;
 
+};
+
+
+export const getOrderIdByOrderItems = async (orderItemId) => {
+    const result = await db('order_items')
+        .select('order_id')
+        .where({ id: orderItemId })
+        .first();
+
+        return result ? result.order_id : null;
 };
 

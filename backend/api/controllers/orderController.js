@@ -3,10 +3,10 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks, updateItemQty } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks, updateItemQty, getOrderIdByOrderItems } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
-import { getProductInventoryById, updateInventory } from '../models/inventoryModel.js';
+import { getProductInventoryById } from '../models/inventoryModel.js';
 import { getUserDashboardOrders } from '../models/userOrderDashboardModel.js';
 import { generatePDF } from '../utils/pdfGenerator.js';
 import { sendOrderInvoices } from '../utils/emailer.js';
@@ -560,10 +560,11 @@ export const updateOrderItemQty = async (req, res) => {
 
     const { orderItemId, opQty } = req.body;
 
-
     try {
 
-        const updateQty = await updateItemQty(orderItemId, opQty);
+        const orderId = await getOrderIdByOrderItems(orderItemId);
+
+        const updateQty = await updateItemQty(orderItemId, opQty, orderId);
 
         res.status(200).json({
             status: 200,

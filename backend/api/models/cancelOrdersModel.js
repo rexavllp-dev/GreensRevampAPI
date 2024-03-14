@@ -291,6 +291,25 @@ export const getOrderItemsByItemId = async (orderId) => {
     return orderItems;
 };
 
+export const getAllCancelledOrders = async () => {
+
+    const cancelledOrders = await db('cancel_orders')
+        .leftJoin('user_orders', 'cancel_orders.order_id', 'user_orders.id')
+        .leftJoin('reasons', 'reasons.id', 'cancel_orders.cancel_reason_id')
+        .select(
+            'cancel_orders.*',
+            'cancel_orders.id as cancelOrderId',
+            'cancel_orders.created_at as cancelOrderDate',
+            'user_orders.*',
+            'user_orders.id as orderId',
+            'user_orders.created_at as orderDate',
+            'reasons.clr_reason',
+            'reasons.clr_status'
+        );
+
+    return cancelledOrders;
+};
+
 
 
 

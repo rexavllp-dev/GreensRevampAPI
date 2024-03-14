@@ -28,8 +28,9 @@ export const getProductInventoryById = async (productId) => {
 
 
 export const getProductQuantity = async (productId) => {
+
   const result = await db('product_inventory')
-    .where('product_id', productId)
+    .where({ product_id: productId })
     .select('product_quantity')
     .first();
 
