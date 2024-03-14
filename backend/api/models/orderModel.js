@@ -387,6 +387,8 @@ export const getDashboardOrders = async (userId, role) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id') // Corrected alias reference
+        .leftJoin({ delivery: 'users' }, 'user_orders.ord_delivery_accepted_by', 'delivery.id') // Corrected alias reference
         .select(
 
             'user_orders.*',
@@ -398,7 +400,10 @@ export const getDashboardOrders = async (userId, role) => {
             'products.id as productId',
             'address.*',
             'address.id as addressId',
+            db.raw('MAX(accepted.usr_firstname) as acceptedusername'),
+            db.raw('MAX(delivery.usr_firstname) as deliveryusername'),
             db.raw('DATE(user_orders.created_at) AS order_date')
+
         )
         .where(builder => {
             //Role 3 = Warehouse
@@ -481,6 +486,8 @@ export const getAssinedOrders = async (userId, role) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
+        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id') 
+        .leftJoin({ delivery: 'users' }, 'user_orders.ord_delivery_accepted_by', 'delivery.id')
         .select(
 
             'user_orders.*',
@@ -492,6 +499,8 @@ export const getAssinedOrders = async (userId, role) => {
             'products.id as productId',
             'address.*',
             'address.id as addressId',
+            db.raw('MAX(accepted.usr_firstname) as acceptedusername'),
+            db.raw('MAX(delivery.usr_firstname) as deliveryusername'),
             db.raw('DATE(user_orders.created_at) AS order_date')
         )
         .where(builder => {
