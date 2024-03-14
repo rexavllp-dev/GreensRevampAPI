@@ -4,7 +4,7 @@ import { createTransaction } from './transactionController.js';
 import { calculatePrice } from '../helpers/calculatePrice.js';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import { updateAnOrder } from "../models/orderModel.js";
-import { createATransaction, findTransaction } from '../models/transactionModel.js';
+import { createATransaction, findTransaction, getTransactions } from '../models/transactionModel.js';
 
 export const handlePaymentRequest = async (req, res) => {
 
@@ -124,6 +124,31 @@ export const handlePaymentRequestCompletion = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed something went wrong",
+            error: error
+        });
+
+    }
+};
+
+export const getAllTransactions = async (req, res) => {
+
+    try {
+        const transaction = await getTransactions();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Transactions retrieved successfully",
+            result: transaction
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to retrieve transactions",
             error: error
         });
 

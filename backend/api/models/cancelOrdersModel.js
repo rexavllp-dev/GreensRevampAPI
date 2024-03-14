@@ -39,7 +39,7 @@ export const updateOrderStatus = async (orderId, trx) => {
     console.log(orderId);
 
     try {
-        
+
         const updatedOrder = await trx('user_orders')
             .where({ id: orderId })
             .select('ord_order_status')
