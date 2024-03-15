@@ -178,7 +178,7 @@ export const getAOrder = async (orderId) => {
         .leftJoin('address', 'user_orders.address_id', 'address.id')
         .leftJoin('return_products', 'return_products.order_item_id', 'order_items.id')
         .leftJoin('replace_products', 'replace_products.order_item_id', 'order_items.id')
-
+        .leftJoin('order_statuses', 'order_statuses.id', 'user_orders.ord_order_status')
 
         .select(
             'user_orders.*',
@@ -194,6 +194,7 @@ export const getAOrder = async (orderId) => {
             'return_products.id as returnProductId',
             'replace_products.*',
             'replace_products.id as replaceProductId',
+            'order_statuses.status_name',
         );
 
     const groupedOrders = [];
@@ -215,6 +216,9 @@ export const getAOrder = async (orderId) => {
                     order_actual_price: order.op_actual_price,
                     order_op_unit_price: order.op_unit_price,
                     order_op_line_total: order.op_line_total,
+                    order_op_qty: order.op_qty,
+                    op_is_cancel: order.op_is_cancel,
+                    op_is_return: order.op_is_return,
                 });
             }
         } else {
@@ -230,8 +234,9 @@ export const getAOrder = async (orderId) => {
                         order_actual_price: order.op_actual_price,
                         order_op_unit_price: order.op_unit_price,
                         order_op_line_total: order.op_line_total,
-                        order_op_qty: order.op_qty
-
+                        order_op_qty: order.op_qty,
+                        op_is_cancel: order.op_is_cancel,
+                        op_is_return: order.op_is_return,
                     },
                 ],
             });
@@ -296,8 +301,8 @@ export const getAOrderData = async (orderId) => {
 
 
 
-export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage) => {
-    let orders = await db("user_orders")
+export const getAllUserOrders = async (order_status_id, search_query, order_date, driverId, page, perPage, paymentMethod, acceptedBy, sortBy) => {
+    let query = db("user_orders")
         .leftJoin('users', 'user_orders.customer_id ', 'users.id')
         .leftJoin('users as deliveryboy', 'user_orders.ord_delivery_accepted_by', 'deliveryboy.id')
         .leftJoin('users as warehouse', 'user_orders.ord_accepted_by', 'warehouse.id')
@@ -320,17 +325,25 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
     // orders.offset(offset).limit(perPage);
 
     if (order_status_id !== null) {
-        orders.where({ 'user_orders.ord_order_status': order_status_id });
+        query.where({ 'user_orders.ord_order_status': order_status_id });
+    };
+
+    if (paymentMethod !== null) {
+        query.where({ 'user_orders.ord_payment_method': paymentMethod });
     };
 
     // search divers by name
     if (driverId !== null) {
-        orders.where({ 'user_orders.ord_delivery_accepted_by': driverId });
+        query.where({ 'user_orders.ord_delivery_accepted_by': driverId });
+    };
+    // search by warehouse accepted by
+    if (acceptedBy !== null) {
+        query.where({ 'user_orders.ord_accepted_by': acceptedBy });
     };
 
 
     if (search_query !== null) {
-        orders.where(function () {
+        query.where(function () {
             this.where('user_orders.ord_customer_name', 'ilike', `%${search_query}%`)
                 .orWhere('user_orders.ord_customer_phone', 'ilike', `%${search_query}%`)
                 .orWhere('user_orders.ord_customer_email', 'ilike', `%${search_query}%`);
@@ -338,10 +351,19 @@ export const getAllUserOrders = async (order_status_id, search_query, order_date
     };
 
     if (order_date !== null) {
-        orders.where({ 'user_orders.created_at': order_date });
+        query.where({ 'user_orders.created_at': order_date });
     };
 
-    console.log(orders.toString());
+    if (sortBy !== null) {
+        if (sortBy === 'newest') {
+            sortBy = 'asc'
+        } else if (sortBy === 'oldest') {
+            sortBy = 'desc'
+        }
+        query.orderBy('user_orders.created_at', sortBy);
+    }
+
+    let orders = await query;
 
     for (let order of orders) {
         let products = await db("order_items")
@@ -469,7 +491,7 @@ export const getAssinedOrders = async (userId, role) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
-        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id') 
+        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id')
         .leftJoin({ delivery: 'users' }, 'user_orders.ord_delivery_accepted_by', 'delivery.id')
         .select(
 
@@ -650,20 +672,20 @@ export const ordersByDriver = async (driverId) => {
 
 export const cancelOrderbyAdmin = async (cancelOrderData) => {
 
-        try {
-            const cancelOrder = await db('cancel_orders').insert({ ...cancelOrderData, cancel_type: "full" }).returning('*');
-            return cancelOrder;
-
-            
-        } catch (error) {
-    
-        }
-    };
+    try {
+        const cancelOrder = await db('cancel_orders').insert({ ...cancelOrderData, cancel_type: "full" }).returning('*');
+        return cancelOrder;
 
 
+    } catch (error) {
 
-     
-    
+    }
+};
+
+
+
+
+
 
 //     const cancelOrder = await db('user_orders').where({ id: orderId })
 //         .update({ 'ord_order_status': 6 }).returning('*')
@@ -727,7 +749,7 @@ export const updateItemQty = async (orderItemId, opQty, orderId) => {
 
     const updatedNewQty = parseInt(productNewQty.product_quantity);
 
-    
+
 
 
     // Create stock history record
@@ -756,6 +778,6 @@ export const getOrderIdByOrderItems = async (orderItemId) => {
         .where({ id: orderItemId })
         .first();
 
-        return result ? result.order_id : null;
+    return result ? result.order_id : null;
 };
 

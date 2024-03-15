@@ -8,9 +8,9 @@ export default {
     client: 'postgresql',
     connection: {
       host: '127.0.0.1',
-      database: 'greensinternational',
+      database: 'greens_international_server',
       user:     'postgres',
-      password: 'postgres',
+      password: '12345',
     }
   },
   // development: {

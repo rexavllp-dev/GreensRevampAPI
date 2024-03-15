@@ -7,7 +7,8 @@ import {
     updateIndividualProductQuantity,
     updateInventoryQtyWhenCancel,
     updateOrderStatus,
-    updateStockHistoryWhenCancel
+    updateStockHistoryWhenCancel,
+    getAllCancelledOrders
 } from "../models/cancelOrdersModel.js";
 import { reCalculateOrder } from "../utils/reCalculateOrder.js";
 
@@ -84,14 +85,15 @@ export const cancelIndividualItems = async (req, res) => {
     const trx = await dbConfig.transaction();
 
     try {
+
         const item = await getSingleOrderItem(cancelOrderData.order_id);
-        await reCalculateOrder(orderId);
 
 
-        const item_id = cancelOrderData?.order_id;
+        const item_id = cancelOrderData?.item_id;
 
         const cancelData = {
             order_id: item?.order_id,
+            item_id: cancelOrderData?.item_id,
             cancel_reason_id: cancelOrderData.cancel_reason_id,
             cancel_note: cancelOrderData.cancel_note,
 
@@ -102,6 +104,8 @@ export const cancelIndividualItems = async (req, res) => {
         // update order status with order id in  user_orders table
 
         const updatedOrder = await updateIndividualOrderStatus(cancelOrderData.order_id, trx);
+
+
 
         //  update product quantity
 
@@ -122,21 +126,8 @@ export const cancelIndividualItems = async (req, res) => {
 
         }
 
-        // const updatedQuantity = await updateIndividualProductQuantity(cancelOrderData.order_id, trx);
 
-        // update stock history
-
-        // const updatedStockHistory = await updateStockHistory(cancelOrderData.order_id, trx);
-
-        // Calculate the remaining product price
-        // const remainingProductPrice = await calculateRemainingProductPrice(cancelOrderData.order_id, trx);
-
-        // // Check if shipping charge should be applied
-        // let shipping = 0;
-        // if (remainingProductPrice < 100) {
-
-        //     shipping = 30;
-        // }
+     const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
 
 
         trx.commit();
@@ -149,7 +140,7 @@ export const cancelIndividualItems = async (req, res) => {
             result: {
                 newCancelOrder,
                 updatedOrder,
-                // grandTotal: remainingProductPrice + shipping
+                reCalculateOrders
             }
         })
     } catch (error) {
