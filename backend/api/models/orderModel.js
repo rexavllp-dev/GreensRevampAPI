@@ -178,7 +178,7 @@ export const getAOrder = async (orderId) => {
         .leftJoin('address', 'user_orders.address_id', 'address.id')
         .leftJoin('return_products', 'return_products.order_item_id', 'order_items.id')
         .leftJoin('replace_products', 'replace_products.order_item_id', 'order_items.id')
-
+        .leftJoin('order_statuses', 'order_statuses.id', 'user_orders.ord_order_status')
 
         .select(
             'user_orders.*',
@@ -194,6 +194,7 @@ export const getAOrder = async (orderId) => {
             'return_products.id as returnProductId',
             'replace_products.*',
             'replace_products.id as replaceProductId',
+            'order_statuses.status_name',
         );
 
     const groupedOrders = [];
@@ -215,6 +216,9 @@ export const getAOrder = async (orderId) => {
                     order_actual_price: order.op_actual_price,
                     order_op_unit_price: order.op_unit_price,
                     order_op_line_total: order.op_line_total,
+                    order_op_qty: order.op_qty,
+                    op_is_cancel: order.op_is_cancel,
+                    op_is_return: order.op_is_return,
                 });
             }
         } else {
@@ -230,8 +234,9 @@ export const getAOrder = async (orderId) => {
                         order_actual_price: order.op_actual_price,
                         order_op_unit_price: order.op_unit_price,
                         order_op_line_total: order.op_line_total,
-                        order_op_qty: order.op_qty
-
+                        order_op_qty: order.op_qty,
+                        op_is_cancel: order.op_is_cancel,
+                        op_is_return: order.op_is_return,
                     },
                 ],
             });
@@ -486,7 +491,7 @@ export const getAssinedOrders = async (userId, role) => {
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
-        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id') 
+        .leftJoin({ accepted: 'users' }, 'user_orders.ord_accepted_by', 'accepted.id')
         .leftJoin({ delivery: 'users' }, 'user_orders.ord_delivery_accepted_by', 'delivery.id')
         .select(
 

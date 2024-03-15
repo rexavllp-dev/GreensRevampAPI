@@ -20,7 +20,7 @@ router.get('/get-cancel-reason/:id', getCancelReasonByIds);
 router.get('/get-cancel-reasons', getCancelReason);
 
 // delete cancel reasons
-router.delete('/delete-cancel-reason/:id', deleteCancelReasons);
+router.delete('/delete-cancel-reason', deleteCancelReasons);
 
 
 
