@@ -18,6 +18,7 @@ import { createStorePickup, getAllStorePickup, getStorePickup, updateStorePickup
 import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge, updateStorePickupCharge } from '../controllers/adminStorePickUpChargeController.js';
 import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
 import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
+import { getAllExpiredProducts, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllRecentOrders } from '../controllers/adminDashBoardController.js';
 
 
 const router = express.Router();
@@ -276,6 +277,27 @@ router.get('/shipping_method/get_onsite_delivery/:shippingId', getOnsiteDelivery
 
 // get all onsite delivery
 router.get('/shipping_method/get_all_onsite_delivery', getAllOnsiteDelivery);
+
+
+
+// admin dashboard API ROUTES
+
+// get all recent orders
+router.get('/dashboard/get_all_recent_orders', getAllRecentOrders);
+
+// get all latest return
+router.get('/dashboard/get_all_latest_return', getAllLatestReturn);
+
+// get all latest replacement
+router.get('/dashboard/get_all_latest_replacement', getAllLatestReplacement);
+
+// get all out of stock
+router.get('/dashboard/get_all_out_of_stock', getAllOutOfStock);
+
+// get all expired products
+router.get('/dashboard/get_all_expired_products', getAllExpiredProducts);
+
+
 
 
 export default router;

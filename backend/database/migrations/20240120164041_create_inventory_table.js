@@ -23,4 +23,4 @@ export const up = async (knex) => {
  */
 export const down = async (knex) => {
     return knex.schema.dropTable('product_inventory');
-}
+};
