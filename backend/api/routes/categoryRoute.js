@@ -11,7 +11,7 @@ router.post('/create-category', createCategory);
 router.post('/upload-category-images/:categoryId', uploadCategoryImages);
 
 // delete brand image
-router.delete('/delete-category-image/:categoryId', deleteCategoryImage);
+router.post('/delete-category-image/:categoryId', deleteCategoryImage);
 
 // update a product
 router.put('/update-category/:categoryId', updateCategory);

@@ -148,15 +148,13 @@ export const uploadCategoryImages = async (req, res) => {
         })
 
         
+        const category = await getCategoryById(categoryId);
 
         res.status(201).json({
             status: 201,
             success: true,
             message: "Category images uploaded successfully",
-            result: {
-                cat_logo,
-                cat_banner,
-            }
+            result: category
         });
 
     } catch (error) {
@@ -173,8 +171,12 @@ export const uploadCategoryImages = async (req, res) => {
 // delete category image
 export const deleteCategoryImage = async (req, res) => {
     const imageId = req.params.categoryId;
+    const type    = req.body.type;
+
     try {
-        const deletedImage = await deleteCategoryImageById(imageId);
+        const deletedImage = await deleteCategoryImageById(imageId, type);
+        const category     = await getCategoryById(imageId);
+
         if(!deletedImage){
             return res.status(404).json({
               status:404,
@@ -182,14 +184,17 @@ export const deleteCategoryImage = async (req, res) => {
               message:"Category image not found"
             });
         }
-
+        
         res.status(200).json({
           status:200,
           success:true,
           message:"Category image deleted successfully",
-          result:deletedImage
+          result:category
         });
     } catch (error) {
+
+        console.log(error);
+        
         res.status(500).json({
           status:500,
           success:false,
@@ -357,6 +362,7 @@ export const getCategoriesByTree = async (req, res) => {
             success: true,
             message: 'Categories fetched successfully',
             data: categoryTree,
+            
         });
     } catch (error) {
         console.log(error);

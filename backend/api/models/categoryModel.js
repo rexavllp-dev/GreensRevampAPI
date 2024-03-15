@@ -40,35 +40,52 @@ export const deleteACategory = async (categoryId) => {
 
 
 export const getCategoriesTree = async () => {
-    console.log('Before query');
-    const categories = await db('categories').select('id', 'cat_parent_id', 'cat_name').orderBy('id');
-    // console.log(categories);
-    const categoryMap = {};
-    const rootCategories = [];
 
-    categories.forEach((category) => {
-        // console.log(category);
-        category.children = [];
-        categoryMap[category.id] = category;
-        const parent = categoryMap[category.cat_parent_id];
-        if (parent) {
-            // console.log(parent);
-            parent.children.push(category);
-        } else {
-            rootCategories.push(category);
-            // console.log(category);
-        }
-    });
-
-    return rootCategories;
+    try {
+        const categories = await db.select('*').from('categories').orderBy('cat_name','asc');
+        return buildTree(categories);
+      } catch (error) {
+        throw error;
+      }
 };
+
+function buildTree(categories, parentId = 0) {
+    let node = [];
+    categories
+      .filter(category => category.cat_parent_id === parentId)
+      .forEach(category => {
+        node.push({
+          id: category.id,
+          name: category.cat_name,
+          description: category.cat_description,
+          category_status: category.category_status,
+          cat_banner: category.cat_banner,
+          cat_logo: category.cat_logo,
+          children: buildTree(categories, category.id)
+        });
+      });
+
+    return node;
+}
 
 
 // delete image
 
-export const deleteCategoryImageById = async (categoryId) => {
-    const deletedImage = await db('categories')
-    .where({ id: categoryId })
-    .update({ cat_banner: null, cat_logo: null });
-    return deletedImage;
+export const deleteCategoryImageById = async (categoryId, type) => {
+
+    if(type == 'cat_logo'){
+        const deletedImage = await db('categories')
+        .where({ id: categoryId })
+        .update({ cat_logo: null });
+        return deletedImage;
+    }
+
+    if(type == 'cat_banner'){
+        const deletedImage = await db('categories')
+        .where({ id: categoryId })
+        .update({ cat_banner: null });
+        return deletedImage;
+    }
+
+    
 };
