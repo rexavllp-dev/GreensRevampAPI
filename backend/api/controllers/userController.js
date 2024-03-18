@@ -996,7 +996,12 @@ export const verifyOtp = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ status: 500, message: 'Failed otp verification', error: error });
+        res.status(500).json({
+            
+            status: 500,
+            message: 'Failed otp verification',
+            error: error
+        });
     }
 
 };

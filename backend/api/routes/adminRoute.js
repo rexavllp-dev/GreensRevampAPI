@@ -9,6 +9,16 @@ import { createSeason, deleteSeason, getAllSeasons, getSingleSeason, updateSeaso
 import { createFeed, deleteFeed, getAllFeeds, getSingleFeed, updateFeed } from '../controllers/feedController.js';
 import { createAds, deleteAds, getAllAds, getSingleAds, updateAds } from '../controllers/adsController.js';
 import { getAllActivityOfUser } from '../controllers/generateActivityLogController.js';
+import { createMaintenance, getAllMaintenance, getMaintenance, updateMaintenance } from '../controllers/adminMaintenanceController.js';
+import { createStore, getAllStore, getStore, updateStore } from '../controllers/adminStoreController.js';
+import { createMail, getAllMails, getMail, updateMail } from '../controllers/adminMailController.js';
+import { createNewsletter, getAllNewsletters, getNewsletter, updateNewsletter } from '../controllers/adminNewsletterController.js';
+import { createFreeShipping, getAllFreeShipping, getFreeShipping, updateFreeShipping } from '../controllers/adminFreeShippingController.js';
+import { createStorePickup, getAllStorePickup, getStorePickup, updateStorePickup } from '../controllers/adminStorePickupController.js';
+import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge, updateStorePickupCharge } from '../controllers/adminStorePickUpChargeController.js';
+import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
+import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
+import { getAllExpiredProducts, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllRecentOrders } from '../controllers/adminDashBoardController.js';
 
 
 const router = express.Router();
@@ -141,6 +151,152 @@ router.delete('/ads/delete_ads/:adsId', deleteAds);
 
 // get all activity of user
 router.get('/generate_activity', getAllActivityOfUser);
+
+
+
+// admin settings API 
+
+// admin maintenance API
+
+// create maintenance
+router.post('/maintenance/create_maintenance', createMaintenance);
+
+// update maintenance
+router.put('/maintenance/update_maintenance/:maintenanceId', updateMaintenance);
+
+// get maintenance
+router.get('/maintenance/get_maintenance/:maintenanceId', getMaintenance);
+
+// get all maintenance
+router.get('/maintenance/get_all_maintenance', getAllMaintenance);
+
+// __________________________________________________________________________________________________________________
+
+// admin store API
+
+// create store
+router.post('/store/create_store', createStore);
+
+// update maintenance
+router.put('/store/update_store/:storeId', updateStore);
+
+// get maintenance
+router.get('/store/get_store/:storeId', getStore);
+
+// get all maintenance
+router.get('/store/get_all_store', getAllStore);
+
+
+// admin mail API
+
+// create mail
+router.post('/mail/create_mail', createMail);
+
+// update mail
+router.put('/mail/update_mail/:mailId', updateMail);
+
+// get mail
+router.get('/mail/get_mail/:mailId', getMail);
+
+// get all mail
+router.get('/mail/get_all_mail', getAllMails);
+
+
+// admin newsletter API
+
+// create newsletter
+router.post('/newsletter/create_newsletter', createNewsletter);
+
+// update newsletter
+router.put('/newsletter/update_newsletter/:newsletterId', updateNewsletter);
+
+// get newsletter
+router.get('/newsletter/get_newsletter/:newsletterId', getNewsletter);
+
+// get all newsletter
+router.get('/newsletter/get_all_newsletter', getAllNewsletters);
+
+
+// admin shipping method  API
+
+// create shipping method
+router.post('/shipping_method/create_free_shipping', createFreeShipping);
+
+// update shipping method
+router.put('/shipping_method/update_free_shipping/:shippingId', updateFreeShipping);
+
+// get shipping method
+router.get('/shipping_method/get_free_shipping/:shippingId', getFreeShipping);
+
+// get all shipping method
+router.get('/shipping_method/get_all_free_shipping', getAllFreeShipping);
+
+
+
+// store pick up API ROUTES
+
+// create store pick up
+router.post('/shipping_method/create_store_pickup', createStorePickup);
+
+// update store pick up
+router.put('/shipping_method/update_store_pickup/:shippingId', updateStorePickup);
+
+// get store pick up
+router.get('/shipping_method/get_store_pickup/:shippingId', getStorePickup);
+
+// get all store pick up
+router.get('/shipping_method/get_all_store_pickup', getAllStorePickup);
+
+
+
+// store pick up charges  API ROUTES
+
+// create store pick up
+router.post('/shipping_method/create_store_pickup_charges', createStorePickupCharge);
+
+// update store pick up
+router.put('/shipping_method/update_store_pickup_charges/:shippingId', updateStorePickupCharge);
+
+// get store pick up
+router.get('/shipping_method/get_store_pickup_charges/:shippingId', getStorePickupCharge);
+
+// get all store pick up
+router.get('/shipping_method/get_all_store_pickup_charges', getAllStorePickupCharge);
+
+
+// admin onsite delivery API
+
+// create onsite delivery
+router.post('/shipping_method/create_onsite_delivery', createOnsiteDelivery);
+
+// update onsite delivery
+router.put('/shipping_method/update_onsite_delivery/:shippingId', updateOnsiteDelivery);
+
+// get onsite delivery
+router.get('/shipping_method/get_onsite_delivery/:shippingId', getOnsiteDelivery);
+
+// get all onsite delivery
+router.get('/shipping_method/get_all_onsite_delivery', getAllOnsiteDelivery);
+
+
+
+// admin dashboard API ROUTES
+
+// get all recent orders
+router.get('/dashboard/get_all_recent_orders', getAllRecentOrders);
+
+// get all latest return
+router.get('/dashboard/get_all_latest_return', getAllLatestReturn);
+
+// get all latest replacement
+router.get('/dashboard/get_all_latest_replacement', getAllLatestReplacement);
+
+// get all out of stock
+router.get('/dashboard/get_all_out_of_stock', getAllOutOfStock);
+
+// get all expired products
+router.get('/dashboard/get_all_expired_products', getAllExpiredProducts);
+
 
 
 

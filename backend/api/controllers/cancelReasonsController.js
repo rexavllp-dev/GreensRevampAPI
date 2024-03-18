@@ -67,14 +67,14 @@ export const getCancelReason = async (req, res) => {
         const type = req.query.type;
         if (req.query.type) {
 
-            Reasons =  await getCancelReasonsByType(type);
+            Reasons = await getCancelReasonsByType(type);
             res.status(200).json({
                 status: 200,
                 success: true,
                 message: "Reasons Type fetched successfully",
                 result: Reasons
             })
-       
+
         } else {
 
             Reasons = await getCancelReasons();
@@ -84,9 +84,9 @@ export const getCancelReason = async (req, res) => {
                 message: " Reasons fetched successfully",
                 result: Reasons
             })
-    
+
         }
-      
+
     } catch (error) {
         console.log(error);
 
@@ -131,16 +131,23 @@ export const getCancelReasonByIds = async (req, res) => {
 
 // delete cancel reasons
 export const deleteCancelReasons = async (req, res) => {
-    const { id } = req.params;
 
     try {
-        const deletedCancelReason = await deleteCancelReason(id);
+        const reasonIds = req.query.data;
+
+        const reasonIdArray = JSON.parse(reasonIds);
+
+        for (let i = 0; i < reasonIdArray.length; i++) {
+            await deleteCancelReason(reasonIdArray[i]);
+        }
+
+        // const deletedCancelReason = await deleteCancelReason(id);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Cancel Reason deleted successfully",
-            result: deletedCancelReason
+            result: [reasonIdArray]
         })
 
     } catch (error) {
