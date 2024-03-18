@@ -104,7 +104,8 @@ export const getallSaveForLater = async (userId) => {
                 'product_badge.id',
                 'product_category.id',
                 'vat.id'
-            );
+            )
+            .orderBy('save_for_later.created_at', 'desc')
 
         // Integrate getPrdPrice for each product
         const savedProductsWithPrice = await Promise.all(savedProducts.map(async (product) => {

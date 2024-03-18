@@ -42,6 +42,7 @@ export const getOrderDetails = async (req, res) => {
     try {
 
         const order = await getUserOrderDetails(orderId);
+        
 
         res.status(200).json({
             status: 200,

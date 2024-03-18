@@ -98,6 +98,23 @@ export const cancelIndividualItems = async (req, res) => {
             cancel_note: cancelOrderData.cancel_note,
 
         }
+
+        const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
+
+        if (reCalculateOrders.subTotal < 100){
+
+            return res.status(400).json({
+
+                status: 400,
+                success: false,
+                message: "Order amount cannot be less than 100 you have to pay shipping charge",
+                result : {
+                    subTotal: reCalculateOrders.subTotal,  
+                    need_payment: true, 
+                }
+            })
+        }
+
         // create cancel order
         const newCancelOrder = await CancelIndividualItem(cancelData, trx, item_id);
 
@@ -127,7 +144,6 @@ export const cancelIndividualItems = async (req, res) => {
         }
 
 
-     const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
 
 
         trx.commit();
@@ -290,22 +306,7 @@ export const cancelIndividualItemsByAdmin = async (req, res) => {
 
         }
 
-        // const updatedQuantity = await updateIndividualProductQuantity(cancelOrderData.order_id, trx);
-
-        // update stock history
-
-        // const updatedStockHistory = await updateStockHistory(cancelOrderData.order_id, trx);
-
-        // Calculate the remaining product price
-        // const remainingProductPrice = await calculateRemainingProductPrice(cancelOrderData.order_id, trx);
-
-        // // Check if shipping charge should be applied
-        // let shipping = 0;
-        // if (remainingProductPrice < 100) {
-
-        //     shipping = 30;
-        // }
-
+        
 
         trx.commit();
 

@@ -1,6 +1,5 @@
 import { checkCompanyExist, createCompany } from "../models/companyModel.js";
 import Joi from 'joi';
-import JoiDate from '@joi/date';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 import { checkUserExist, createUser, deleteAUser, getCountryDialCode, getUserByEmail, getUserById, getUserByPhoneNumber, updateOtp, updateRegisterOtp, updateUserVerificationStatus } from "../models/userModel.js";
@@ -8,24 +7,16 @@ import bcrypt from 'bcrypt';
 import { sendVerificationEmail } from "../utils/emailer.js";
 import sendVerificationCode from "../utils/mobileOtp.js";
 import jwt from 'jsonwebtoken';
-import aws from 'aws-sdk';
 import sharp from "sharp";
-import maintenanceModeMessage from 'aws-sdk/lib/maintenance_mode_message.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
+import resizeAndUpload from "../utils/resizeAndUploader.js";
 dayjs.extend(utc);
 
-// Suppress maintenance mode warning
-maintenanceModeMessage.suppress = true;
 
-const awsConfig = ({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION,
-    bucketName: process.env.S3_BUCKET_NAME
-});
 
-const s3 = new aws.S3(awsConfig)
+
+
 
 // creating a company functions 
 export const registerCompany = async (req, res) => {
@@ -169,66 +160,20 @@ export const registerCompany = async (req, res) => {
             });
         }
 
+    
         let company_vat_certificate;
-        let company_trade_license;
+        let company_trade_licenses = [];
 
         for (const field in files) {
             const file = files[field];
-
-
-            // Check if the file size is under 5MB
-            // if (!isFileSizeValid(file)) {
-            //     return res.status(400).json({
-            //         status: 400,
-            //         success: false,
-            //         message: "Image size should be under 5MB.",
-            //     });
-            // }
-
-
-            // Check if the file is a PDF or JPEG before processing
-            if (file.mimetype === 'image/pdf' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-                // Resize only if it's a PDF, JPEG, PNG 
-                const resizedBuffer = await sharp(file.data)
-                .resize(700)
-                .webp({ quality: 90 })  // Adjust quality as needed
-                .jpeg({ quality: 90, progressive: true, force: false })  // Adjust quality and other options as needed
-                .png({ quality: 90, force: false })  // Adjust compression level and other options as needed
-                .toBuffer();
-
-                // Upload resized image to S3
-                const uploadParams = {
-                    Bucket: process.env.S3_BUCKET_NAME,
-                    Key: `images/${file.name}`,
-                    Body: resizedBuffer, // Use the resized buffer
-                    ContentType: file.mimetype,
-                };
-
-                const s3Data = await s3.upload(uploadParams).promise();
-
-                if (field === "company_vat_certificate") {
-                    company_vat_certificate = s3Data.Location;
-                } else {
-                    company_trade_license = s3Data.Location;
-                }
-            } else {
-                // If it's not a PDF or JPEG, upload the original file without resizing
-                const uploadParams = {
-                    Bucket: process.env.S3_BUCKET_NAME,
-                    Key: `images/${file.name}`,
-                    Body: file.data,
-                    ContentType: file.mimetype,
-                };
-
-                const s3Data = await s3.upload(uploadParams).promise();
-
-                if (field === "company_vat_certificate") {
-                    company_vat_certificate = s3Data.Location;
-                } else {
-                    company_trade_license = s3Data.Location;
-                }
+            if (field === "company_vat_certificate") {
+                const resizedUrl = await resizeAndUpload(file);
+                company_vat_certificate = resizedUrl;
+            } else if (field === "company_trade_license") {
+                const resizedUrl = await resizeAndUpload(file);
+                company_trade_licenses.push(resizedUrl);
             }
-        }
+        };
 
 
         const newCompany = await createCompany({
@@ -237,7 +182,7 @@ export const registerCompany = async (req, res) => {
             company_landline_country_code,
             company_vat_certificate,
             company_trn_number,
-            company_trade_license,
+            company_trade_license: company_trade_licenses,
             company_trade_license_expiry,
         });
 
