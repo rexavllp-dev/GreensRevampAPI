@@ -467,3 +467,52 @@ export const sendOrderInvoices = async (orderData, pdfData) => {
 
 };
 
+
+// send a email when user change password 
+
+export const userPasswordChanged = async (usr_email, usr_firstname) => {
+
+    const emailData = {
+        email: usr_email,
+        subject: `password changed`,
+        html: `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Your password has been changed </title>
+  </head>
+  <body>
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+
+      <!-- Logo -->
+      <div style="text-align: center;">
+          <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+      </div>
+  
+          <h2>Password changed</h2>
+  
+          <p> Hello <b> ${usr_firstname} </b></p>
+  
+          <p>Your password has been changed.</p>
+
+  
+          <p>Best regards,<br> <b>Greens International </b> </p>
+  
+      </div>
+  </body>
+  </html>`,
+    };
+
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
+
+};
+
+
+
+
+
