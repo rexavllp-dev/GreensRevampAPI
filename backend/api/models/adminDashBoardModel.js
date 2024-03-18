@@ -2,7 +2,7 @@ import db from "../../config/dbConfig.js";
 
 
 
-
+// get total orders
 export const getsAllTotalOrders = async () => {
     const totalOrders = await db("user_orders")
     
@@ -17,7 +17,7 @@ export const getsAllTotalOrders = async () => {
 };
 
 
-
+// get recent orders
 export const getsAllRecentOrders = async () => {
 
     const orders = await db("user_orders")
@@ -54,7 +54,7 @@ export const getsAllRecentOrders = async () => {
 
 };
 
-
+// get latest cancelled orders
 export const getsLatestCancelledOrders = async () => {
 
     const canceledOrders = await db("cancel_orders")
@@ -62,13 +62,14 @@ export const getsLatestCancelledOrders = async () => {
 
 
         .select('*')
+        .orderBy("cancel_orders.created_at", "desc");
 
     return canceledOrders;
 
 };
 
 
-
+// get  latest returned orders
 export const getsLatestReturnedOrders = async () => {
 
     const returnedOrders = await db("return_products")
@@ -118,7 +119,7 @@ export const getsLatestReturnedOrders = async () => {
 
 
 
-
+// get latest replacement orders
 export const getsAllLatestReplacementOrders = async () => {
 
     const replacementOrders = await db("replace_products")
@@ -166,7 +167,7 @@ export const getsAllLatestReplacementOrders = async () => {
 
 
 
-
+// get all out of stock products
 export const getsAllOutOfStockProducts = async () => {
 
     const outOfStockProducts = await db("product_inventory")
@@ -198,7 +199,7 @@ export const getsAllOutOfStockProducts = async () => {
 };
 
 
-
+// get all expired products
 export const getsAllExpiredProducts = async () => {
 
     const currentDate = new Date();
@@ -234,7 +235,7 @@ export const getsAllExpiredProducts = async () => {
 };
 
 
-
+// get all products with min qty
 export const getsAllProductsMinQty = async () => {
 
     const products = await db("product_inventory")
@@ -281,7 +282,7 @@ export const getsAllProductsMinQty = async () => {
 
 
 
-
+// get all expired trade licenses
 export const getsAllExpiredTradeLicenses = async () => {
 
     const currentDate = new Date();

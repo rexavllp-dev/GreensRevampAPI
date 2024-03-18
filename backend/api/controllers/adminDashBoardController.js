@@ -30,7 +30,7 @@ export const getAllTotalOrders = async (req, res) => {
 
 
 
-
+// get all recent orders
 export const getAllRecentOrders = async (req, res) => {
 
     try {
@@ -57,6 +57,7 @@ export const getAllRecentOrders = async (req, res) => {
 
 
 
+// get all latest return
 
 export const getAllLatestCancelledOrders = async (req, res) => {
 
@@ -112,7 +113,7 @@ export const getAllLatestReturn = async (req, res) => {
 };
 
 
-
+// get all latest replacement
 
 export const getAllLatestReplacement = async (req, res) => {
 
@@ -141,6 +142,7 @@ export const getAllLatestReplacement = async (req, res) => {
 
 
 
+// get all out of stock
 
 export const getAllOutOfStock = async (req, res) => {
 
@@ -169,7 +171,7 @@ export const getAllOutOfStock = async (req, res) => {
 };
 
 
-
+// get all expired
 export const getAllExpiredProducts = async (req, res) => {
 
     try {
@@ -197,6 +199,7 @@ export const getAllExpiredProducts = async (req, res) => {
 };
 
 
+<<<<<<< Updated upstream
 
 
 export const getAllProductsMinQty = async (req, res) => {
@@ -259,3 +262,5 @@ export const getAllExpiredTradeLicense = async (req, res) => {
 
 
 
+=======
+>>>>>>> Stashed changes
