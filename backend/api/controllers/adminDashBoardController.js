@@ -199,8 +199,7 @@ export const getAllExpiredProducts = async (req, res) => {
 };
 
 
-<<<<<<< Updated upstream
-
+// get all products min qty
 
 export const getAllProductsMinQty = async (req, res) => {
 
@@ -231,7 +230,7 @@ export const getAllProductsMinQty = async (req, res) => {
 
 
 
-
+// get all expired
 export const getAllExpiredTradeLicense = async (req, res) => {
 
     try {
@@ -262,5 +261,3 @@ export const getAllExpiredTradeLicense = async (req, res) => {
 
 
 
-=======
->>>>>>> Stashed changes
