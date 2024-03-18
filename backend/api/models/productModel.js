@@ -6,9 +6,10 @@ import { getPrdPrice } from './productPriceModel.js';
 
 // create product
 export const createAProduct = async (productData) => {
-    const newProduct = await db("products").insert(productData).returning('*');
+    const { user_id, ...newProductData } = productData;
+    const newProduct = await db("products").insert(newProductData).returning('*');
     await generateActivityLog({
-        userId: productData.user_id,
+        userId: user_id,
         comment: `Created product ${productData.prd_name}`
     })
     return newProduct;
@@ -17,14 +18,15 @@ export const createAProduct = async (productData) => {
 
 // update product
 export const updateAProduct = async (productId, updatedData) => {
+    const { user_id, ...newProductData } = updatedData;
     const updatedProduct = await db('products').where({ id: productId })
-        .update(updatedData)
+        .update(newProductData)
         .returning('*'); // Return the updated product
 
-        await generateActivityLog({
-            userId: updatedData?.user_id,
-            comment: `Updated product ${updatedData?.prd_name}`
-        })
+    await generateActivityLog({
+        userId: user_id,
+        comment: `Updated product ${updatedData?.prd_name}`
+    })
     return updatedProduct;
 };
 
@@ -53,7 +55,7 @@ export const getProductById = async (productId) => {
             "bulk_above_max_orders.id as bulkAboveMaxOrderId",
             'wishlist.*',
             'wishlist.id as wishlist_id',
-            
+
 
 
 
@@ -110,7 +112,7 @@ export const getProductById = async (productId) => {
             'products_bulks.id',
             'bulk_above_max_orders.id',
             'wishlist.id',
-            
+
 
         )
 
@@ -144,7 +146,7 @@ export const getBulkQuantity = async (userId, productId) => {
 // get all products
 
 export const getAllProducts = async (page, per_page, search, filters, sort, minPrice, maxPrice, userId) => {
-  
+
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')

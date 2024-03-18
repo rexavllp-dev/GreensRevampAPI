@@ -3,7 +3,7 @@ import dbConfig from "../../config/dbConfig.js";
 import {
     CancelIndividualItem, createCancelOrder,
     getSingleOrderItem, getOrderItems,
-    getOrderItemsByItemId, updateIndividualOrderStatus,
+     updateIndividualOrderStatus,
     updateIndividualProductQuantity,
     updateInventoryQtyWhenCancel,
     updateOrderStatus,
@@ -152,33 +152,6 @@ export const cancelIndividualItems = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed to cancel order",
-        })
-    }
-}
-
-
-// get all order items
-export const getOrderItem = async (req, res) => {
-
-    const orderId = req.params.orderId;
-
-    try {
-
-        const orderItems = await getOrderItemsByItemId(orderId);
-
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Order items retrieved successfully",
-            result: orderItems
-        })
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to retrieve order items",
         })
     }
 }

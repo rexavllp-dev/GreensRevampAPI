@@ -49,6 +49,8 @@ export const createProduct = async (req, res) => {
 
     try {
 
+        const userId = req.user?.userId;
+
         // const schema = Joi.object({
         //     prd_name: Joi.string().required().label("prd_name"),
         //     prd_description: Joi.string().required().label("prd_description"),
@@ -100,7 +102,7 @@ export const createProduct = async (req, res) => {
 
         // create a product
         const newProduct = await createAProduct({
-
+            user_id: userId,
             prd_name,
             prd_description,
             prd_storage_type,
@@ -166,10 +168,13 @@ export const updateProduct = async (req, res) => {
             search_keywords
         } = req.body;
 
+        const userId = req.user?.userId;
+
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
 
         // Call the model function to update the product
         const updatedProduct = await updateAProduct(productId, {
+            user_id: userId,
             prd_name,
             prd_description,
             prd_storage_type,
