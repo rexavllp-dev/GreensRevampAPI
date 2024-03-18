@@ -1,6 +1,23 @@
 import db from "../../config/dbConfig.js";
 
 
+
+
+export const getsAllTotalOrders = async () => {
+    const totalOrders = await db("user_orders")
+    
+        .select(
+            db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 1 THEN 1 END) as pending_count"),
+            db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 5 THEN 1 END) as completed_count"),
+            db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 6 THEN 1 END) as canceled_count")
+        )
+        .first(); 
+
+    return totalOrders;
+};
+
+
+
 export const getsAllRecentOrders = async () => {
 
     const orders = await db("user_orders")
@@ -24,7 +41,17 @@ export const getsAllRecentOrders = async () => {
         .orderBy("user_orders.created_at", "desc");
 
 
-    return orders;
+    const totalRecentOrders = await db("user_orders")
+        .count("* as totalCount")
+        .first();
+
+    return {
+
+        orders,
+        totalCount: totalRecentOrders.totalCount
+
+    };
+
 };
 
 
@@ -32,10 +59,9 @@ export const getsLatestCancelledOrders = async () => {
 
     const canceledOrders = await db("cancel_orders")
 
-        .leftJoin("user_orders", "cancel_orders.order_id", "user_orders.id")
-        .leftJoin("reasons", "cancel_orders.cancel_reason_id", "reasons.id")
 
-        .select()
+
+        .select('*')
 
     return canceledOrders;
 
@@ -75,7 +101,17 @@ export const getsLatestReturnedOrders = async () => {
 
         )
 
-    return returnedOrders;
+    const totalReturnedOrders = await db("return_products")
+        .count("* as totalCount")
+        .first();
+
+    return {
+
+        returnedOrders,
+        totalCount: totalReturnedOrders.totalCount
+
+    };
+
 
 };
 
@@ -115,7 +151,17 @@ export const getsAllLatestReplacementOrders = async () => {
 
         )
 
-    return replacementOrders;
+    const totalReplacementOrders = await db("replace_products")
+        .count("* as totalCount")
+        .first();
+
+
+    return {
+
+        replacementOrders,
+        totalCount: totalReplacementOrders.totalCount
+
+    };
 };
 
 
@@ -130,11 +176,25 @@ export const getsAllOutOfStockProducts = async () => {
         .select(
             "products.id as productId",
             "product_inventory.stock_availability as stockAvailability",
+
+
+            "products.prd_name as productName",
         )
 
         .where("product_inventory.stock_availability", "Out of stock");
 
-    return outOfStockProducts;
+    const totalOutOfStock = await db("product_inventory")
+        .count("* as totalCount")
+        .where("product_inventory.stock_availability", "Out of stock")
+        .first();
+
+
+    return {
+
+        outOfStockProducts,
+        totalCount: totalOutOfStock.totalCount
+
+    };
 };
 
 
@@ -158,6 +218,97 @@ export const getsAllExpiredProducts = async () => {
 
         );
 
-    return expiredProducts;
+    const totalExpiredProducts = await db("products")
+        .count("* as totalCount")
+        .where("products.prd_expiry_date", "<", currentDate)
+        .andWhere('products.prd_dashboard_status', '=', true)
+        .andWhere('products.show_expiry_on_dashboard', '=', true)
+        .first();
+
+
+    return {
+
+        expiredProducts,
+        totalCount: totalExpiredProducts.totalCount
+    };
 };
 
+
+
+export const getsAllProductsMinQty = async () => {
+
+    const products = await db("product_inventory")
+        .leftJoin("products", "product_inventory.product_id", "products.id")
+        .where("product_inventory.inventory_management", true)
+        .andWhere(function () {
+            this.where("product_inventory.product_quantity", "<=", db.raw("product_inventory.min_qty"))
+        })
+
+        .select(
+
+
+            "product_inventory.id as inventoryId",
+            "product_inventory.min_qty as minQty",
+            "product_inventory.product_quantity as remainingStock",
+
+
+
+            "products.id as productId",
+            "products.prd_name",
+
+
+        );
+
+
+    const totalProductsMinQty = await db("product_inventory")
+        .count("* as totalCount")
+        .where("product_inventory.inventory_management", true)
+        .andWhere(function () {
+            this.where("product_inventory.product_quantity", "<=", db.raw("product_inventory.min_qty"))
+        })
+        .first();
+
+
+
+    return {
+
+        products,
+        totalCount: totalProductsMinQty.totalCount
+
+    };
+};
+
+
+
+
+
+export const getsAllExpiredTradeLicenses = async () => {
+
+    const currentDate = new Date();
+
+    const expiredLicense = await db("company")
+
+        .where("company.company_trade_license_expiry", "<", currentDate)
+
+        .select(
+            "company.id as companyId",
+            "company.company_name",
+            "company.company_trade_license_expiry as expiryDate",
+
+        );
+
+
+    const totalExpiredLicense = await db("company")
+        .count("* as totalCount")
+        .where("company.company_trade_license_expiry", "<", currentDate)
+        .first();
+
+
+    return {
+
+        expiredLicense,
+        totalCount: totalExpiredLicense.totalCount
+
+    };
+
+};

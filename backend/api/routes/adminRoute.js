@@ -18,7 +18,7 @@ import { createStorePickup, getAllStorePickup, getStorePickup, updateStorePickup
 import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge, updateStorePickupCharge } from '../controllers/adminStorePickUpChargeController.js';
 import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
 import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
-import { getAllExpiredProducts, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllRecentOrders } from '../controllers/adminDashBoardController.js';
+import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders } from '../controllers/adminDashBoardController.js';
 
 
 const router = express.Router();
@@ -282,8 +282,14 @@ router.get('/shipping_method/get_all_onsite_delivery', getAllOnsiteDelivery);
 
 // admin dashboard API ROUTES
 
+// get all total orders
+router.get('/dashboard/get_all_total_orders', getAllTotalOrders);
+
 // get all recent orders
 router.get('/dashboard/get_all_recent_orders', getAllRecentOrders);
+
+// get all latest cancelled orders
+router.get('/dashboard/get_all_latest_cancelled_orders', getAllLatestCancelledOrders);
 
 // get all latest return
 router.get('/dashboard/get_all_latest_return', getAllLatestReturn);
@@ -296,6 +302,12 @@ router.get('/dashboard/get_all_out_of_stock', getAllOutOfStock);
 
 // get all expired products
 router.get('/dashboard/get_all_expired_products', getAllExpiredProducts);
+
+// get all products min qty
+router.get('/dashboard/get_all_products_min_qty', getAllProductsMinQty);
+
+// get all company expired trade licenses
+router.get('/dashboard/get_all_expired_trade_licenses', getAllExpiredTradeLicense);
 
 
 
