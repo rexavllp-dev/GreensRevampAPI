@@ -679,18 +679,6 @@ export const cancelOrderbyAdmin = async (cancelOrderData) => {
 
 
 
-
-
-
-//     const cancelOrder = await db('user_orders').where({ id: orderId })
-//         .update({ 'ord_order_status': 6 }).returning('*')
-
-
-
-//     return cancelOrder;
-
-
-// }
 // Add remarks to the order by admin
 export const addARemarks = async (orderId, remark) => {
 

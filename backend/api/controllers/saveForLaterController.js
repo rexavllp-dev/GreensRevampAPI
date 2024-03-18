@@ -27,7 +27,7 @@ export const createSaveForLater = async (req, res) => {
 
 
         // check if save for later is more than 20 products
-        const saveForLaterLimit = 20;
+        const saveForLaterLimit = 30;
         console.log(userSaveForLater?.length, saveForLaterLimit)
 
         if (userSaveForLater?.length >= saveForLaterLimit) {
@@ -35,7 +35,7 @@ export const createSaveForLater = async (req, res) => {
             return res.status(400).json({
                 status: 400,
                 success: false,
-                message: 'Save for later limit reached. Remove some products to add more.'
+                message: 'Save for later has touched the max limit. Please remove existing items to add a new item.'
             })
         }
 
@@ -67,10 +67,19 @@ export const getAllSaveForLaterProduct = async (req, res) => {
 
     try {
         const allSaveForLater = await getallSaveForLater(userId);
+        console.log(allSaveForLater)
+
+        // Count the number of items in the save for later list
+
+        const saveForLaterCount = allSaveForLater?.savedProducts.length;
+        console.log("ddhgjskla",saveForLaterCount)
+
+
         res.status(200).json({
             status: 200,
             success: true,
             result: allSaveForLater,
+             saveForLaterCount,
             message: 'All save for later products'
         })
     } catch (error) {

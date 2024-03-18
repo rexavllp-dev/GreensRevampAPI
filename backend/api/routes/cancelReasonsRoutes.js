@@ -24,4 +24,4 @@ router.delete('/delete-cancel-reason/:id', deleteCancelReasons);
 
 
 
-export default router
+export default router;

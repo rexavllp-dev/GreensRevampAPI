@@ -77,10 +77,13 @@ export const getAllWishlistProduct = async (req, res) => {
         
         const allWishlist = await getAllWishlist(userId);
 
+        const wishlistCount = allWishlist?.allWishlist?.length
+
         res.status(200).json({
             status: 200,
             success: true,
             result: allWishlist,
+            wishlistCount: wishlistCount,
             message: 'All wishlist products'
         })
 
