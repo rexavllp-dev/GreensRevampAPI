@@ -24,10 +24,10 @@ const router = express.Router();
 
 
 // create a product
-router.post('/create-product', createProduct);
+router.post('/create-product',verifyToken, createProduct);
 
 // update a product
-router.put('/update-product/:productId', updateProduct)
+router.put('/update-product/:productId',verifyToken, updateProduct)
 
 // get a product
 router.get('/get-product/:productId', getSingleProduct)
@@ -66,10 +66,10 @@ router.get('/get-products-category/:categoryId', getProductsOfCategory);
 // __________________________________________________________________________________________________________________________________________________________________________
 
 // create price route
-router.post('/create-price', createPrice);
+router.post('/create-price',verifyToken, createPrice);
 
 // update price
-router.put('/update-price/:productId', updatePrice);
+router.put('/update-price/:productId',verifyToken, updatePrice);
 
 // get all price
 router.get('/getall-price', getAllPrice)
@@ -114,11 +114,11 @@ router.delete('/delete-seo/:seoId', deleteSeo);
 // inventory routes
 
 // create inventory
-router.post('/create-inventory', createProductInventory);
+router.post('/create-inventory', verifyToken,  createProductInventory);
 // update inventory 
-router.put('/update-inventory/:productId', updateProductInventory);
+router.put('/update-inventory/:productId',verifyToken, updateProductInventory);
 // add stock and reduce stock
-router.post('/modify-stock/:productId', modifyStock);
+router.post('/modify-stock/:productId', verifyToken, modifyStock);
 
 
 
