@@ -152,6 +152,7 @@ export const getsAllExpiredProducts = async () => {
         .select(
 
             "products.id as productId",
+            "products.prd_name",
             "products.prd_expiry_date as expiryDate",
             "products.prd_dashboard_status as dashboardStatus"
 
