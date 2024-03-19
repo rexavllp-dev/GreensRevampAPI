@@ -5,7 +5,7 @@ import { createStockHistory } from './stockHistoryModel.js';
 
 
 // Function to create a user order
-export const createUserOrder = async (trx, userId, orderData) => {
+export const createUserOrder = async (trx, userId, orderData, totals) => {
 
     let addressId = null;
 
@@ -31,6 +31,12 @@ export const createUserOrder = async (trx, userId, orderData) => {
                 ord_payment_method: orderData.payment_method,
                 ord_shipping_method: orderData.shipping_method,
                 ord_accepted_by: 5, // hardcoded value for default warehouse user
+                ord_grand_total: totals?.grandTotal,
+                ord_shipping_cost: totals?.shippingCharge,
+                ord_tax: totals?.totalProductVAT,
+                ord_sub_total: totals?.subTotal,
+                ord_discount: totals?.totalDiscount,
+                ord_service_charge: totals?.storePickupCharge
             })
             .returning('*');
 

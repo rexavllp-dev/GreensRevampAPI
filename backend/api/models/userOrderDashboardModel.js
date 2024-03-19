@@ -23,11 +23,13 @@ export const getAllUserOrders = async (userId, sort) => {
         .groupBy('user_orders.id', 'order_items.id', 'products.id', 'address.id');
 
     // Apply sorting
-    // if (sort == 'newest') {
-        // ordersQuery = ordersQuery.orderBy('user_orders.created_at', 'asc');
-    // } else if (sort == 'oldest') {
-    //     ordersQuery = ordersQuery.orderBy('user_orders.created_at', 'asc');
-    // }
+    if (sort == 'newest') {
+        console.log('newest triggered')
+        ordersQuery = ordersQuery.orderBy('user_orders.created_at', 'asc');
+    } else if (sort == 'oldest') {
+        console.log('oldest triggered')
+        ordersQuery = ordersQuery.orderBy('user_orders.created_at', 'desc');
+    }
 
     // Execute the query
     const orders = await ordersQuery;
@@ -55,6 +57,8 @@ export const getAllUserOrders = async (userId, sort) => {
 
     // Convert the object back to an array of orders
     const resultOrders = Object.values(groupedOrders);
+
+    console.log(resultOrders);
 
     return resultOrders;
 };

@@ -89,31 +89,30 @@ export const cancelIndividualItems = async (req, res) => {
         const item = await getSingleOrderItem(cancelOrderData.order_id);
 
 
-        const item_id = cancelOrderData?.item_id;
+        const item_id = cancelOrderData?.order_id;
 
         const cancelData = {
             order_id: item?.order_id,
-            item_id: cancelOrderData?.item_id,
+            item_id: cancelOrderData?.order_id,
             cancel_reason_id: cancelOrderData.cancel_reason_id,
             cancel_note: cancelOrderData.cancel_note,
-
         }
 
-        const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
+        // const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
 
-        if (reCalculateOrders.subTotal < 100){
+        // if (reCalculateOrders.subTotal < 100){
 
-            return res.status(400).json({
+        //     return res.status(400).json({
 
-                status: 400,
-                success: false,
-                message: "Order amount cannot be less than 100 you have to pay shipping charge",
-                result : {
-                    subTotal: reCalculateOrders.subTotal,  
-                    need_payment: true, 
-                }
-            })
-        }
+        //         status: 400,
+        //         success: false,
+        //         message: "Order amount cannot be less than 100 you have to pay shipping charge",
+        //         result : {
+        //             subTotal: reCalculateOrders.subTotal,  
+        //             need_payment: true, 
+        //         }
+        //     })
+        // }
 
         // create cancel order
         const newCancelOrder = await CancelIndividualItem(cancelData, trx, item_id);
@@ -156,7 +155,7 @@ export const cancelIndividualItems = async (req, res) => {
             result: {
                 newCancelOrder,
                 updatedOrder,
-                reCalculateOrders
+                // reCalculateOrders
             }
         })
     } catch (error) {
