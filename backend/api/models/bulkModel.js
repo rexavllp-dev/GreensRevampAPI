@@ -149,7 +149,8 @@ export const isBulkOrderRequestExists = async (userId, productId) => {
     const existingRequest = await db('bulk_above_max_orders')
         .where({
             user_id: userId,
-            product_id: productId
+            product_id: productId,
+            approved_status: 'Pending',
         })
         .first();
     return !!existingRequest; // Returns true if request exists, false otherwise

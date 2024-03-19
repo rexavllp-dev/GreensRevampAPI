@@ -1,8 +1,36 @@
-import { getsAllExpiredProducts, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllRecentOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
+import { getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
 
 
 
 
+export const getAllTotalOrders = async (req, res) => {
+
+    try {
+
+        const totalOrders = await getsAllTotalOrders();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Total orders fetched successfully",
+            result: totalOrders
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch total orders",
+            error: error
+        });
+    }
+};
+
+
+
+
+// get all recent orders
 export const getAllRecentOrders = async (req, res) => {
 
     try {
@@ -27,6 +55,35 @@ export const getAllRecentOrders = async (req, res) => {
     }
 };
 
+
+
+// get all latest return
+
+export const getAllLatestCancelledOrders = async (req, res) => {
+
+    try {
+
+        const latestCancelledOrders = await getsLatestCancelledOrders();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Latest cancelled orders fetched successfully",
+            result: latestCancelledOrders
+        });
+
+    } catch (error) {
+
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch cancelled orders",
+            error: error
+        });
+    }
+
+};
 
 
 
@@ -56,7 +113,7 @@ export const getAllLatestReturn = async (req, res) => {
 };
 
 
-
+// get all latest replacement
 
 export const getAllLatestReplacement = async (req, res) => {
 
@@ -85,6 +142,7 @@ export const getAllLatestReplacement = async (req, res) => {
 
 
 
+// get all out of stock
 
 export const getAllOutOfStock = async (req, res) => {
 
@@ -113,7 +171,7 @@ export const getAllOutOfStock = async (req, res) => {
 };
 
 
-
+// get all expired
 export const getAllExpiredProducts = async (req, res) => {
 
     try {
@@ -139,3 +197,67 @@ export const getAllExpiredProducts = async (req, res) => {
     }
 
 };
+
+
+// get all products min qty
+
+export const getAllProductsMinQty = async (req, res) => {
+
+    try {
+
+        const productQty = await getsAllProductsMinQty();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched products qty successfully",
+            result: productQty
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch products qty",
+            error: error
+        });
+    }
+
+};
+
+
+
+
+// get all expired
+export const getAllExpiredTradeLicense = async (req, res) => {
+
+    try {
+
+        const productQty = await getsAllExpiredTradeLicenses();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched expired trade licenses successfully",
+            result: productQty
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch expired trade licenses",
+            error: error
+        });
+    }
+
+};
+
+
+
+
+

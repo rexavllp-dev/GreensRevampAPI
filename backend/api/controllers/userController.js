@@ -492,13 +492,13 @@ export const loginWithOtp = async (req, res) => {
         //check user exist with mobile number
         const existingUser = await getUserByPhoneNumber(usr_mobile_number);
 
-        if (!existingUser || existingUser.usr_mobile_country_code !== usr_mobile_country_code) {
-            return res.status(404).json({
-                status: 404,
-                success: false,
-                message: !existingUser ? "Mobile number not found, please register your mobile number!" : "User not found with the provided country code and mobile number!"
-            });
-        };
+        // if (!existingUser || existingUser.usr_mobile_country_code !== usr_mobile_country_code) {
+        //     return res.status(404).json({
+        //         status: 404,
+        //         success: false,
+        //         message: !existingUser ? "Mobile number not found, please register your mobile number!" : "User not found with the provided country code and mobile number!"
+        //     });
+        // };
 
 
         // Check attempt  if the user is blocked by the admin

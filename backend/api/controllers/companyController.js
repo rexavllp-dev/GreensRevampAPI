@@ -162,7 +162,7 @@ export const registerCompany = async (req, res) => {
 
     
         let company_vat_certificate;
-        let company_trade_licenses = [];
+        let company_trade_license;
 
         for (const field in files) {
             const file = files[field];
@@ -171,7 +171,7 @@ export const registerCompany = async (req, res) => {
                 company_vat_certificate = resizedUrl;
             } else if (field === "company_trade_license") {
                 const resizedUrl = await resizeAndUpload(file);
-                company_trade_licenses.push(resizedUrl);
+                company_trade_license = resizedUrl;
             }
         };
 
@@ -182,7 +182,7 @@ export const registerCompany = async (req, res) => {
             company_landline_country_code,
             company_vat_certificate,
             company_trn_number,
-            company_trade_license: company_trade_licenses,
+            company_trade_license,
             company_trade_license_expiry,
         });
 
