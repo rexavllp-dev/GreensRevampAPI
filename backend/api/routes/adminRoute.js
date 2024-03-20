@@ -21,6 +21,7 @@ import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
 import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
 import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
 import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
+import { createMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
 
 
 const router = express.Router();
@@ -349,6 +350,21 @@ router.get('/pages/get_all_page_seo', getAllPageSeos);
 
 // delete page seo
 router.delete('/pages/delete_page_seo/:pageSeoId', deletePageSeo);
+
+
+// admin menu API ROUTES
+
+// create menu
+router.post('/menu/create_menu', createMenu);
+
+// update menu
+router.put('/menu/update_menu/:menuId', updateMenu);
+
+// get menu
+router.get('/menu/get_menu/:menuId', getMenu);
+
+// get all menu
+router.get('/menu/get_all_menu', getAllMenus);
 
 
 
