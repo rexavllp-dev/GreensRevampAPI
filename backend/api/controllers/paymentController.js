@@ -37,7 +37,7 @@ export const handlePaymentRequest = async (req, res) => {
         const createPrice = async function (amount, orderID) {
             const price = await stripeInstance.prices.create({
                 currency: 'aed',
-                unit_amount: (amount * 100),
+                unit_amount: Math.round(amount * 100),
                 product_data: {
                     name: 'Greens Order ' + orderID,
                 },
@@ -49,8 +49,8 @@ export const handlePaymentRequest = async (req, res) => {
 
         const session = await stripeInstance.checkout.sessions.create({
 
-            success_url: 'http://localhost:3000/checkout/success?od=' + orderID,
-            cancel_url: 'http://localhost:3000/checkout/failed?od=' + orderID,
+            success_url: process.env.BASE_URL + '/checkout/success?od=' + orderID,
+            cancel_url: process.env.BASE_URL + '/checkout/failed?od=' + orderID,
             customer_email: 'test@test.com',
             line_items: [
                 {

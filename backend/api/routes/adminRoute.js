@@ -19,6 +19,8 @@ import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge,
 import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
 import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
 import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
+import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
+import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
 
 
 const router = express.Router();
@@ -311,6 +313,42 @@ router.get('/dashboard/get_all_expired_trade_licenses', getAllExpiredTradeLicens
 
 // get all total sales
 router.get('/dashboard/get_all_total_sales', getAllTotalSalesAmount);
+
+
+
+// admin pages API ROUTES
+
+// create page
+router.post('/pages/create_page', createPage);
+
+// update page
+router.put('/pages/update_page/:pageId', updatePage);
+
+// get page
+router.get('/pages/get_page/:pageId', getPage);
+
+// get all pages
+router.get('/pages/get_all_pages', getAllPages);
+
+// delete page
+router.delete('/pages/delete_page/:pageId', deletePage);
+
+
+// Pages SEO
+// create page seo
+router.post('/pages/create_page_seo', createPageSeo);
+
+// update page seo
+router.put('/pages/update_page_seo/:pageSeoId', updatePageSeo);
+
+// get page seo
+router.get('/pages/get_page_seo/:pageSeoId', getPageSeo);
+
+// get all page seo
+router.get('/pages/get_all_page_seo', getAllPageSeos);
+
+// delete page seo
+router.delete('/pages/delete_page_seo/:pageSeoId', deletePageSeo);
 
 
 

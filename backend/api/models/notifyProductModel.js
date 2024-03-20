@@ -15,11 +15,10 @@ export const createNotifyProduct = async (userId,notifyProductData) => {
 
 
 // get user  notify product with id 
-export const getNotifyProducts = async (userId) => {
+export const getNotifyProducts = async (userId, productId) => {
     const notifyProducts = await db("notify_products")
-        .where({ user_id: userId })
-        .select("*")
-        .first();
+        .where({ user_id: userId, product_id: productId })
+        .select("*");
 
     return notifyProducts;
 

@@ -32,6 +32,7 @@ export const createOrder = async (req, res) => {
         payment_method,
         shipping_method,
         orderItems,
+        totals
 
     } = req.body;
 
@@ -176,7 +177,7 @@ export const createOrder = async (req, res) => {
 
 
             // Create order data
-            const newOrder = await createUserOrder(trx, customerId, orderData);
+            const newOrder = await createUserOrder(trx, customerId, orderData, totals);
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 

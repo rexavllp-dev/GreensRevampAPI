@@ -5,6 +5,7 @@ import { createAProduct, createProductGallery, deleteAProduct, deleteProductImag
 import sharp from "sharp";
 import aws from 'aws-sdk';
 import { getPrdPrice } from "../models/productPriceModel.js";
+import { saveSearchHistory } from "../models/searchHistoryModel.js";
 
 
 
@@ -264,6 +265,11 @@ export const getAllProduct = async (req, res) => {
 
         const products = await getAllProducts(page, per_page, search_query, filters, sort, minPrice, maxPrice, userId);
 
+        // Save search history
+        if (search_query) {
+            await saveSearchHistory(userId, search_query, products.searchResultCount);
+        };
+
         res.status(200).json({
             status: 200,
             success: true,
@@ -437,7 +443,7 @@ export const addProductImages = async (req, res) => {
         if (!files?.length) {
             files = [files]
         }
-        
+
         const isBaseImage = req.body?.isBaseImage;
         let productImages = [];
 
