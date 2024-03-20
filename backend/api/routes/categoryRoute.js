@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategory, deleteCategory, deleteCategoryImage, getAllCategories, getCategoriesByTree, getCategoriesWithParentId, getSingleCategory, updateCategory, uploadCategoryImages } from '../controllers/categoryController.js';
+import { createCategory, deleteCategory, deleteCategoryImage, getAllCategories, getCategoriesByTree, getCategoriesWithParentId, getSingleCategory, updateCategory, uploadCategoryImages, getMainTree } from '../controllers/categoryController.js';
 
 
 const router = express.Router();
@@ -30,6 +30,8 @@ router.get('/get-categories', getAllCategories)
 
 // get categories tree
 router.get('/get-categories-tree', getCategoriesByTree);
+
+router.get('/get-main-tree', getMainTree);
 
 
 
