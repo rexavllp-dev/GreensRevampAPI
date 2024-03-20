@@ -4,14 +4,21 @@ import { getAllUserOrders, getUserOrderDetails } from "../models/userOrderDashbo
 export const getUserOrders = async (req, res) => {
 
     try {
+
         let sort = null;
+        let statusFilter = null;
+
         const userId = req.user?.userId;
 
         if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
             sort = req.query.sort;
         }
 
-        const orders = await getAllUserOrders(userId, sort);
+        if (req.query.status !== null && req.query.status !== undefined && req.query.status !== 'undefined') {
+            statusFilter = req.query.status;
+        }
+
+        const orders = await getAllUserOrders(userId, sort, statusFilter);
 
 
         res.status(200).json({
@@ -42,6 +49,7 @@ export const getOrderDetails = async (req, res) => {
     try {
 
         const order = await getUserOrderDetails(orderId);
+
 
         res.status(200).json({
             status: 200,

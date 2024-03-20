@@ -11,7 +11,7 @@ dayjs.extend(utc);
 import maintenanceModeMessage from 'aws-sdk/lib/maintenance_mode_message.js';
 import aws from 'aws-sdk';
 import sharp from "sharp";
-import { UpdateUserAccountToCompany } from "../utils/emailer.js";
+import { UpdateUserAccountToCompany, userPasswordChanged } from "../utils/emailer.js";
 
 // Suppress maintenance mode warning
 maintenanceModeMessage.suppress = true;
@@ -114,6 +114,8 @@ export const ChangeUserPassword = async (req, res) => {
             const hashedPassword = await bcrypt.hash(newPassword, 12);
 
             const updatedUser = await updateUserAccountInformation(userId, { usr_password: hashedPassword });
+
+            await userPasswordChanged(existingUser.usr_email,existingUser.usr_firstname);
 
             res.status(200).json({
                 status: 200,

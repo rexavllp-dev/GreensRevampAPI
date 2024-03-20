@@ -5,6 +5,7 @@ import { createAProduct, createProductGallery, deleteAProduct, deleteProductImag
 import sharp from "sharp";
 import aws from 'aws-sdk';
 import { getPrdPrice } from "../models/productPriceModel.js";
+import { saveSearchHistory } from "../models/searchHistoryModel.js";
 
 
 
@@ -48,6 +49,8 @@ export const createProduct = async (req, res) => {
     } = req.body;
 
     try {
+
+        const userId = req.user?.userId;
 
         // const schema = Joi.object({
         //     prd_name: Joi.string().required().label("prd_name"),
@@ -100,7 +103,7 @@ export const createProduct = async (req, res) => {
 
         // create a product
         const newProduct = await createAProduct({
-
+            user_id: userId,
             prd_name,
             prd_description,
             prd_storage_type,
@@ -166,10 +169,13 @@ export const updateProduct = async (req, res) => {
             search_keywords
         } = req.body;
 
+        const userId = req.user?.userId;
+
         const productId = req.params.productId; // Assuming you have a route parameter for the product ID
 
         // Call the model function to update the product
         const updatedProduct = await updateAProduct(productId, {
+            user_id: userId,
             prd_name,
             prd_description,
             prd_storage_type,
@@ -258,6 +264,11 @@ export const getAllProduct = async (req, res) => {
         };
 
         const products = await getAllProducts(page, per_page, search_query, filters, sort, minPrice, maxPrice, userId);
+
+        // Save search history
+        if (search_query) {
+            await saveSearchHistory(userId, search_query, products.searchResultCount);
+        };
 
         res.status(200).json({
             status: 200,
@@ -432,7 +443,7 @@ export const addProductImages = async (req, res) => {
         if (!files?.length) {
             files = [files]
         }
-        
+
         const isBaseImage = req.body?.isBaseImage;
         let productImages = [];
 

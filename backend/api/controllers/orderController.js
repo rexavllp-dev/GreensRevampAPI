@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks, updateItemQty, getOrderIdByOrderItems } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks, updateItemQty, getOrderIdByOrderItems, getOrderItemsByItemId, getOrderItems } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById } from '../models/inventoryModel.js';
@@ -32,6 +32,7 @@ export const createOrder = async (req, res) => {
         payment_method,
         shipping_method,
         orderItems,
+        totals
 
     } = req.body;
 
@@ -176,7 +177,7 @@ export const createOrder = async (req, res) => {
 
 
             // Create order data
-            const newOrder = await createUserOrder(trx, customerId, orderData);
+            const newOrder = await createUserOrder(trx, customerId, orderData, totals);
             // Create order items
             const newOrderItems = await createOrderItems(trx, newOrder[0].id, orderItems);
 
@@ -335,6 +336,58 @@ export const getAllOrders = async (req, res) => {
         });
     }
 };
+
+
+
+// get single order item
+export const getOrderItem = async (req, res) => {
+
+    const orderItemId = req.params.orderItemId;
+
+    try {
+        const orderItems = await getOrderItemsByItemId(orderItemId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Order items retrieved successfully",
+            result: orderItems
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to retrieve order items",
+        })
+    }
+}
+
+// Get all order items
+export const getAllOrderItems = async (req, res) => {
+
+    const orderId = req.params.orderId;
+
+    try {
+        const orderItems = await getOrderItems(orderId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Order items retrieved successfully",
+            result: orderItems
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to retrieve order items",
+        })
+    }
+}
 
 export const getUserDashBoardStatus = async (req, res) => {
 

@@ -37,7 +37,7 @@ export const handlePaymentRequest = async (req, res) => {
         const createPrice = async function (amount, orderID) {
             const price = await stripeInstance.prices.create({
                 currency: 'aed',
-                unit_amount: (amount * 100),
+                unit_amount: Math.round(amount * 100),
                 product_data: {
                     name: 'Greens Order ' + orderID,
                 },
@@ -49,8 +49,8 @@ export const handlePaymentRequest = async (req, res) => {
 
         const session = await stripeInstance.checkout.sessions.create({
 
-            success_url: 'http://localhost:3000/checkout/success?od=' + orderID,
-            cancel_url: 'http://localhost:3000/checkout/failed?od=' + orderID,
+            success_url: process.env.BASE_URL + '/checkout/success?od=' + orderID,
+            cancel_url: process.env.BASE_URL + '/checkout/failed?od=' + orderID,
             customer_email: 'test@test.com',
             line_items: [
                 {
@@ -154,3 +154,51 @@ export const getAllTransactions = async (req, res) => {
 
     }
 };
+
+
+// export const needPayment = async (req, res) => {
+
+//     try {
+
+//         const orderId = req.body.order_id;
+
+//         if (!orderId) {
+//             return res.status(400).json({
+//                 status: 400,
+//                 success: false,
+//                 message: 'Order ID is required',
+//             })
+//         }
+
+//         const shippingChargeAmount = 30; // 30 AED
+
+//         // Create a payment intent for the shipping charge
+//         const paymentIntent = await stripeInstance.paymentIntents.create({
+//             amount: shippingChargeAmount * 100, // Convert to cents
+//             currency: 'aed',
+//             metadata: {
+//                 order_id: orderId,
+//                 description: 'Shipping Charge for Order ' + orderId
+//             }
+//         });
+
+//         res.status(200).json({
+//             status: 200,
+//             success: true,
+//             message: 'Payment intent created successfully',
+//         });
+
+        
+
+
+//     } catch (error) {
+//         console.log(error);
+
+//         res.status(500).json({
+//             status: 500,
+//             success: false,
+//             message: 'Payment Failed while processing the payment for shipping charge',
+//         })
+//     }
+    
+// }

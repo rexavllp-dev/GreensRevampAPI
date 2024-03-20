@@ -2,14 +2,22 @@ import { createNotifyProduct, getAllNotifyProducts, getNotifyProducts, removeNot
 
 // notify product
 export const notifyProduct = async (req, res) => {
-    
-    const  notifyProductData  = req.body;
+
+    const notifyProductData = req.body;
     const userId = req.user.userId;
 
     try {
 
-        const userNotifyProduct = await getNotifyProducts(userId);
-        
+        const userNotifyProduct = await getNotifyProducts(userId, notifyProductData.product_id);
+        if(userNotifyProduct.length > 0){
+            return res.status(200).json({
+                status: 400,
+                success: false,
+                message: "Product already notified",
+                result: userNotifyProduct
+            })
+        }
+
         const notifyProduct = await createNotifyProduct(userId, notifyProductData);
 
         res.status(200).json({
@@ -19,7 +27,7 @@ export const notifyProduct = async (req, res) => {
             result: notifyProduct
         })
 
-    }  catch (error) {
+    } catch (error) {
         console.log(error);
         res.status(500).json({
             status: 500,
@@ -46,7 +54,7 @@ export const getNotifyProduct = async (req, res) => {
             result: notifyProduct
         })
 
-    }  catch (error) {
+    } catch (error) {
         console.log(error);
         res.status(500).json({
             status: 500,
@@ -59,11 +67,11 @@ export const getNotifyProduct = async (req, res) => {
 
 
 export const removeNotifiedProduct = async (req, res) => {
-    
-    const notifyProductId = req.params.notifyProductId;
+
 
     try {
-        
+        const notifyProductId = req.params.id;
+
         const removedNotifyProduct = await removeNotifyProduct(notifyProductId);
 
         res.status(200).json({
@@ -74,7 +82,7 @@ export const removeNotifiedProduct = async (req, res) => {
         })
 
     } catch (error) {
-        
+
         console.log(error)
         res.status(500).json({
             status: 500,

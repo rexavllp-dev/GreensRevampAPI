@@ -11,6 +11,8 @@ import { getBulkRangesByProductId } from "../models/bulkModel.js";
 // create inventory
 export const createProductInventory = async (req, res) => {
 
+  const userId = req.user?.userId;
+
 
   const {
 
@@ -100,7 +102,8 @@ export const createProductInventory = async (req, res) => {
 
     const updatedProduct = await updateAProduct(product_id, {
       ein_code,
-      item_code
+      item_code,
+      user_id: userId
     });
 
     res.status(201).json({
@@ -127,6 +130,7 @@ export const createProductInventory = async (req, res) => {
 export const updateProductInventory = async (req, res) => {
 
   const { productId } = req.params;
+  const userId = req.user.userId;
 
   const {
     sku,
@@ -158,19 +162,19 @@ export const updateProductInventory = async (req, res) => {
 
 
     // Check if there are bulk discount ranges set for this product
-     // Check if there are existing bulk discount ranges for the product
-     const existingBulks = await getBulkRangesByProductId(productId);
+    // Check if there are existing bulk discount ranges for the product
+    const existingBulks = await getBulkRangesByProductId(productId);
 
-     if (existingBulks.length > 0 && max_qty < existingBulks[existingBulks.length - 1].end_range) {
-       return res.status(400).json({
-         status: 400,
-         success: false,
-         message: `Warning: Reducing the maximum quantity below the end range of a bulk discount may affect existing discounts. Please consider updating the bulk ranges accordingly.`,
-       });
-     }
+    if (existingBulks.length > 0 && max_qty < existingBulks[existingBulks.length - 1].end_range) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: `Warning: Reducing the maximum quantity below the end range of a bulk discount may affect existing discounts. Please consider updating the bulk ranges accordingly.`,
+      });
+    }
 
 
-     let updatedStockAvailability = stock_availability;
+    let updatedStockAvailability = stock_availability;
 
     //  if (product_quantity > 0) {
     //   updatedStockAvailability = "In stock";
@@ -185,7 +189,7 @@ export const updateProductInventory = async (req, res) => {
       sku,
       inventory_management,
       product_quantity,
-      stock_availability : updatedStockAvailability,
+      stock_availability: updatedStockAvailability,
       show_out_of_stock_on_dashboard,
       back_in_stock,
       best_seller,
@@ -195,7 +199,8 @@ export const updateProductInventory = async (req, res) => {
 
     const updatedProduct = await updateAProduct(productId, {
       ein_code,
-      item_code
+      item_code,
+      user_id: userId,
     });
 
     res.status(201).json({

@@ -3,7 +3,7 @@ import dbConfig from "../../config/dbConfig.js";
 import {
     CancelIndividualItem, createCancelOrder,
     getSingleOrderItem, getOrderItems,
-    getOrderItemsByItemId, updateIndividualOrderStatus,
+     updateIndividualOrderStatus,
     updateIndividualProductQuantity,
     updateInventoryQtyWhenCancel,
     updateOrderStatus,
@@ -89,16 +89,32 @@ export const cancelIndividualItems = async (req, res) => {
         const item = await getSingleOrderItem(cancelOrderData.order_id);
 
 
-        const item_id = cancelOrderData?.item_id;
+        const item_id = cancelOrderData?.order_id;
 
         const cancelData = {
             order_id: item?.order_id,
-            item_id: cancelOrderData?.item_id,
+            item_id: cancelOrderData?.order_id,
             cancel_reason_id: cancelOrderData.cancel_reason_id,
             cancel_note: cancelOrderData.cancel_note,
-
         }
-        // create cancel order
+
+        // const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
+
+        // if (reCalculateOrders.subTotal < 100){
+
+        //     return res.status(400).json({
+
+        //         status: 400,
+        //         success: false,
+        //         message: "Order amount cannot be less than 100 you have to pay shipping charge",
+        //         result : {
+        //             subTotal: reCalculateOrders.subTotal,  
+        //             need_payment: true, 
+        //         }
+        //     })
+        // }
+
+        // // create cancel order
         const newCancelOrder = await CancelIndividualItem(cancelData, trx, item_id);
 
         // update order status with order id in  user_orders table
@@ -127,7 +143,6 @@ export const cancelIndividualItems = async (req, res) => {
         }
 
 
-     const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
 
 
         trx.commit();
@@ -140,7 +155,7 @@ export const cancelIndividualItems = async (req, res) => {
             result: {
                 newCancelOrder,
                 updatedOrder,
-                reCalculateOrders
+                // reCalculateOrders
             }
         })
     } catch (error) {
@@ -152,33 +167,6 @@ export const cancelIndividualItems = async (req, res) => {
             status: 500,
             success: false,
             message: "Failed to cancel order",
-        })
-    }
-}
-
-
-// get all order items
-export const getOrderItem = async (req, res) => {
-
-    const orderId = req.params.orderId;
-
-    try {
-
-        const orderItems = await getOrderItemsByItemId(orderId);
-
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Order items retrieved successfully",
-            result: orderItems
-        })
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: 500,
-            success: false,
-            message: "Failed to retrieve order items",
         })
     }
 }
@@ -317,22 +305,7 @@ export const cancelIndividualItemsByAdmin = async (req, res) => {
 
         }
 
-        // const updatedQuantity = await updateIndividualProductQuantity(cancelOrderData.order_id, trx);
-
-        // update stock history
-
-        // const updatedStockHistory = await updateStockHistory(cancelOrderData.order_id, trx);
-
-        // Calculate the remaining product price
-        // const remainingProductPrice = await calculateRemainingProductPrice(cancelOrderData.order_id, trx);
-
-        // // Check if shipping charge should be applied
-        // let shipping = 0;
-        // if (remainingProductPrice < 100) {
-
-        //     shipping = 30;
-        // }
-
+        
 
         trx.commit();
 

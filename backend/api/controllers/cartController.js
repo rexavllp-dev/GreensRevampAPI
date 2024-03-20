@@ -206,6 +206,7 @@ export const addProductToCart = async (req, res) => {
                         result: req.session.cart
                     });
                 }
+                
                 // check product stock availability
                 if (product.stock_availability === 'Out of stock') {
                     return res.status(400).json({

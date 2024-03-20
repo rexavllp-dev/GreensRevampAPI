@@ -1,5 +1,5 @@
 import express from "express";
-import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin, updateOrderItemQty } from "../controllers/orderController.js";
+import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin, updateOrderItemQty, getOrderItem, getAllOrderItems } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
 import { getCancelledOrders } from "../controllers/cancelOrderController.js";
@@ -23,6 +23,12 @@ router.get('/get-order/:orderId', getASingleOrder);
 
 // get all orders
 router.get('/get-all-orders', getAllOrders);
+
+//get single order item
+router.get('/order-item/:orderItemId', getOrderItem);
+
+//get all order items
+router.get('/all-order-items/:orderId', getAllOrderItems);
 
 
 // user order details

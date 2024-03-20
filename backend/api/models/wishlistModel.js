@@ -90,7 +90,9 @@ export const getAllWishlist = async (userId) => {
                 'product_category.id',
                 'wishlist.id',
                 'vat.id'
-            );
+            )
+
+            .orderBy('wishlist.created_at', 'desc'); // Order by the timestamp when items were added to the wishlist
 
         // Integrate getPrdPrice for each product
         const savedProductsWithPrice = await Promise.all(allWishlist.map(async (product) => {

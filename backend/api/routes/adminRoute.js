@@ -18,6 +18,10 @@ import { createStorePickup, getAllStorePickup, getStorePickup, updateStorePickup
 import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge, updateStorePickupCharge } from '../controllers/adminStorePickUpChargeController.js';
 import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
 import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
+import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
+import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
+import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
+import { createMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
 
 
 const router = express.Router();
@@ -276,6 +280,93 @@ router.get('/shipping_method/get_onsite_delivery/:shippingId', getOnsiteDelivery
 
 // get all onsite delivery
 router.get('/shipping_method/get_all_onsite_delivery', getAllOnsiteDelivery);
+
+
+
+// admin dashboard API ROUTES
+
+// get all total orders
+router.get('/dashboard/get_all_total_orders', getAllTotalOrders);
+
+// get all recent orders
+router.get('/dashboard/get_all_recent_orders', getAllRecentOrders);
+
+// get all latest cancelled orders
+router.get('/dashboard/get_all_latest_cancelled_orders', getAllLatestCancelledOrders);
+
+// get all latest return
+router.get('/dashboard/get_all_latest_return', getAllLatestReturn);
+
+// get all latest replacement
+router.get('/dashboard/get_all_latest_replacement', getAllLatestReplacement);
+
+// get all out of stock
+router.get('/dashboard/get_all_out_of_stock', getAllOutOfStock);
+
+// get all expired products
+router.get('/dashboard/get_all_expired_products', getAllExpiredProducts);
+
+// get all products min qty
+router.get('/dashboard/get_all_products_min_qty', getAllProductsMinQty);
+
+// get all company expired trade licenses
+router.get('/dashboard/get_all_expired_trade_licenses', getAllExpiredTradeLicense);
+
+// get all total sales
+router.get('/dashboard/get_all_total_sales', getAllTotalSalesAmount);
+
+
+
+// admin pages API ROUTES
+
+// create page
+router.post('/pages/create_page', createPage);
+
+// update page
+router.put('/pages/update_page/:pageId', updatePage);
+
+// get page
+router.get('/pages/get_page/:pageId', getPage);
+
+// get all pages
+router.get('/pages/get_all_pages', getAllPages);
+
+// delete page
+router.delete('/pages/delete_page/:pageId', deletePage);
+
+
+// Pages SEO
+// create page seo
+router.post('/pages/create_page_seo', createPageSeo);
+
+// update page seo
+router.put('/pages/update_page_seo/:pageSeoId', updatePageSeo);
+
+// get page seo
+router.get('/pages/get_page_seo/:pageSeoId', getPageSeo);
+
+// get all page seo
+router.get('/pages/get_all_page_seo', getAllPageSeos);
+
+// delete page seo
+router.delete('/pages/delete_page_seo/:pageSeoId', deletePageSeo);
+
+
+// admin menus API ROUTES
+
+// create menu
+router.post('/menus/create_menu', createMenu);
+
+// update menu
+router.put('/menus/update_menu/:menuId', updateMenu);
+
+// get menu
+router.get('/menus/get_menu/:menuId', getMenu);
+
+// get all menu
+router.get('/menus/get_all_menu', getAllMenus);
+
+
 
 
 export default router;
