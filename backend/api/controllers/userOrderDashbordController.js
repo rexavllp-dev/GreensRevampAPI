@@ -7,6 +7,7 @@ export const getUserOrders = async (req, res) => {
 
         let sort = null;
         let statusFilter = null;
+
         const userId = req.user?.userId;
 
         if (req.query.sort !== null && req.query.sort !== undefined && req.query.sort !== 'undefined') {
@@ -17,7 +18,7 @@ export const getUserOrders = async (req, res) => {
             statusFilter = req.query.status;
         }
 
-        const orders = await getAllUserOrders(userId, sort);
+        const orders = await getAllUserOrders(userId, sort, statusFilter);
 
 
         res.status(200).json({

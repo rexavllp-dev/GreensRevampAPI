@@ -3,12 +3,14 @@ import db from '../../config/dbConfig.js';
 
 // get all order of a user
 export const getAllUserOrders = async (userId, sort, statusFilter) => {
-    console.log(sort);
+
+    console.log("sort", sort);
+    console.log("statusFilter", statusFilter);
     let ordersQuery = db("user_orders")
         .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
         .leftJoin('products', 'order_items.product_id', 'products.id')
         .leftJoin('address', 'user_orders.address_id', 'address.id')
-        // .leftJoin('order_statuses', 'user_orders.ord_order_status', 'order_statuses.id')
+        .leftJoin('order_statuses', 'user_orders.ord_order_status', 'order_statuses.id')
 
         .where({ 'user_orders.customer_id': userId })
 
@@ -24,8 +26,8 @@ export const getAllUserOrders = async (userId, sort, statusFilter) => {
             'address.*',
             'address.id as addressId',
 
-            'order_statuses.*',
-            'order_statuses.id as orderStatusId',
+            'order_statuses.status_name',
+            
 
         )
         .groupBy(
@@ -34,7 +36,7 @@ export const getAllUserOrders = async (userId, sort, statusFilter) => {
             'order_items.id',
             'products.id',
             'address.id',
-            // 'order_statuses.id',
+            'order_statuses.id',
         );
 
 
@@ -52,7 +54,6 @@ export const getAllUserOrders = async (userId, sort, statusFilter) => {
             };
         }
         if (order.productId) {
-
             const opQty = parseInt(order.op_qty, 10) || 0;
             groupedOrders[order.orderId].products.push({
                 ...order,
@@ -66,11 +67,15 @@ export const getAllUserOrders = async (userId, sort, statusFilter) => {
     // Convert the object back to an array of orders
     let resultOrders = Object.values(groupedOrders);
 
+    console.log("resultOrders", resultOrders);
+
 
     // Filter orders by status if provided
+    // Filter orders by status if provided
     if (statusFilter) {
-        resultOrders = resultOrders.filter(order => order.ord_order_status === statusFilter);
+        resultOrders = resultOrders.filter(order => order.status_name === statusFilter);
     }
+
 
 
 
@@ -83,8 +88,6 @@ export const getAllUserOrders = async (userId, sort, statusFilter) => {
 
 
 
-
-    console.log(resultOrders);
 
     return resultOrders;
 };
