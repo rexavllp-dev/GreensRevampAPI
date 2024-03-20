@@ -83,7 +83,7 @@ export const getPrdPrice = async (priceId) => {
                 uatOfferEndDate = uatOfferEndDate.toISOString().split('T')[0];
 
                 let uatCurrentDate = new Date(currentDate);
-                uatCurrentDate = uatCurrentDate.toISOString().split('T')[0];
+                uatCurrentDate = uatCurrentDate.toISOString().split('T')[0]; 
                 const vatPercentage = vat.vat / 100;
                 const priceWithVat = price + (price * vatPercentage);
                 if (isDiscount === true &&

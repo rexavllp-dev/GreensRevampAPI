@@ -101,21 +101,21 @@ export const cancelIndividualItems = async (req, res) => {
 
         const reCalculateOrders =  await reCalculateOrder(cancelOrderData.order_id, trx);
 
-        if (reCalculateOrders.subTotal < 100){
+        // if (reCalculateOrders.subTotal < 100){
 
-            return res.status(400).json({
+        //     return res.status(400).json({
 
-                status: 400,
-                success: false,
-                message: "Order amount cannot be less than 100 you have to pay shipping charge",
-                result : {
-                    subTotal: reCalculateOrders.subTotal,  
-                    need_payment: true, 
-                }
-            })
-        }
+        //         status: 400,
+        //         success: false,
+        //         message: "Order amount cannot be less than 100 you have to pay shipping charge",
+        //         result : {
+        //             subTotal: reCalculateOrders.subTotal,  
+        //             need_payment: true, 
+        //         }
+        //     })
+        // }
 
-        // create cancel order
+        // // create cancel order
         const newCancelOrder = await CancelIndividualItem(cancelData, trx, item_id);
 
         // update order status with order id in  user_orders table

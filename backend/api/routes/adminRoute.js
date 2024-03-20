@@ -18,7 +18,7 @@ import { createStorePickup, getAllStorePickup, getStorePickup, updateStorePickup
 import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge, updateStorePickupCharge } from '../controllers/adminStorePickUpChargeController.js';
 import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
 import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
-import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders } from '../controllers/adminDashBoardController.js';
+import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
 
 
 const router = express.Router();
@@ -308,6 +308,9 @@ router.get('/dashboard/get_all_products_min_qty', getAllProductsMinQty);
 
 // get all company expired trade licenses
 router.get('/dashboard/get_all_expired_trade_licenses', getAllExpiredTradeLicense);
+
+// get all total sales
+router.get('/dashboard/get_all_total_sales', getAllTotalSalesAmount);
 
 
 

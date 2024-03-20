@@ -1,4 +1,9 @@
-import { getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
+import { getAllTotalSales, getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import  timezone  from 'dayjs/plugin/timezone.js';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 
 
@@ -256,6 +261,130 @@ export const getAllExpiredTradeLicense = async (req, res) => {
     }
 
 };
+
+// total sales  total revenue
+
+export const getAllTotalSalesAmount = async (req, res) => {
+
+    let fromDate = req.query.fromDate;
+    let toDate = req.query.toDate;
+    // fromDate = dayjs.utc(fromDate).utc(true).format();
+    // toDate = dayjs.utc(toDate).utc(true).format();
+    let filterBy = req.query.filterBy;
+
+    let uatOfferStartDate = new Date(fromDate);
+
+    uatOfferStartDate = uatOfferStartDate.toISOString().split('T')[0];
+    let uatOfferEndDate = new Date(toDate);
+
+    uatOfferEndDate = uatOfferEndDate.toISOString().split('T')[0];
+
+    // fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
+    // toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
+
+    if (filterBy === "today") {
+        fromDate = dayjs().utcOffset('+05:30').format(); // Convert fromDate to IST
+        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST
+    }
+
+    if (filterBy === "week") {
+        fromDate = dayjs().subtract(7, 'days').utcOffset('+05:30').format(); // Convert fromDate to IST
+        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST    
+    }
+
+    if (filterBy === "month") {
+        fromDate = dayjs().subtract(1, 'month').utcOffset('+05:30').format(); // Convert fromDate to IST
+        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST
+    }
+
+    if (filterBy === "year") {
+        fromDate = dayjs().subtract(1, 'year').utcOffset('+05:30').format(); // Convert fromDate to IST
+        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST
+    }
+
+    if (filterBy === "custom") {
+
+        console.log(filterBy);
+        // fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
+        // toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
+
+        uatOfferStartDate= fromDate;
+        uatOfferEndDate= toDate;
+        // fromDate = '2024-03-13'
+        // toDate = '2024-03-19'
+    }
+
+   
+
+    // get total sales and  date filter
+    if (filterBy === "all") {
+        fromDate = null 
+        toDate = null 
+    }
+
+
+    console.log(fromDate, toDate);
+
+
+    try {
+
+        
+        const totalSales = await getAllTotalSales({
+
+            fromDate,
+            toDate
+        });
+
+
+        console.log(totalSales);
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Total sales fetched successfully",
+            result: totalSales
+        })
+    } catch (error) {
+
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch total sales",
+            error: error
+        });
+    }
+
+}
+
+
+// sales bar chart
+
+export const getSalesBarChartData = async (req, res) => {
+    
+
+    try {
+
+        const salesBarChartData = await getSalesBarChart();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Sales bar chart data fetched successfully",
+            result: salesBarChartData
+        })
+
+    } catch (error) {
+
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch sales bar chart data",
+        });
+    }
+}
 
 
 
