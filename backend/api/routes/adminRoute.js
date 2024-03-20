@@ -352,19 +352,19 @@ router.get('/pages/get_all_page_seo', getAllPageSeos);
 router.delete('/pages/delete_page_seo/:pageSeoId', deletePageSeo);
 
 
-// admin menu API ROUTES
+// admin menus API ROUTES
 
 // create menu
-router.post('/menu/create_menu', createMenu);
+router.post('/menus/create_menu', createMenu);
 
 // update menu
-router.put('/menu/update_menu/:menuId', updateMenu);
+router.put('/menus/update_menu/:menuId', updateMenu);
 
 // get menu
-router.get('/menu/get_menu/:menuId', getMenu);
+router.get('/menus/get_menu/:menuId', getMenu);
 
 // get all menu
-router.get('/menu/get_all_menu', getAllMenus);
+router.get('/menus/get_all_menu', getAllMenus);
 
 
 
