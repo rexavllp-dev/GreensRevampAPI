@@ -3,15 +3,34 @@ import db from "../../config/dbConfig.js";
 
 
 // get total orders
-export const getsAllTotalOrders = async () => {
-    const totalOrders = await db("user_orders")
+export const getsAllTotalOrders = async (filter) => {
+
+    const currentDate = new Date();
+
+    let query = db("user_orders")
 
         .select(
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 1 THEN 1 END) as pending_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 5 THEN 1 END) as completed_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 6 THEN 1 END) as canceled_count")
         )
-        .first();
+
+
+    // Adjust the query based on the specified time frame
+
+    if (filter === 'today') {
+        query.whereRaw('DATE_TRUNC(\'day\', user_orders.created_at) = CURRENT_DATE');
+    } else if (filter === 'weekly') {
+        query.whereRaw('user_orders.created_at >= DATE_TRUNC(\'week\', CURRENT_DATE)');
+    } else if (filter === 'monthly') {
+        query.whereRaw('DATE_TRUNC(\'month\', user_orders.created_at) = DATE_TRUNC(\'month\', CURRENT_DATE)');
+    } else if (filter === 'yearly') {
+        query.whereRaw('DATE_TRUNC(\'year\', user_orders.created_at) = DATE_TRUNC(\'year\', CURRENT_DATE)');
+
+    }
+
+    const totalOrders = await query.first();
+
 
     return totalOrders;
 };
