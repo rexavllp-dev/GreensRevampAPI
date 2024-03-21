@@ -272,12 +272,14 @@ export const getAllTotalSalesAmount = async (req, res) => {
     // toDate = dayjs.utc(toDate).utc(true).format();
     let filterBy = req.query.filterBy;
 
-    let uatOfferStartDate = new Date(fromDate);
+    console.log(req.query)
 
-    uatOfferStartDate = uatOfferStartDate.toISOString().split('T')[0];
-    let uatOfferEndDate = new Date(toDate);
+    // let uatOfferStartDate = new Date(fromDate);
 
-    uatOfferEndDate = uatOfferEndDate.toISOString().split('T')[0];
+    // uatOfferStartDate = uatOfferStartDate.toISOString().split('T')[0];
+    // let uatOfferEndDate = new Date(toDate);
+
+    // uatOfferEndDate = uatOfferEndDate.toISOString().split('T')[0];
 
     // fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
     // toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
@@ -289,7 +291,8 @@ export const getAllTotalSalesAmount = async (req, res) => {
 
     if (filterBy === "week") {
         fromDate = dayjs().subtract(7, 'days').utcOffset('+05:30').format(); // Convert fromDate to IST
-        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST    
+        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST
+        console.log("fromDate", fromDate, "toDate", toDate);    
     }
 
     if (filterBy === "month") {
@@ -305,11 +308,11 @@ export const getAllTotalSalesAmount = async (req, res) => {
     if (filterBy === "custom") {
 
         console.log(filterBy);
-        // fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
-        // toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
+        fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
+        toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
 
-        uatOfferStartDate= fromDate;
-        uatOfferEndDate= toDate;
+        // uatOfferStartDate= fromDate;
+        // uatOfferEndDate= toDate;
         // fromDate = '2024-03-13'
         // toDate = '2024-03-19'
     }
@@ -321,9 +324,6 @@ export const getAllTotalSalesAmount = async (req, res) => {
         fromDate = null 
         toDate = null 
     }
-
-
-    console.log(fromDate, toDate);
 
 
     try {

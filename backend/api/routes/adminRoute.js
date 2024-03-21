@@ -22,6 +22,7 @@ import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelled
 import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
 import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
 import { createMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
+import { addDiscount } from '../controllers/adminDiscountController.js';
 
 
 const router = express.Router();
@@ -365,6 +366,9 @@ router.get('/menus/get_menu/:menuId', getMenu);
 
 // get all menu
 router.get('/menus/get_all_menu', getAllMenus);
+
+// create brand discount 
+router.post('/discount/create_discount', addDiscount); 
 
 
 
