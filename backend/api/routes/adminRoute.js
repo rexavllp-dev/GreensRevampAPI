@@ -21,6 +21,7 @@ import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
 import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalCounts, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
 import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
 import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
+import { addDiscount } from '../controllers/adminDiscountController.js';
 import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
 import { createRole, getAllRoles, updateRole } from '../controllers/userRolesController.js';
 

@@ -9,8 +9,8 @@ export const addDiscount = async (req, res) => {
 
     try {
 
-        if (!is_brand) {
-
+        if (is_brand === null) {
+            console.log(is_brand);
             return res.status(400).json({
                 status: 400,
                 success: false,
@@ -25,7 +25,7 @@ export const addDiscount = async (req, res) => {
 
             const brandData = {
 
-                brand_id: discountData.brand_id,
+                brand_id: discountData.discount_id,
                 brand_discount_name: discountData.discount_name,
                 brand_discount_status: discountData.discount_status,
                 brand_discount_start_date: discountData.discount_start_date,
@@ -40,7 +40,7 @@ export const addDiscount = async (req, res) => {
 
             const categoryData = {
                 
-                category_id: discountData.category_id,
+                category_id: discountData.discount_id,
                 category_discount_name: discountData.discount_name,
                 category_discount_status: discountData.discount_status,
                 category_discount_start_date: discountData.discount_start_date,
