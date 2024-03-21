@@ -62,7 +62,7 @@ export const getsLatestCancelledOrders = async () => {
         .orderBy("cancel_orders.created_at", "desc");
 
 
-        const totalCanceledOrders = await db("return_products")
+    const totalCanceledOrders = await db("return_products")
         .count("* as totalCount")
         .first();
 
@@ -165,7 +165,7 @@ export const getsAllLatestReplacementOrders = async () => {
 
     return {
 
-        data:replacementOrders,
+        data: replacementOrders,
         totalCount: totalReplacementOrders.totalCount
 
     };
@@ -385,4 +385,31 @@ export const getSalesBarChart = async () => {
 
 
 
+
+export const getsAllCompanyPendingApproval = async () => {
+
+    const users = await db("users")
+
+
+        .leftJoin("company", "users.usr_company", "company.id")
+        .leftJoin('user_approval_status', 'users.usr_approval_id', 'user_approval_status.id')
+        .where('user_approval_status.status_name', 'Pending Approval')
+        .select(
+
+            'users.usr_firstname',
+            'users.usr_lastname',
+            'users.usr_email',
+
+            'company.company_name',
+            'company.created_at',
+
+            'user_approval_status.status_name as approval_status'
+
+        )
+        .orderBy('company.created_at', 'desc');
+
+
+    return users;
+
+};
 

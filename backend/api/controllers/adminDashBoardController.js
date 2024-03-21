@@ -1,4 +1,4 @@
-import { getAllTotalSales, getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
+import { getAllTotalSales, getsAllCompanyPendingApproval, getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
@@ -389,8 +389,7 @@ export const getSalesBarChartData = async (req, res) => {
 
 
 
-
-export const getAllTotalCounts = async (req,res) => {
+export const getAllTotalCounts = async (req, res) => {
 
     try {
 
@@ -438,6 +437,31 @@ export const getAllTotalCounts = async (req,res) => {
     }
 };
 
+
+
+export const getAllCompanyPendingApprovals = async (req, res) => {
+
+    try {
+
+        const companyPendingApprovals = await getsAllCompanyPendingApproval();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Company pending approvals fetched successfully",
+            result: companyPendingApprovals
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch company pending approvals",
+            error: error
+        });
+    }
+};
 
 
 
