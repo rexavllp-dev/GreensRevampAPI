@@ -21,7 +21,8 @@ import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
 import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
 import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
 import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
-import { createMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
+import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
+import { createRole, getAllRoles, updateRole } from '../controllers/userRolesController.js';
 
 
 const router = express.Router();
@@ -366,9 +367,21 @@ router.get('/menus/get_menu/:menuId', getMenu);
 // get all menu
 router.get('/menus/get_all_menu', getAllMenus);
 
+// delete menu
+router.delete('/menus/delete_menu/:menuId', deleteMenu);
 
 
 
+// admin roles API ROUTES
+
+// create role
+router.post('/roles/create_role', createRole);
+
+// update role
+router.put('/roles/update_role/:roleId', updateRole);
+
+// get all roles
+router.get('/roles/get_all_roles', getAllRoles);
 
 
 
