@@ -18,11 +18,11 @@ import { createStorePickup, getAllStorePickup, getStorePickup, updateStorePickup
 import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge, updateStorePickupCharge } from '../controllers/adminStorePickUpChargeController.js';
 import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
 import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
-import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
+import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalCounts, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
 import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
 import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
-import { createMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
-import { addDiscount } from '../controllers/adminDiscountController.js';
+import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
+import { createRole, getAllRoles, updateRole } from '../controllers/userRolesController.js';
 
 
 const router = express.Router();
@@ -316,6 +316,9 @@ router.get('/dashboard/get_all_expired_trade_licenses', getAllExpiredTradeLicens
 // get all total sales
 router.get('/dashboard/get_all_total_sales', getAllTotalSalesAmount);
 
+// get all total counts
+router.get('/dashboard/get_all_total_counts', getAllTotalCounts);
+
 
 
 // admin pages API ROUTES
@@ -370,9 +373,21 @@ router.get('/menus/get_all_menu', getAllMenus);
 // create brand discount 
 router.post('/discount/create_discount', addDiscount); 
 
+// delete menu
+router.delete('/menus/delete_menu/:menuId', deleteMenu);
 
 
 
+// admin roles API ROUTES
+
+// create role
+router.post('/roles/create_role', createRole);
+
+// update role
+router.put('/roles/update_role/:roleId', updateRole);
+
+// get all roles
+router.get('/roles/get_all_roles', getAllRoles);
 
 
 
