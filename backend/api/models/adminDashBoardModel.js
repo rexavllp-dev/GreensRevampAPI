@@ -5,13 +5,13 @@ import db from "../../config/dbConfig.js";
 // get total orders
 export const getsAllTotalOrders = async () => {
     const totalOrders = await db("user_orders")
-    
+
         .select(
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 1 THEN 1 END) as pending_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 5 THEN 1 END) as completed_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 6 THEN 1 END) as canceled_count")
         )
-        .first(); 
+        .first();
 
     return totalOrders;
 };
@@ -24,7 +24,7 @@ export const getsAllRecentOrders = async () => {
         .leftJoin("order_statuses", "user_orders.ord_order_status", "order_statuses.id")
 
         .select(
-
+            "user_orders.id",
             "user_orders.id as orderId",
             "user_orders.ord_order_status as orderStatus",
             "user_orders.ord_customer_name",
@@ -47,7 +47,7 @@ export const getsAllRecentOrders = async () => {
 
     return {
 
-        orders,
+        data: orders,
         totalCount: totalRecentOrders.totalCount
 
     };
@@ -80,7 +80,7 @@ export const getsLatestReturnedOrders = async () => {
 
         .select(
 
-
+            "return_products.id",
             "return_products.id as returnId",
             "return_products.reason_id as returnReasonId",
             "return_products.created_at as returnDate",
@@ -108,7 +108,7 @@ export const getsLatestReturnedOrders = async () => {
 
     return {
 
-        returnedOrders,
+        data: returnedOrders,
         totalCount: totalReturnedOrders.totalCount
 
     };
@@ -130,7 +130,7 @@ export const getsAllLatestReplacementOrders = async () => {
 
         .select(
 
-
+            "replace_products.id",
             "replace_products.id as replacementId",
             "replace_products.reason_id as replacementReasonId",
             "replace_products.created_at as replacementDate",
@@ -159,7 +159,7 @@ export const getsAllLatestReplacementOrders = async () => {
 
     return {
 
-        replacementOrders,
+        data:replacementOrders,
         totalCount: totalReplacementOrders.totalCount
 
     };
@@ -175,6 +175,7 @@ export const getsAllOutOfStockProducts = async () => {
         .leftJoin("products", "product_inventory.product_id", "products.id")
 
         .select(
+            "products.id",
             "products.id as productId",
             "product_inventory.stock_availability as stockAvailability",
 
@@ -192,7 +193,7 @@ export const getsAllOutOfStockProducts = async () => {
 
     return {
 
-        outOfStockProducts,
+        data: outOfStockProducts,
         totalCount: totalOutOfStock.totalCount
 
     };
@@ -211,7 +212,7 @@ export const getsAllExpiredProducts = async () => {
         .andWhere('products.show_expiry_on_dashboard', '=', true)
 
         .select(
-
+            "products.id",
             "products.id as productId",
             "products.prd_name",
             "products.prd_expiry_date as expiryDate",
@@ -229,7 +230,7 @@ export const getsAllExpiredProducts = async () => {
 
     return {
 
-        expiredProducts,
+        data: expiredProducts,
         totalCount: totalExpiredProducts.totalCount
     };
 };
@@ -247,7 +248,7 @@ export const getsAllProductsMinQty = async () => {
 
         .select(
 
-
+            "products.id",
             "product_inventory.id as inventoryId",
             "product_inventory.min_qty as minQty",
             "product_inventory.product_quantity as remainingStock",
@@ -273,7 +274,7 @@ export const getsAllProductsMinQty = async () => {
 
     return {
 
-        products,
+        data: products,
         totalCount: totalProductsMinQty.totalCount
 
     };
@@ -292,6 +293,7 @@ export const getsAllExpiredTradeLicenses = async () => {
         .where("company.company_trade_license_expiry", "<", currentDate)
 
         .select(
+            "company.id",
             "company.id as companyId",
             "company.company_name",
             "company.company_trade_license_expiry as expiryDate",
@@ -307,7 +309,7 @@ export const getsAllExpiredTradeLicenses = async () => {
 
     return {
 
-        expiredLicense,
+        data: expiredLicense,
         totalCount: totalExpiredLicense.totalCount
 
     };
