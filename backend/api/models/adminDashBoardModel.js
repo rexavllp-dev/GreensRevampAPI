@@ -5,7 +5,10 @@ import db from "../../config/dbConfig.js";
 // get total orders
 export const getsAllTotalOrders = async (filter) => {
 
+    console.log("filter", filter);
+
     const currentDate = new Date();
+
 
     let query = db("user_orders")
 
@@ -16,17 +19,36 @@ export const getsAllTotalOrders = async (filter) => {
         )
 
 
-    // Adjust the query based on the specified time frame
+    // filter
 
     if (filter === 'today') {
-        query.whereRaw('DATE_TRUNC(\'day\', user_orders.created_at) = CURRENT_DATE');
-    } else if (filter === 'weekly') {
-        query.whereRaw('user_orders.created_at >= DATE_TRUNC(\'week\', CURRENT_DATE)');
-    } else if (filter === 'monthly') {
-        query.whereRaw('DATE_TRUNC(\'month\', user_orders.created_at) = DATE_TRUNC(\'month\', CURRENT_DATE)');
-    } else if (filter === 'yearly') {
-        query.whereRaw('DATE_TRUNC(\'year\', user_orders.created_at) = DATE_TRUNC(\'year\', CURRENT_DATE)');
 
+        const currentDayStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()); // Start of the current day
+        const currentDayEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1); // End of the current day
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at < ?', [currentDayStartDate.toISOString(), currentDayEndDate.toISOString()]);
+
+    } else if (filter === 'weekly') {
+
+        const lastWeekStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 7);
+        const lastWeekEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 1);
+
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at <= ?', [lastWeekStartDate.toISOString(), lastWeekEndDate.toISOString()]);
+
+    } else if (filter === 'monthly') {
+
+        const currentMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // Start of the current month
+        const nextMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1); // Start of the next month
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at < ?', [currentMonthStartDate.toISOString(), nextMonthStartDate.toISOString()]);
+
+    } else if (filter === 'yearly') {
+
+        const currentYearStartDate = new Date(currentDate.getFullYear(), 0, 1); // Start of the current year
+        const currentYearEndDate = new Date(currentDate.getFullYear(), 11, 31); // End of the current year
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at <= ?', [currentYearStartDate.toISOString(), currentYearEndDate.toISOString()]);
     }
 
     const totalOrders = await query.first();
