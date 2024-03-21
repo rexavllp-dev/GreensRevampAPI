@@ -18,7 +18,7 @@ import { createStorePickup, getAllStorePickup, getStorePickup, updateStorePickup
 import { createStorePickupCharge, getAllStorePickupCharge, getStorePickupCharge, updateStorePickupCharge } from '../controllers/adminStorePickUpChargeController.js';
 import { createOnsiteDelivery, getOnsiteDelivery, updateOnsiteDelivery } from '../controllers/adminOnsiteDeliveryController.js';
 import { getAllOnsiteDelivery } from '../models/adminOnsiteDelivery.js';
-import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
+import { getAllExpiredProducts, getAllExpiredTradeLicense, getAllLatestCancelledOrders, getAllLatestReplacement, getAllLatestReturn, getAllOutOfStock, getAllProductsMinQty, getAllRecentOrders, getAllTotalCounts, getAllTotalOrders, getAllTotalSalesAmount } from '../controllers/adminDashBoardController.js';
 import { createPage, deletePage, getAllPages, getPage, updatePage } from '../controllers/pageController.js';
 import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo } from '../controllers/pageSeoController.js';
 import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
@@ -315,6 +315,9 @@ router.get('/dashboard/get_all_expired_trade_licenses', getAllExpiredTradeLicens
 
 // get all total sales
 router.get('/dashboard/get_all_total_sales', getAllTotalSalesAmount);
+
+// get all total counts
+router.get('/dashboard/get_all_total_counts', getAllTotalCounts);
 
 
 

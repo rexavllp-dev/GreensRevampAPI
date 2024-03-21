@@ -58,13 +58,19 @@ export const getsAllRecentOrders = async () => {
 export const getsLatestCancelledOrders = async () => {
 
     const canceledOrders = await db("cancel_orders")
-
-
-
         .select('*')
         .orderBy("cancel_orders.created_at", "desc");
 
-    return canceledOrders;
+
+        const totalCanceledOrders = await db("return_products")
+        .count("* as totalCount")
+        .first();
+
+    return {
+        canceledOrders,
+        totalCount: totalCanceledOrders.totalCount
+
+    };
 
 };
 
@@ -323,8 +329,8 @@ export const getAllTotalSales = async ({ fromDate, toDate }) => {
     let totalSales = db("user_orders")
         .where({ ord_order_status: 5 })
     if (fromDate && toDate) {
-        
-        totalSales.whereBetween('created_at', [fromDate.toString() , toDate.toString()])
+
+        totalSales.whereBetween('created_at', [fromDate.toString(), toDate.toString()])
     }
 
 
@@ -376,3 +382,7 @@ export const getSalesBarChart = async () => {
         throw error;
     }
 };
+
+
+
+

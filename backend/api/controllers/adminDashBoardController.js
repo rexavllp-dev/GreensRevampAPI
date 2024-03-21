@@ -1,7 +1,7 @@
 import { getAllTotalSales, getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import  timezone  from 'dayjs/plugin/timezone.js';
+import timezone from 'dayjs/plugin/timezone.js';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -308,18 +308,18 @@ export const getAllTotalSalesAmount = async (req, res) => {
         // fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
         // toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
 
-        uatOfferStartDate= fromDate;
-        uatOfferEndDate= toDate;
+        uatOfferStartDate = fromDate;
+        uatOfferEndDate = toDate;
         // fromDate = '2024-03-13'
         // toDate = '2024-03-19'
     }
 
-   
+
 
     // get total sales and  date filter
     if (filterBy === "all") {
-        fromDate = null 
-        toDate = null 
+        fromDate = null
+        toDate = null
     }
 
 
@@ -328,7 +328,7 @@ export const getAllTotalSalesAmount = async (req, res) => {
 
     try {
 
-        
+
         const totalSales = await getAllTotalSales({
 
             fromDate,
@@ -362,7 +362,7 @@ export const getAllTotalSalesAmount = async (req, res) => {
 // sales bar chart
 
 export const getSalesBarChartData = async (req, res) => {
-    
+
 
     try {
 
@@ -384,7 +384,59 @@ export const getSalesBarChartData = async (req, res) => {
             message: "Failed to fetch sales bar chart data",
         });
     }
-}
+};
+
+
+
+
+
+export const getAllTotalCounts = async (req,res) => {
+
+    try {
+
+        // const totalOrders = await getsAllTotalOrders();
+        const totalRecentOrders = await getsAllRecentOrders();
+        const totalCanceledOrders = await getsLatestCancelledOrders();
+        const totalReturnedOrders = await getsLatestReturnedOrders();
+        const totalReplacementOrders = await getsAllLatestReplacementOrders();
+        const totalOutOfStockProducts = await getsAllOutOfStockProducts();
+        const totalExpiredProducts = await getsAllExpiredProducts();
+        const totalProductsMinQty = await getsAllProductsMinQty();
+        const totalExpiredTradeLicenses = await getsAllExpiredTradeLicenses();
+
+
+
+        const totalCounts = {
+            // totalOrders: totalOrders.pending_count + totalOrders.completed_count + totalOrders.canceled_count,
+            totalRecentOrders: totalRecentOrders.totalCount,
+            totalCanceledOrders: totalCanceledOrders.totalCount,
+            totalReturnedOrders: totalReturnedOrders.totalCount,
+            totalReplacementOrders: totalReplacementOrders.totalCount,
+            totalOutOfStockProducts: totalOutOfStockProducts.totalCount,
+            totalExpiredProducts: totalExpiredProducts.totalCount,
+            totalProductsMinQty: totalProductsMinQty.totalCount,
+            totalExpiredTradeLicenses: totalExpiredTradeLicenses.totalCount
+        };
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Total counts fetched successfully",
+            result: totalCounts
+        });
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch total counts",
+            error: error
+        });
+    }
+};
 
 
 
