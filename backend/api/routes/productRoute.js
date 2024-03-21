@@ -12,11 +12,12 @@ import { addProductOptionValues, deleteOptionLabel, getOptionsValues, updateAOpt
 import { createProductLanguage, deleteLanguage, getAllProductLanguages, updateProductLanguage } from '../controllers/productLanguageController.js';
 import { getStockHistoryByProduct } from '../controllers/stockHistoryController.js';
 import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVariantsWithProductId, updateAVariantLabel } from '../controllers/productVariantsController.js';
-import { createNewSearchHistory, getAllSearchHistory } from '../controllers/searchHistoryController.js';
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkStatusWithProductStatus, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import verifyLogged from '../middleware/verifyLogged.js';
-import { replaceAProduct } from '../controllers/replaceController.js';
+import { getAllRecommendedProducts } from '../controllers/recommendedProductController.js';
+
+
 
 
 
@@ -24,10 +25,10 @@ const router = express.Router();
 
 
 // create a product
-router.post('/create-product',verifyToken, createProduct);
+router.post('/create-product', verifyToken, createProduct);
 
 // update a product
-router.put('/update-product/:productId',verifyToken, updateProduct)
+router.put('/update-product/:productId', verifyToken, updateProduct)
 
 // get a product
 router.get('/get-product/:productId', getSingleProduct)
@@ -36,9 +37,7 @@ router.get('/get-product/:productId', getSingleProduct)
 router.delete('/delete-product', deleteProduct);
 
 // get all products.
-router.get('/get-products',
- verifyLogged, 
-getAllProduct);
+router.get('/get-products', verifyLogged, getAllProduct);
 
 router.get('/get-all-option-products', getAllOptionProducts);
 
@@ -66,10 +65,10 @@ router.get('/get-products-category/:categoryId', getProductsOfCategory);
 // __________________________________________________________________________________________________________________________________________________________________________
 
 // create price route
-router.post('/create-price',verifyToken, createPrice);
+router.post('/create-price', verifyToken, createPrice);
 
 // update price
-router.put('/update-price/:productId',verifyToken, updatePrice);
+router.put('/update-price/:productId', verifyToken, updatePrice);
 
 // get all price
 router.get('/getall-price', getAllPrice)
@@ -114,9 +113,9 @@ router.delete('/delete-seo/:seoId', deleteSeo);
 // inventory routes
 
 // create inventory
-router.post('/create-inventory', verifyToken,  createProductInventory);
+router.post('/create-inventory', verifyToken, createProductInventory);
 // update inventory 
-router.put('/update-inventory/:productId',verifyToken, updateProductInventory);
+router.put('/update-inventory/:productId', verifyToken, updateProductInventory);
 // add stock and reduce stock
 router.post('/modify-stock/:productId', verifyToken, modifyStock);
 
@@ -253,12 +252,6 @@ router.delete('/delete-product-language/:languageId', deleteLanguage);
 router.get('/stock-history-by-product/:product_id', getStockHistoryByProduct);
 
 
-// search history route
-router.post('/create-search', createNewSearchHistory);
-
-// get all search
-router.get('/get-all-search', getAllSearchHistory);
-
 
 // products bulk route
 
@@ -295,6 +288,13 @@ router.post('/submit-bulk-request', verifyToken, submitBulkOrderRequest);
 router.get('/get-all-bulk-request', getBulkOrderRequestsHandler);
 
 // update bulk above max orders
+
+
+
+
+
+// get all recommended products
+router.get('/get_all_recommended_products', verifyLogged, getAllRecommendedProducts);
 
 
 export default router;

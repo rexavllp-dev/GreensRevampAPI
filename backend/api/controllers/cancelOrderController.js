@@ -114,7 +114,7 @@ export const cancelIndividualItems = async (req, res) => {
         //     })
         // }
 
-        // create cancel order
+        // // create cancel order
         const newCancelOrder = await CancelIndividualItem(cancelData, trx, item_id);
 
         // update order status with order id in  user_orders table

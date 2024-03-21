@@ -2,7 +2,7 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
-import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById,  updateACategory } from '../models/categoryModel.js';
+import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById,  updateACategory, getMainCategoriesByTree } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
 
@@ -322,6 +322,9 @@ export const getAllCategories = async (req, res) => {
 };
 
 
+
+
+
 export const deleteCategory = async (req,res) => {
     try {
         const categoryId = req.params.categoryId;
@@ -356,6 +359,29 @@ export const deleteCategory = async (req,res) => {
 export const getCategoriesByTree = async (req, res) => {
     try {
         const categoryTree = await getCategoriesTree();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: 'Categories fetched successfully',
+            data: categoryTree,
+            
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: 'Failed to fetch categories. Please try again later',
+            error: error,
+        });
+    }
+}
+
+
+export const getMainTree = async (req, res) => {
+    try {
+        const categoryTree = await getMainCategoriesByTree();
 
         res.status(200).json({
             status: 200,

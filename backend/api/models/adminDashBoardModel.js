@@ -315,3 +315,64 @@ export const getsAllExpiredTradeLicenses = async () => {
     };
 
 };
+
+// get all total revenue
+
+export const getAllTotalSales = async ({ fromDate, toDate }) => {
+
+    let totalSales = db("user_orders")
+        .where({ ord_order_status: 5 })
+    if (fromDate && toDate) {
+        
+        totalSales.whereBetween('created_at', [fromDate.toString() , toDate.toString()])
+    }
+
+
+    totalSales.sum("ord_grand_total as totalSales")
+
+    console.log(totalSales.toString())
+
+    return await totalSales || 0;
+
+}
+
+// get sales bar chart
+
+export const getSalesBarChart = async () => {
+    // Initialize an object to store sales data for each day of the week
+    const salesData = {
+        Sunday: 0,
+        Monday: 0,
+        Tuesday: 0,
+        Wednesday: 0,
+        Thursday: 0,
+        Friday: 0,
+        Saturday: 0
+    };
+
+    try {
+        // Calculate the start and end dates for the last week
+        const endDate = dayjs().subtract(1, 'week').endOf('week').format('YYYY-MM-DD');
+        const startDate = dayjs().subtract(1, 'week').startOf('week').format('YYYY-MM-DD');
+
+        // Query the database for sales data for each day of the last week
+        for (let day in salesData) {
+            const totalSales = await db("user_orders")
+                .where({ ord_order_status: 5 })
+                .whereRaw(`DATE_TRUNC('day', created_at) = '${startDate}'::date`)
+                .sum("ord_grand_total as totalSales")
+                .first();
+
+            // Store the total sales for the day in the salesData object
+            salesData[day] = totalSales.totalSales || 0;
+
+            // Move to the next day
+            startDate = dayjs(startDate).add(1, 'day').format('YYYY-MM-DD');
+        }
+
+        return salesData;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
