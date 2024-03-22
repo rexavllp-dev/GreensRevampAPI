@@ -67,51 +67,52 @@ export const createBanner = async (req, res) => {
 
 // update a banner
 export const updateBanner = async (req, res) => {
-    const bannerData = req.body;
-    const bannerId = req.params.bannerId;
-    const file = req.files.file;
 
+   
+    
+    const bannerData = req.body;
+    const bannerId   = req.params.bannerId;
+   
     try {
 
-        if (!file) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: "Image file is required for creating a banner."
-            });
-        };
+        if (req.files) {
+            const file       = req.files.banner_image;
+            const uploadParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `banners/${file.name}`, // Adjust the key/path as needed
+                Body: file?.data,
+                ContentType: file.mimetype,
+            };
+    
+            const s3Data = await s3.upload(uploadParams).promise();
+    
+            const imageUrl = s3Data.Location;
+    
+    
+            if (bannerData.banner_order) {
+                bannerData.banner_order = parseInt(bannerData.banner_order);
+            }
+    
+            // Add the image URL to the banner data
+            bannerData.banner_image = imageUrl;
 
-        const uploadParams = {
-            Bucket: process.env.S3_BUCKET_NAME,
-            Key: `banners/${file.name}`, // Adjust the key/path as needed
-            Body: file?.data,
-            ContentType: file.mimetype,
-        };
 
-        const s3Data = await s3.upload(uploadParams).promise();
-
-        const imageUrl = s3Data.Location;
-
-
-        if (bannerData.banner_order) {
-            bannerData.banner_order = parseInt(bannerData.banner_order);
         }
 
-        // Add the image URL to the banner data
-        bannerData.banner_image = imageUrl;
+       
 
         const newBanner = await updateABanner(bannerId, bannerData);
 
-        res.status(200).json({
+        return res.status(200).json({
             status: 200,
             success: true,
-            message: "Banner created successfully",
+            message: "Banner updated successfully",
             result: newBanner
         });
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             status: 500,
             success: false,
             message: "Failed to create banner",
