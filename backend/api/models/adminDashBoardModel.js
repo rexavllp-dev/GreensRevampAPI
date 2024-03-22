@@ -3,15 +3,56 @@ import db from "../../config/dbConfig.js";
 
 
 // get total orders
-export const getsAllTotalOrders = async () => {
-    const totalOrders = await db("user_orders")
+export const getsAllTotalOrders = async (filter) => {
+
+    console.log("filter", filter);
+
+    const currentDate = new Date();
+
+
+    let query = db("user_orders")
 
         .select(
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 1 THEN 1 END) as pending_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 5 THEN 1 END) as completed_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 6 THEN 1 END) as canceled_count")
         )
-        .first();
+
+
+    // filter
+
+    if (filter === 'today') {
+
+        const currentDayStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()); // Start of the current day
+        const currentDayEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1); // End of the current day
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at < ?', [currentDayStartDate.toISOString(), currentDayEndDate.toISOString()]);
+
+    } else if (filter === 'weekly') {
+
+        const lastWeekStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 7);
+        const lastWeekEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 1);
+
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at <= ?', [lastWeekStartDate.toISOString(), lastWeekEndDate.toISOString()]);
+
+    } else if (filter === 'monthly') {
+
+        const currentMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // Start of the current month
+        const nextMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1); // Start of the next month
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at < ?', [currentMonthStartDate.toISOString(), nextMonthStartDate.toISOString()]);
+
+    } else if (filter === 'yearly') {
+
+        const currentYearStartDate = new Date(currentDate.getFullYear(), 0, 1); // Start of the current year
+        const currentYearEndDate = new Date(currentDate.getFullYear(), 11, 31); // End of the current year
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at <= ?', [currentYearStartDate.toISOString(), currentYearEndDate.toISOString()]);
+    }
+
+    const totalOrders = await query.first();
+
 
     return totalOrders;
 };
@@ -24,7 +65,7 @@ export const getsAllRecentOrders = async () => {
         .leftJoin("order_statuses", "user_orders.ord_order_status", "order_statuses.id")
 
         .select(
-
+            "user_orders.id",
             "user_orders.id as orderId",
             "user_orders.ord_order_status as orderStatus",
             "user_orders.ord_customer_name",
@@ -47,7 +88,7 @@ export const getsAllRecentOrders = async () => {
 
     return {
 
-        orders,
+        data: orders,
         totalCount: totalRecentOrders.totalCount
 
     };
@@ -58,13 +99,19 @@ export const getsAllRecentOrders = async () => {
 export const getsLatestCancelledOrders = async () => {
 
     const canceledOrders = await db("cancel_orders")
-
-
-
         .select('*')
         .orderBy("cancel_orders.created_at", "desc");
 
-    return canceledOrders;
+
+    const totalCanceledOrders = await db("return_products")
+        .count("* as totalCount")
+        .first();
+
+    return {
+        canceledOrders,
+        totalCount: totalCanceledOrders.totalCount
+
+    };
 
 };
 
@@ -80,7 +127,7 @@ export const getsLatestReturnedOrders = async () => {
 
         .select(
 
-
+            "return_products.id",
             "return_products.id as returnId",
             "return_products.reason_id as returnReasonId",
             "return_products.created_at as returnDate",
@@ -108,7 +155,7 @@ export const getsLatestReturnedOrders = async () => {
 
     return {
 
-        returnedOrders,
+        data: returnedOrders,
         totalCount: totalReturnedOrders.totalCount
 
     };
@@ -130,7 +177,7 @@ export const getsAllLatestReplacementOrders = async () => {
 
         .select(
 
-
+            "replace_products.id",
             "replace_products.id as replacementId",
             "replace_products.reason_id as replacementReasonId",
             "replace_products.created_at as replacementDate",
@@ -159,7 +206,7 @@ export const getsAllLatestReplacementOrders = async () => {
 
     return {
 
-        replacementOrders,
+        data: replacementOrders,
         totalCount: totalReplacementOrders.totalCount
 
     };
@@ -175,6 +222,7 @@ export const getsAllOutOfStockProducts = async () => {
         .leftJoin("products", "product_inventory.product_id", "products.id")
 
         .select(
+            "products.id",
             "products.id as productId",
             "product_inventory.stock_availability as stockAvailability",
 
@@ -192,7 +240,7 @@ export const getsAllOutOfStockProducts = async () => {
 
     return {
 
-        outOfStockProducts,
+        data: outOfStockProducts,
         totalCount: totalOutOfStock.totalCount
 
     };
@@ -211,7 +259,7 @@ export const getsAllExpiredProducts = async () => {
         .andWhere('products.show_expiry_on_dashboard', '=', true)
 
         .select(
-
+            "products.id",
             "products.id as productId",
             "products.prd_name",
             "products.prd_expiry_date as expiryDate",
@@ -229,7 +277,7 @@ export const getsAllExpiredProducts = async () => {
 
     return {
 
-        expiredProducts,
+        data: expiredProducts,
         totalCount: totalExpiredProducts.totalCount
     };
 };
@@ -247,7 +295,7 @@ export const getsAllProductsMinQty = async () => {
 
         .select(
 
-
+            "products.id",
             "product_inventory.id as inventoryId",
             "product_inventory.min_qty as minQty",
             "product_inventory.product_quantity as remainingStock",
@@ -273,7 +321,7 @@ export const getsAllProductsMinQty = async () => {
 
     return {
 
-        products,
+        data: products,
         totalCount: totalProductsMinQty.totalCount
 
     };
@@ -292,6 +340,7 @@ export const getsAllExpiredTradeLicenses = async () => {
         .where("company.company_trade_license_expiry", "<", currentDate)
 
         .select(
+            "company.id",
             "company.id as companyId",
             "company.company_name",
             "company.company_trade_license_expiry as expiryDate",
@@ -307,7 +356,7 @@ export const getsAllExpiredTradeLicenses = async () => {
 
     return {
 
-        expiredLicense,
+        data: expiredLicense,
         totalCount: totalExpiredLicense.totalCount
 
     };
@@ -321,8 +370,8 @@ export const getAllTotalSales = async ({ fromDate, toDate }) => {
     let totalSales = db("user_orders")
         .where({ ord_order_status: 5 })
     if (fromDate && toDate) {
-        
-        totalSales.whereBetween('created_at', [fromDate.toString() , toDate.toString()])
+
+        totalSales.whereBetween('created_at', [fromDate.toString(), toDate.toString()])
     }
 
 
@@ -374,3 +423,34 @@ export const getSalesBarChart = async () => {
         throw error;
     }
 };
+
+
+
+
+export const getsAllCompanyPendingApproval = async () => {
+
+    const users = await db("users")
+
+
+        .leftJoin("company", "users.usr_company", "company.id")
+        .leftJoin('user_approval_status', 'users.usr_approval_id', 'user_approval_status.id')
+        .where('user_approval_status.status_name', 'Pending Approval')
+        .select(
+
+            'users.usr_firstname',
+            'users.usr_lastname',
+            'users.usr_email',
+
+            'company.company_name',
+            'company.created_at',
+
+            'user_approval_status.status_name as approval_status'
+
+        )
+        .orderBy('company.created_at', 'desc');
+
+
+    return users;
+
+};
+

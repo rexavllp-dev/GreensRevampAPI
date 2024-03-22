@@ -1,7 +1,7 @@
-import { getAllTotalSales, getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
+import { getAllTotalSales, getsAllCompanyPendingApproval, getsAllExpiredProducts, getsAllExpiredTradeLicenses, getsAllLatestReplacementOrders, getsAllOutOfStockProducts, getsAllProductsMinQty, getsAllRecentOrders, getsAllTotalOrders, getsLatestCancelledOrders, getsLatestReturnedOrders } from "../models/adminDashBoardModel.js";
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import  timezone  from 'dayjs/plugin/timezone.js';
+import timezone from 'dayjs/plugin/timezone.js';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -10,9 +10,13 @@ dayjs.extend(timezone);
 
 export const getAllTotalOrders = async (req, res) => {
 
+   
+
     try {
 
-        const totalOrders = await getsAllTotalOrders();
+        const { filter } = req.query;
+
+        const totalOrders = await getsAllTotalOrders(filter);
 
         res.status(200).json({
             status: 200,
@@ -272,12 +276,14 @@ export const getAllTotalSalesAmount = async (req, res) => {
     // toDate = dayjs.utc(toDate).utc(true).format();
     let filterBy = req.query.filterBy;
 
-    let uatOfferStartDate = new Date(fromDate);
+    console.log(req.query)
 
-    uatOfferStartDate = uatOfferStartDate.toISOString().split('T')[0];
-    let uatOfferEndDate = new Date(toDate);
+    // let uatOfferStartDate = new Date(fromDate);
 
-    uatOfferEndDate = uatOfferEndDate.toISOString().split('T')[0];
+    // uatOfferStartDate = uatOfferStartDate.toISOString().split('T')[0];
+    // let uatOfferEndDate = new Date(toDate);
+
+    // uatOfferEndDate = uatOfferEndDate.toISOString().split('T')[0];
 
     // fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
     // toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
@@ -289,7 +295,8 @@ export const getAllTotalSalesAmount = async (req, res) => {
 
     if (filterBy === "week") {
         fromDate = dayjs().subtract(7, 'days').utcOffset('+05:30').format(); // Convert fromDate to IST
-        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST    
+        toDate = dayjs().utcOffset('+05:30').format(); // Convert toDate to IST
+        console.log("fromDate", fromDate, "toDate", toDate);    
     }
 
     if (filterBy === "month") {
@@ -305,30 +312,27 @@ export const getAllTotalSalesAmount = async (req, res) => {
     if (filterBy === "custom") {
 
         console.log(filterBy);
-        // fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
-        // toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
+        fromDate = dayjs(fromDate).utcOffset('+05:30').format(); // Convert fromDate to IST
+        toDate = dayjs(toDate).utcOffset('+05:30').format(); // Convert toDate to IST
 
-        uatOfferStartDate= fromDate;
-        uatOfferEndDate= toDate;
+        // uatOfferStartDate= fromDate;
+        // uatOfferEndDate= toDate;
         // fromDate = '2024-03-13'
         // toDate = '2024-03-19'
     }
 
-   
+
 
     // get total sales and  date filter
     if (filterBy === "all") {
-        fromDate = null 
-        toDate = null 
+        fromDate = null
+        toDate = null
     }
-
-
-    console.log(fromDate, toDate);
 
 
     try {
 
-        
+
         const totalSales = await getAllTotalSales({
 
             fromDate,
@@ -362,7 +366,7 @@ export const getAllTotalSalesAmount = async (req, res) => {
 // sales bar chart
 
 export const getSalesBarChartData = async (req, res) => {
-    
+
 
     try {
 
@@ -384,8 +388,84 @@ export const getSalesBarChartData = async (req, res) => {
             message: "Failed to fetch sales bar chart data",
         });
     }
-}
+};
 
+
+
+
+export const getAllTotalCounts = async (req, res) => {
+
+    try {
+
+        // const totalOrders = await getsAllTotalOrders();
+        const totalRecentOrders = await getsAllRecentOrders();
+        const totalCanceledOrders = await getsLatestCancelledOrders();
+        const totalReturnedOrders = await getsLatestReturnedOrders();
+        const totalReplacementOrders = await getsAllLatestReplacementOrders();
+        const totalOutOfStockProducts = await getsAllOutOfStockProducts();
+        const totalExpiredProducts = await getsAllExpiredProducts();
+        const totalProductsMinQty = await getsAllProductsMinQty();
+        const totalExpiredTradeLicenses = await getsAllExpiredTradeLicenses();
+
+
+
+        const totalCounts = {
+            // totalOrders: totalOrders.pending_count + totalOrders.completed_count + totalOrders.canceled_count,
+            totalRecentOrders: totalRecentOrders.totalCount,
+            totalCanceledOrders: totalCanceledOrders.totalCount,
+            totalReturnedOrders: totalReturnedOrders.totalCount,
+            totalReplacementOrders: totalReplacementOrders.totalCount,
+            totalOutOfStockProducts: totalOutOfStockProducts.totalCount,
+            totalExpiredProducts: totalExpiredProducts.totalCount,
+            totalProductsMinQty: totalProductsMinQty.totalCount,
+            totalExpiredTradeLicenses: totalExpiredTradeLicenses.totalCount
+        };
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Total counts fetched successfully",
+            result: totalCounts
+        });
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch total counts",
+            error: error
+        });
+    }
+};
+
+
+
+export const getAllCompanyPendingApprovals = async (req, res) => {
+
+    try {
+
+        const companyPendingApprovals = await getsAllCompanyPendingApproval();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Company pending approvals fetched successfully",
+            result: companyPendingApprovals
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch company pending approvals",
+            error: error
+        });
+    }
+};
 
 
 
