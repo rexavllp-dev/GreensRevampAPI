@@ -39,7 +39,7 @@ export const updateReviewByUser = async (reviewId, reviewData) => {
 
 
 // get all user reviews by userId
-export const getsAllReviewsByUserId = async ( userId, sortBy, page, perPage ) => {
+export const getsAllReviewsByUserId = async (userId, sortBy, page, perPage) => {
 
     let reviews = db('products')
 
@@ -109,7 +109,7 @@ export const getsAllReviewsByUserId = async ( userId, sortBy, page, perPage ) =>
 
 
     return review;
-    
+
 };
 
 
@@ -118,39 +118,29 @@ export const getUserPurchases = async (userId, productId) => {
     console.log(userId, productId);
 
     const userOrders = await db('user_orders')
-        .select('user_orders.id')
-        .where('user_orders.customer_id', userId);
+        .select('user_orders.*')
+        .leftJoin('order_items', 'user_orders.id', 'order_items.order_id') // Joining order_items with user_orders
+        .where('user_orders.customer_id', userId)
+        .andWhere('order_items.product_id', productId); // Filtering based on product_id
 
-
-    const orderIds = userOrders.map(order => order.id);
-
-
-    const orderItems = await db('order_items')
-        .select('order_items.product_id')
-        .whereIn('order_items.order_id', orderIds);
-
-    // Extract the product IDs
-    const productIds = orderItems.map(item => item.product_id);
-
-
-    // Check if the specified product is among the user's purchased products
-    const hasPurchasedProduct = productIds.includes(productId);
-
-    return hasPurchasedProduct;
-
+    if (userOrders.length > 0) {
+        return true;
+    } else {
+        return false;
+    }
 };
 
 // get all reviews
 
 export const getsAllReviewsByProductId = async (productId) => {
-    const reviews = await db('products')
+    const reviews = await db('product_reviews')
 
-        .leftJoin('product_reviews', 'products.id', 'product_reviews.product_id')
+        .leftJoin('products', 'product_reviews.product_id', 'products.id')
         .leftJoin('review_gallery', 'product_reviews.id', 'review_gallery.review_id')
         .leftJoin('users', 'product_reviews.user_id', 'users.id')
         .leftJoin('review_likes_dislikes', 'product_reviews.id', 'review_likes_dislikes.review_id')
 
-        .where({ 'products.id': productId })
+        .where({ 'product_reviews.product_id': productId })
         .where({ 'product_reviews.is_approved': true })
         .select(
 
@@ -159,6 +149,7 @@ export const getsAllReviewsByProductId = async (productId) => {
 
             'product_reviews.review',
             'product_reviews.rating',
+            'product_reviews.heading_review',
             'product_reviews.created_at',
 
             db.raw('COUNT(CASE WHEN review_likes_dislikes.action = \'like\' THEN 1 ELSE NULL END) AS likes'),
@@ -170,6 +161,7 @@ export const getsAllReviewsByProductId = async (productId) => {
         )
 
         .groupBy(
+
             'product_reviews.id',
 
             'users.usr_firstname',
@@ -177,6 +169,7 @@ export const getsAllReviewsByProductId = async (productId) => {
 
             'product_reviews.review',
             'product_reviews.rating',
+            'product_reviews.heading_review',
             'product_reviews.created_at'
         );
 
@@ -282,7 +275,6 @@ export const likeOrDislikeReview = async (userId, reviewId, action) => {
 
     return actions
 };
- 
 
 
- 
+

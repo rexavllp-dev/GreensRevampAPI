@@ -17,11 +17,13 @@ const s3 = new aws.S3(awsConfig);
 // user reviews controller
 export const addProductReview = async (req, res) => {
 
-    const reviewData = req.body;
-    const userId = req.user.userId;
-    let files = req.files?.files;
-
     try {
+        const userId = req.user.userId;
+        let files = req.files?.files;
+        const reviewData = JSON.parse(req.body?.data);
+    
+        console.log(files);
+        console.log(reviewData)
 
 
         if (!files?.length) {
@@ -36,9 +38,9 @@ export const addProductReview = async (req, res) => {
         const productId = parseInt(reviewData.product_id);
 
 
-        const userPurchases = await getUserPurchases(1, productId);
+        const userPurchases = await getUserPurchases(userId, productId);
 
-        if (!userPurchases || userPurchases.length === 0) {
+        if (!userPurchases) {
             return res.status(403).json({
                 status: 403,
                 success: false,
