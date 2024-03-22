@@ -12,8 +12,8 @@ export const createRecipe = async (req, res) => {
 
     try {
 
-         // Check if there's a file attached
-         if (!file) {
+        // Check if there's a file attached
+        if (!file) {
             return res.status(400).json({
                 status: 400,
                 success: false,
@@ -22,7 +22,7 @@ export const createRecipe = async (req, res) => {
         };
 
         const imageUrl = await uploadAndResizeImage(file);
-        
+
         data.recipe_image = imageUrl;
 
         const newRecipe = await createARecipe(data);

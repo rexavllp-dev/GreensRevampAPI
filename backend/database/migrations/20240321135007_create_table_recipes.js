@@ -8,7 +8,6 @@ export const up = async (knex) => {
 
         table.increments('recipe_id').primary();
         table.string('recipe_name')
-        table.integer('product_id').unsigned().references('id').inTable('products');
         table.text('recipe_description');
         table.boolean('recipe_status');
         table.string('recipe_image');
