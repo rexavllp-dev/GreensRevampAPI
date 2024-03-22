@@ -39,7 +39,7 @@ export const updateReviewByUser = async (reviewId, reviewData) => {
 
 
 // get all user reviews by userId
-export const getsAllReviewsByUserId = async ( userId, sortBy, page, perPage ) => {
+export const getsAllReviewsByUserId = async (userId, sortBy, page, perPage) => {
 
     let reviews = db('products')
 
@@ -109,7 +109,7 @@ export const getsAllReviewsByUserId = async ( userId, sortBy, page, perPage ) =>
 
 
     return review;
-    
+
 };
 
 
@@ -118,26 +118,16 @@ export const getUserPurchases = async (userId, productId) => {
     console.log(userId, productId);
 
     const userOrders = await db('user_orders')
-        .select('user_orders.id')
-        .where('user_orders.customer_id', userId);
+        .select('user_orders.*')
+        .leftJoin('order_items', 'user_orders.id', 'order_items.order_id') // Joining order_items with user_orders
+        .where('user_orders.customer_id', userId)
+        .andWhere('order_items.product_id', productId); // Filtering based on product_id
 
-
-    const orderIds = userOrders.map(order => order.id);
-
-
-    const orderItems = await db('order_items')
-        .select('order_items.product_id')
-        .whereIn('order_items.order_id', orderIds);
-
-    // Extract the product IDs
-    const productIds = orderItems.map(item => item.product_id);
-
-
-    // Check if the specified product is among the user's purchased products
-    const hasPurchasedProduct = productIds.includes(productId);
-
-    return hasPurchasedProduct;
-
+    if (userOrders.length > 0) {
+        return true;
+    } else {
+        return false;
+    }
 };
 
 // get all reviews
@@ -282,7 +272,6 @@ export const likeOrDislikeReview = async (userId, reviewId, action) => {
 
     return actions
 };
- 
 
 
- 
+
