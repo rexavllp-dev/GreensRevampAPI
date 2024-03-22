@@ -837,6 +837,7 @@ export const getsAllRecommendedProducts = async (userId, search) => {
         )
 
         .distinct('products.id')
+        
         .groupBy(
             'products.id',
             'brands.id',
