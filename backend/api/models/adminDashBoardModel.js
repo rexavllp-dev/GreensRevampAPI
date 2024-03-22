@@ -3,15 +3,56 @@ import db from "../../config/dbConfig.js";
 
 
 // get total orders
-export const getsAllTotalOrders = async () => {
-    const totalOrders = await db("user_orders")
+export const getsAllTotalOrders = async (filter) => {
+
+    console.log("filter", filter);
+
+    const currentDate = new Date();
+
+
+    let query = db("user_orders")
 
         .select(
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 1 THEN 1 END) as pending_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 5 THEN 1 END) as completed_count"),
             db.raw("COUNT(CASE WHEN user_orders.ord_order_status = 6 THEN 1 END) as canceled_count")
         )
-        .first();
+
+
+    // filter
+
+    if (filter === 'today') {
+
+        const currentDayStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()); // Start of the current day
+        const currentDayEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1); // End of the current day
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at < ?', [currentDayStartDate.toISOString(), currentDayEndDate.toISOString()]);
+
+    } else if (filter === 'weekly') {
+
+        const lastWeekStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 7);
+        const lastWeekEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 1);
+
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at <= ?', [lastWeekStartDate.toISOString(), lastWeekEndDate.toISOString()]);
+
+    } else if (filter === 'monthly') {
+
+        const currentMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // Start of the current month
+        const nextMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1); // Start of the next month
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at < ?', [currentMonthStartDate.toISOString(), nextMonthStartDate.toISOString()]);
+
+    } else if (filter === 'yearly') {
+
+        const currentYearStartDate = new Date(currentDate.getFullYear(), 0, 1); // Start of the current year
+        const currentYearEndDate = new Date(currentDate.getFullYear(), 11, 31); // End of the current year
+
+        query.whereRaw('user_orders.created_at >= ? AND user_orders.created_at <= ?', [currentYearStartDate.toISOString(), currentYearEndDate.toISOString()]);
+    }
+
+    const totalOrders = await query.first();
+
 
     return totalOrders;
 };

@@ -5,6 +5,7 @@ import { createProductOption } from "../models/productOptionModel.js";
 // create option
 export const createNewOption = async (req, res) => {
   try {
+    
     let data = { option_name: req.body.option_name };
     const newOption = await createOption(data);
 

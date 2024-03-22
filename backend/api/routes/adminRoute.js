@@ -24,6 +24,7 @@ import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo
 import { addDiscount } from '../controllers/adminDiscountController.js';
 import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
 import { createRole, getAllRoles, updateRole } from '../controllers/userRolesController.js';
+import { createRecipe } from '../controllers/recipeController.js';
 
 
 const router = express.Router();
@@ -140,7 +141,7 @@ router.delete('/feeds/delete_feed/:feedId', deleteFeed);
 // create a feed
 router.post('/ads/create_ads', createAds);
 
-// update feed
+// update ads
 router.put('/ads/update_ads/:adsId', updateAds);
 
 // get a single feed
@@ -392,6 +393,12 @@ router.put('/roles/update_role/:roleId', updateRole);
 
 // get all roles
 router.get('/roles/get_all_roles', getAllRoles);
+
+
+// Admin Recipes API ROUTES
+
+// create recipe
+router.post('/recipes/create_recipe', createRecipe);
 
 
 
