@@ -3,9 +3,12 @@ import { addRelatedProduct, deleteARelatedProduct, getAllRelatedProducts, getPro
 // creates related products
 
 export const createRelatedProduct = async (req, res) => {
+
     const { product_id } = req.params;
     const { relatedProductData } = req.body;
-    console.log(relatedProductData)
+
+    // console.log(relatedProductData)
+
     try {
 
         if (!relatedProductData) {

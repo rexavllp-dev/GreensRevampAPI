@@ -1,4 +1,5 @@
 import { createARecipe, deleteARecipe, getARecipe, getsAllRecipes, updateARecipe } from "../models/recipeModel.js";
+import { createARecipeProducts } from "../models/recipeProductsModel.js";
 import uploadAndResizeImage from "../utils/uploadImage.js";
 
 
@@ -6,9 +7,13 @@ import uploadAndResizeImage from "../utils/uploadImage.js";
 
 export const createRecipe = async (req, res) => {
 
-    const data = req.body;
+    let { recipe_name, recipe_description, recipe_status } = req.body;
+    const productIds = req.body.productIds;
+    console.log( productIds);
     const file = req.files;
     console.log(file);
+
+
 
     try {
 
@@ -23,9 +28,27 @@ export const createRecipe = async (req, res) => {
 
         const imageUrl = await uploadAndResizeImage(file);
 
-        data.recipe_image = imageUrl;
+        const recipeData = {
+            recipe_name,
+            recipe_description,
+            recipe_status,
+            recipe_image: imageUrl
+        };
 
-        const newRecipe = await createARecipe(data);
+        const newRecipe = await createARecipe(recipeData);
+
+        let recipeId = newRecipe[0].recipe_id;
+        recipeId = parseInt(recipeId);
+
+        if (!Array.isArray(productIds)) {
+            throw new Error("productIds must be an array");
+        }
+
+      
+        
+         for (const productId of productIds) {
+            await createARecipeProducts(recipeId, productId);
+        };
 
         res.status(200).json({
             status: 200,
