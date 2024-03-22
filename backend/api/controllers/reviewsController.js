@@ -36,7 +36,7 @@ export const addProductReview = async (req, res) => {
         const productId = parseInt(reviewData.product_id);
 
 
-        const userPurchases = await getUserPurchases(1, productId);
+        const userPurchases = await getUserPurchases(userId, productId);
 
         if (!userPurchases || userPurchases.length === 0) {
             return res.status(403).json({

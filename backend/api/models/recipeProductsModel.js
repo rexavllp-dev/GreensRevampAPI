@@ -3,9 +3,6 @@ import db from '../../config/dbConfig.js';
 
 export const createARecipeProducts = async (recipeId, productId) => {
 
-    recipeId = parseInt(recipeId);
-    productId = parseInt(productId);
-
     const recipeProduct = await db("recipe_products")
         .insert({
 

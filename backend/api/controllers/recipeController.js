@@ -6,17 +6,12 @@ import uploadAndResizeImage from "../utils/uploadImage.js";
 
 
 export const createRecipe = async (req, res) => {
-
     let { recipe_name, recipe_description, recipe_status } = req.body;
-    const productIds = req.body.productIds;
-    console.log( productIds);
+    const productIds = JSON.parse(req.body.productIds); 
     const file = req.files;
     console.log(file);
 
-
-
     try {
-
         // Check if there's a file attached
         if (!file) {
             return res.status(400).json({
@@ -44,9 +39,7 @@ export const createRecipe = async (req, res) => {
             throw new Error("productIds must be an array");
         }
 
-      
-        
-         for (const productId of productIds) {
+        for (const productId of productIds) {
             await createARecipeProducts(recipeId, productId);
         };
 
@@ -66,7 +59,6 @@ export const createRecipe = async (req, res) => {
             error: error
         });
     }
-
 };
 
 
