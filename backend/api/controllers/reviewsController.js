@@ -28,7 +28,7 @@ export const addProductReview = async (req, res) => {
 
 
         if (!files?.length) {
-            files = [];
+            files = [files];
         }
 
         let reviewImages = [];

@@ -3,11 +3,11 @@ import db from '../../config/dbConfig.js';
 import { getPrdPrice } from './productPriceModel.js';
 
 // create notify product
-export const createNotifyProduct = async (userId,notifyProductData) => {
+export const createNotifyProduct = async (userId, notifyProductData) => {
     const newNotifyProduct = await db("notify_products")
-    .insert({
-          user_id: userId,
-          ...notifyProductData
+        .insert({
+            user_id: userId,
+            ...notifyProductData
         })
         .returning("*");
     return newNotifyProduct;
@@ -29,6 +29,7 @@ export const getNotifyProducts = async (userId, productId) => {
 export const getAllNotifyProducts = async (userId) => {
 
     try {
+
         const allNotifyProducts = await db("notify_products")
             .leftJoin('products', 'notify_products.product_id', 'products.id')
             .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
@@ -39,9 +40,19 @@ export const getAllNotifyProducts = async (userId) => {
             .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
             .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
             .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+            .leftJoin('wishlist', function () {
+                if (userId != undefined) {
+                    this.on('notify_products.product_id', '=', 'wishlist.product_id')
+                        .andOn('notify_products.user_id', '=', userId);
+                } else {
+                    this.on('notify_products.product_id', '=', 'wishlist.product_id')
+                        .andOnNull('notify_products.user_id');
+                }
+            })
             .crossJoin('vat')
             .where('notify_products.user_id', userId)
             .whereNot('notify_products.product_id', null)
+
             .select(
                 'products.*',
                 'products.id as product_id',
@@ -49,6 +60,8 @@ export const getAllNotifyProducts = async (userId) => {
                 'brands.id as brand_id',
                 'notify_products.*',
                 'notify_products.id as notifyProductsId',
+                'wishlist.*',
+                'wishlist.id as wishlistId',
                 'categories.*',
                 "categories.id as category_id",
                 "products_price.*",
@@ -61,6 +74,7 @@ export const getAllNotifyProducts = async (userId) => {
                 "product_badge.id as product_badge_id",
                 "product_category.*",
                 "product_category.id as product_category_id",
+
                 db.raw(`
             CASE 
                 WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
@@ -93,6 +107,7 @@ export const getAllNotifyProducts = async (userId) => {
                 'product_badge.id',
                 'product_category.id',
                 'notify_products.id',
+                'wishlist.id',
                 'vat.id'
             );
 
@@ -121,3 +136,22 @@ export const removeNotifyProduct = async (notifyProductId) => {
     return removedNotifyProduct;
 }
 
+
+
+export const getUsersSubscribedToProduct = async (productId) => {
+    const users = await db("notify_products")
+        .leftJoin('users', 'users.id', 'notify_products.user_id')
+        .leftJoin('products', 'products.id', 'notify_products.product_id')
+
+        .where({ 'notify_products.product_id': productId })
+        .select(
+
+            "users.*",
+            'users.id as userId',
+            'products.*',
+            'products.id as productId',
+            
+            )
+
+    return users;
+};
