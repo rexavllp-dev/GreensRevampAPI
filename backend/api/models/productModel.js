@@ -601,6 +601,7 @@ export const saveImageUrl = async (productId, imageUrl) => {
 
 
 export const fetchAllOptionProducts = async (page, per_page, search, filters, sort) => {
+
     let query = db('products')
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
@@ -837,7 +838,7 @@ export const getsAllRecommendedProducts = async (userId, search) => {
         )
 
         .distinct('products.id')
-        
+
         .groupBy(
             'products.id',
             'brands.id',
@@ -912,6 +913,135 @@ export const getsAllRecommendedProducts = async (userId, search) => {
 
     };
 
+};
+
+
+
+export const getsAllTopTrendingProducts = async () => {
+
+    const topTrendingProducts = await db('order_items')
+        .select(
+
+            'products.*',
+            'products.id as productId',
+            'products.created_at as product_created_at',
+            'products.updated_at as product_updated_at',
+            'brands.*',
+            'brands.id as brandId',
+            'brands.updated_at as brand_updated_at',
+            'brands.created_at as brand_created_at',
+            'categories.*',
+            "categories.id as categoryId",
+            'categories.updated_at as category_updated_at',
+            'categories.created_at as category_created_at',
+
+            // "wishlist.*",
+            // "wishlist.id as wishlist_id",
+            // "wishlist.created_at as wishlist_created_at",
+            // "wishlist.updated_at as wishlist_updated_at",
+
+            "products_price.*",
+            "products_price.id as productPriceId",
+            'products_price.created_at as product_price_created_at',
+            'products_price.updated_at as product_price_updated_at',
+
+            "product_inventory.*",
+            "product_inventory.id as productInventoryId",
+            'product_inventory.created_at as product_inventory_created_at',
+            'product_inventory.updated_at as product_inventory_updated_at',
+            "product_inventory.id as product_inventory_id",
+
+            "product_seo.*",
+            "product_seo.id as productSeoId",
+            "product_seo.created_at as product_seo_created_at",
+            "product_seo.updated_at as product_seo_updated_at",
+
+            "product_badge.*",
+            "product_badge.id as productBadgeId",
+
+            "product_category.*",
+            "product_category.id as productCategoryId",
+            "product_category.created_at as product_category_created_at",
+            "product_category.updated_at as product_category_updated_at",
+            "vat.*",
+            "vat.id as vat_id",
+
+
+
+
+            db.raw(`
+        CASE 
+            WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+            WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                CASE 
+                    WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                    WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                    ELSE 0
+                END
+            ELSE products_price.product_price * (1 + vat.vat / 100)
+        END AS compute_price
+`),
+
+
+            db.raw(`COALESCE(product_inventory.stock_availability, 'Out of stock') as stock_availability`),
+
+
+
+
+            db.raw(`jsonb_agg(distinct jsonb_build_object('id', product_gallery.id, 'url', product_gallery.url)) AS productImages`),
+
+
+            db.raw(`
+        jsonb_agg( distinct
+            jsonb_build_object(
+                'productOptionId', product_options.id,
+                'optionId', product_options.option_id,
+                'optionLabel', product_options.option_label
+            )
+        ) as productOptions
+    `),
+
+
+
+            db.raw('count(*) as total_orders'
+
+
+            ))
+
+        .leftJoin('products', 'order_items.product_id', 'products.id')
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_options', 'products.id', 'product_options.product_id')
+        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .crossJoin('vat')
+
+
+        .distinct('products.id')
+
+        .groupBy(
+
+            'products.id',
+            'brands.id',
+            'categories.id',
+            // 'wishlist.id',
+            // 'product_options.id',
+            'products_price.id',
+            'product_inventory.id',
+            'product_seo.id',
+            'product_badge.id',
+            'product_category.id',
+            'vat.id'
+
+        )
+        .orderByRaw('total_orders DESC')
+        .limit(10);
+
+    return topTrendingProducts;
 };
 
 

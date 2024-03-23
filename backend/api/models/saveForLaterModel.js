@@ -48,6 +48,15 @@ export const getallSaveForLater = async (userId) => {
             .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
             .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
             .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+            .leftJoin('wishlist', function () {
+                if (userId != undefined) {
+                    this.on('save_for_later.product_id', '=', 'wishlist.product_id')
+                        .andOn('wishlist.user_id', '=', userId);
+                } else {
+                    this.on('save_for_later.product_id', '=', 'wishlist.product_id')
+                        .andOnNull('wishlist.user_id');
+                }
+            })
             .crossJoin('vat')
             .where('save_for_later.user_id', userId)
             .whereNot('save_for_later.product_id', null)
@@ -59,6 +68,10 @@ export const getallSaveForLater = async (userId) => {
                 'products.id as product_id',
                 'brands.*',
                 'brands.id as brand_id',
+                "wishlist.*",
+                "wishlist.id as wishlist_id",
+                "wishlist.created_at as wishlist_created_at",
+                "wishlist.updated_at as wishlist_updated_at",
                 'categories.*',
                 "categories.id as category_id",
                 "products_price.*",
@@ -100,6 +113,7 @@ export const getallSaveForLater = async (userId) => {
                 'categories.id',
                 'products_price.id',
                 'product_inventory.id',
+                'wishlist.id',
                 'product_seo.id',
                 'product_badge.id',
                 'product_category.id',

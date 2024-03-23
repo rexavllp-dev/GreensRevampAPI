@@ -37,8 +37,9 @@ export const getsAllSeasons = async () => {
 export const deleteASeason = async (seasonId) => {
     const season = await db('seasons')
         .where({ season_id: seasonId })
-        .del()
-        .returning('*');
+
+        .del();
+
 
     return season;
 };

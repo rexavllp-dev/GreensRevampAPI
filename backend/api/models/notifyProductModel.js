@@ -39,6 +39,15 @@ export const getAllNotifyProducts = async (userId) => {
             .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
             .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
             .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+            .leftJoin('wishlist', function () {
+                if (userId != undefined) {
+                    this.on('notify_products.product_id', '=', 'wishlist.product_id')
+                        .andOn('notify_products.user_id', '=', userId);
+                } else {
+                    this.on('notify_products.product_id', '=', 'wishlist.product_id')
+                        .andOnNull('notify_products.user_id');
+                }
+            })
             .crossJoin('vat')
             .where('notify_products.user_id', userId)
             .whereNot('notify_products.product_id', null)
@@ -49,6 +58,8 @@ export const getAllNotifyProducts = async (userId) => {
                 'brands.id as brand_id',
                 'notify_products.*',
                 'notify_products.id as notifyProductsId',
+                'wishlist.*',
+                'wishlist.id as wishlistId',
                 'categories.*',
                 "categories.id as category_id",
                 "products_price.*",
@@ -93,6 +104,7 @@ export const getAllNotifyProducts = async (userId) => {
                 'product_badge.id',
                 'product_category.id',
                 'notify_products.id',
+                'wishlist.id',
                 'vat.id'
             );
 

@@ -24,7 +24,8 @@ export const getAHomePageCategory = async (homepageCategoryId) => {
 export const getsAllHomePageCategories = async () => {
 
     const homePageCategories = await db('homepage_category')
-        .select('*')
+    .leftJoin('categories', 'homepage_category.category_id', 'categories.id')
+    .select('*')
 
     return homePageCategories;
 
@@ -36,7 +37,11 @@ export const deleteAHomePageCategory = async (homepageCategoryId) => {
 
     const homePageCategory = await db('homepage_category')
         .where({ homepage_category_id: homepageCategoryId })
-        .del()
+        .del();
+
 
     return homePageCategory;
 };
+
+
+
