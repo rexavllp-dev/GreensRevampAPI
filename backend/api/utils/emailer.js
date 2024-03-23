@@ -322,6 +322,8 @@ export const sendVerificationBulkApproved = async (usr_email, usr_firstname, pro
             <p> Hello, <b> ${usr_firstname} </b></p>
     
             <p>Your bulk order has been approved successfully for product <b>${productName}</b> with quantity <b> ${quantity} </b> with per product price of <b> ${lowestBulkDiscount} </b> </p>
+
+            <p> <b>website link</b> : <a href="https://react.greens-intl.ae/">greensintl.com</a></p>
     
   
           

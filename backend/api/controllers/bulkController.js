@@ -438,18 +438,22 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
         const { newStatus, newQuantity } = req.body;
         console.log(newStatus, newQuantity, bulkId)
 
+        // Check if the bulk order exists
+
+        const bulkExists = await getBulkAboveOrder(bulkId);
+
         // Update the bulk order status and quantity
         const updates = await updateBulkMaxOrderStatusAndQty(bulkId, newStatus, newQuantity);
         const vat = await getVat();
 
 
-        const bulkDiscountPrice = await getBulkDiscountPriceByProductId(productId);
+        const bulkDiscountPrice = await getBulkDiscountPriceByProductId(bulkExists.product_id);
 
 
         let lowestBulkDiscount = Math.min(...bulkDiscountPrice);
 
-        lowestBulkDiscount = lowestBulkDiscount + (lowestBulkDiscount * vat) / 100;
-
+        lowestBulkDiscount = parseFloat(lowestBulkDiscount) + (lowestBulkDiscount * vat.vat) / 100;
+        console.log("bulkDiscountPrice", vat)
 
 
 
