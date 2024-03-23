@@ -54,7 +54,7 @@ export const createABulk = async (req, res) => {
             return res.status(400).json({
                 status: 400,
                 success: false,
-                message: "Discounted price cannot be greater than the product price.",
+                message:"Discounted price cannot be greater than the product price.",
             });
         };
 
@@ -224,6 +224,8 @@ export const getSingleBulk = async (req, res) => {
     try {
         const bulk = await getABulk(bulkId);
 
+         console.log(bulk);
+
         res.status(200).json({
             status: 200,
             success: true,
@@ -246,6 +248,8 @@ export const getSingleBulk = async (req, res) => {
 export const getsAllBulks = async (req, res) => {
     try {
         const allBulks = await getAllBulk();
+
+        console.log(allBulks);
         res.status(200).json({
             status: 200,
             success: true,

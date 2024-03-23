@@ -7,9 +7,38 @@ export const createPrice = async (req, res) => {
 
   try {
     const { prd_status, prd_dashboard_status, ...priceData } = req.body;
+    
     console.log(req.body)
 
+    // check if i gave special price is greater than bulk discount
+
+    const bulkDiscountPrice = await getBulkDiscountPriceByProductId(priceData?.product_id);
+    console.log(bulkDiscountPrice)
+
+    // calculate bulk discount price and product price minus it
+
+    const calculateMaxDiscountPrice = parent(priceData?.product_price) - parseInt(bulkDiscountPrice?.discounted_price) 
+    
+
+
+
+
+    if (bulkDiscountPrice) {
+
+      if (price?.special_price > bulkDiscountPrice?.discounted_price) {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "discount price must be less than bulk discount price",
+        });
+      }
+    }
+
+
+
     const product = await getProductPriceById(priceData?.product_id);
+
+
 
     if (!product) {
 
@@ -87,6 +116,49 @@ export const updatePrice = async (req, res) => {
   console.log(prd_status);
   try {
 
+
+    // check if i gave special price is greater than bulk discount
+
+    const bulkDiscountPrice = await getBulkDiscountPriceByProductId(productId);
+    const productPrice = await getProductPriceById(productId);
+    
+
+    const greatestBulkDiscount = Math.max(...bulkDiscountPrice);
+
+    console.log(greatestBulkDiscount)
+
+    // calculate bulk discount price and product price minus it
+
+    const calculateMaxDiscountPrice = parseInt(productPrice?.product_price) - parseInt(greatestBulkDiscount)
+
+    console.log("this is product price",productPrice?.product_price)
+
+    console.log("this is bulk discount", bulkDiscountPrice)
+
+
+    console.log(calculateMaxDiscountPrice)
+
+
+
+
+    if (bulkDiscountPrice) {
+      console.log("this is bulk discount price", bulkDiscountPrice)
+      console.log("this is product price", productPrice?.product_price)
+      console.log("this is special price", priceData?.special_price)
+      console.log("this is greatestBulkDiscount", greatestBulkDiscount)
+
+      console.log(priceData?.special_price < greatestBulkDiscount)
+
+      if (!(priceData?.special_price < calculateMaxDiscountPrice)) {
+        console.log(priceData?.special_price < greatestBulkDiscount) // Log special price and discounted price
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "discount price must be less than bulk discount price",
+        });
+      }
+    }
+
     const product = await getProductPriceById(productId);
     const productComputedPrice = await getPriceByProductIdAndCalculate(productId);
     console.log("product computed  data", productComputedPrice);
@@ -105,22 +177,23 @@ export const updatePrice = async (req, res) => {
 
 
     // Format the computed price to two decimal places
-    const computedPrice = parseFloat(productComputedPrice.computed_price).toFixed(2);
+    // const computedPrice = parseFloat(productComputedPrice.computed_price).toFixed(2);
 
   
-    // Find the maximum discounted price
-    const maxDiscountedPrice = Math.max(...bulkDiscountedPrices);
-    console.log("max discounted price", maxDiscountedPrice);
+    // // Find the maximum discounted price
+    // const maxDiscountedPrice = Math.max(...bulkDiscountedPrices);
+    // console.log("max discounted price", maxDiscountedPrice);
 
-    // Check if discounted price is greater than product price
-    if (computedPrice <= maxDiscountedPrice) {
+    // // Check if discounted price is greater than product price
+    // if (computedPrice <= maxDiscountedPrice) {
+    //   console.log("checking_prices", computedPrice, maxDiscountedPrice);
 
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: "Discounted price cannot be less than or equal to the product price.",
-      });
-    };
+    //   return res.status(400).json({
+    //     status: 400,
+    //     success: false,
+    //     message: "Discounted price cannot be less than or equal to the product price.",
+    //   });
+    // };
 
     // Apply the special price
     await updatePrdPrice(productId, priceData, prd_status, prd_dashboard_status);
@@ -170,8 +243,8 @@ export const getPrice = async (req, res) => {
   const priceId = req.params.priceId;
   console.log(priceId)
   try {
-    const price = await getPrdPrice(priceId);
-    console.log(price)
+    const price = await getPrdPrice(priceId,res);
+    console.log("price", price)
     if (!price) {
       res.status(404).json({ error: 'Price not found' });
       return;
@@ -196,7 +269,8 @@ export const getPrice = async (req, res) => {
 
 // get all price
 
-export const getAllPrice = async (req, res) => {
+export const getAllPrice = async (req, res) => { 
+
   try {
     const price = await getAllPrdPrice();
     res.status(201).json({

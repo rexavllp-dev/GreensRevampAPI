@@ -88,6 +88,13 @@ export const deleteBulk = async (bulkId) => {
     return bulk;
 };
 
+export const getBulkDiscountPriceByProductId = async (productId) => {
+    const discountPrices = await db('products_bulks')
+        .where({ product_id: productId })
+        .select('*');
+    return discountPrices;
+}
+
 // _______________________________________________________________________________________________________________________________________________________________________
 
 export const createBulkAbove = async (bulkData) => {

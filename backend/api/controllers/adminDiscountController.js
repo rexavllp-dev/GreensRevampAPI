@@ -70,3 +70,4 @@ export const addDiscount = async (req, res) => {
         })
     }
 }
+
