@@ -172,6 +172,7 @@ export const deleteSeason = async (req, res) => {
         let seasons = JSON.parse(seasonId);
 
         for (let i = 0; i < seasons.length; i++) {
+            
             await deleteASeason(seasons[i]);
         }
         res.status(200).json({

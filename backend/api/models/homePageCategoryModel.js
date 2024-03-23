@@ -37,7 +37,10 @@ export const deleteAHomePageCategory = async (homepageCategoryId) => {
 
     const homePageCategory = await db('homepage_category')
         .where({ homepage_category_id: homepageCategoryId })
-        .del()
+        .del();
 
-    return homePageCategory;
+    return deletedProduct;
 };
+
+
+
