@@ -138,7 +138,7 @@ export const updatePrice = async (req, res) => {
     console.log(calculateMaxDiscountPrice)
 
 
-
+// bulk discount price must be less than product price
 
     if (bulkDiscountPrice) {
       console.log("this is bulk discount price", bulkDiscountPrice)
