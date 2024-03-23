@@ -43,6 +43,7 @@ export const createABulk = async (req, res) => {
         };
 
         const productPrice = await getPriceByProductIdAndCalculate(bulkData.product_id);
+
         // Format the computed price to two decimal places
         const computedPrice = parseFloat(productPrice.computed_price).toFixed(2);
         console.log("checking_prices", bulkData.discounted_price, computedPrice);
@@ -451,7 +452,7 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
             await approveBulkMaxOrder(bulkId);
 
             // Send verification for bulk approval
-            await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+            await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity,);
 
             messages = 'Bulk order approved successfully';
         } else if (newStatus === 'Reject') {
