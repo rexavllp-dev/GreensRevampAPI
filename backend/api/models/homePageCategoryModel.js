@@ -34,9 +34,20 @@ export const getsAllHomePageCategories = async () => {
 
 export const deleteAHomePageCategory = async (homepageCategoryId) => {
 
-    const homePageCategory = await db('homepage_category')
-        .where({ homepage_category_id: homepageCategoryId })
-        .del()
+    const deletedProduct = await db('homepage_category')
 
-    return homePageCategory;
+        .where({ homepage_category_id: homepageCategoryId })
+
+    return deletedProduct;
 };
+
+
+
+// export const deleteAHomePageCategory = async (homepageCategoryId) => {
+
+//     const homePageCategory = await db('homepage_category')
+//         .where({ homepage_category_id: homepageCategoryId })
+//         .del()
+
+//     return homePageCategory;
+// };

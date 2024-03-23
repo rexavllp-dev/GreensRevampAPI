@@ -1,4 +1,4 @@
-import { createAHomePageCategory, deleteAHomePageCategory, getAHomePageCategory, getsAllHomePageCategories } from "../models/homePageCategoryModel.js";
+import { createAHomePageCategory,  deleteAHomePageCategory,  getAHomePageCategory, getsAllHomePageCategories } from "../models/homePageCategoryModel.js";
 
 
 
@@ -88,26 +88,29 @@ export const getAllHomePageCategories = async (req, res) => {
 
 export const deleteHomePageCategory = async (req, res) => {
 
-    const homepageCategoryId = req.params.homepageCategoryId;
+    const homepageCategoryId = req.query.data;
 
     try {
 
-        const deletedHomepageCategory = await deleteAHomePageCategory(homepageCategoryId);
+        let categories = JSON.parse(homepageCategoryId);
+
+        for (let i = 0; i < categories.length; i++) {
+            await deleteAHomePageCategory(categories[i]);
+        }
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Deleted homepage category successfully",
-            result: deletedHomepageCategory
+            message: 'categories deleted successfully',
+
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to delete homepage category",
-            error: error
+            error: error,
+            message: 'Failed to delete categories. Please try again later.',
         });
     }
-
 };

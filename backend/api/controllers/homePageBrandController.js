@@ -1,4 +1,5 @@
-import { createAHomePageBrand, deleteAHomePageBrand, getAHomePageBrand, getsAllHomePageBrands } from "../models/homePageBrandController.js";
+
+import { createAHomePageBrand, deleteAHomePageBrand, getAHomePageBrand, getsAllHomePageBrands } from "../models/homePageBrandModel.js";
 
 
 
@@ -88,27 +89,29 @@ export const getAllHomePageBrands = async (req, res) => {
 
 export const deleteHomePageBrand = async (req, res) => {
 
-    const homepageBrandId = req.params.homepageBrandId;
+    const homepageBrandId = req.query.data;
 
     try {
 
-        const deletedHomepageBrand = await deleteAHomePageBrand(homepageBrandId);
+        let brands = JSON.parse(homepageBrandId);
 
+        for (let i = 0; i < brands.length; i++) {
+            await deleteAHomePageBrand(brands[i]);
+        }
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Deleted homepage Brand successfully",
-            result: deletedHomepageBrand
+            message: 'brands deleted successfully',
+
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to delete homepage Brand",
-            error: error
+            error: error,
+            message: 'Failed to delete brands. Please try again later.',
         });
     }
-
 };
