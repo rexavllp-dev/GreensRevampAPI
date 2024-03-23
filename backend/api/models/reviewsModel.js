@@ -173,7 +173,7 @@ export const getsAllReviewsByProductId = async (productId) => {
             'product_reviews.created_at'
         );
 
-        // Count total ratings (total number of reviews)
+    // Count total ratings (total number of reviews)
     const totalRatings = reviews.length;
 
 
@@ -280,4 +280,51 @@ export const likeOrDislikeReview = async (userId, reviewId, action) => {
 };
 
 
+
+export const getSingleReviewByReviewId = async (reviewId) => {
+
+    let reviews = db('product_reviews')
+        .where({ id: reviewId })
+
+        .leftJoin('users', 'users.id', 'product_reviews.user_id')
+        .leftJoin('products', 'products.id', 'product_reviews.product_id')
+        .leftJoin('review_gallery', 'product_reviews.id', 'review_gallery.review_id')
+
+        .select(
+
+            'product_reviews.id as reviewId',
+            'product_reviews.review',
+            'product_reviews.rating',
+            'product_reviews.is_approved',
+            'product_reviews.created_at as createdAt',
+
+
+            'products.prd_name',
+
+            'users.usr_firstname',
+            'users.usr_lastname',
+
+            db.raw(`jsonb_agg(jsonb_build_object('id', review_gallery.id, 'url', review_gallery.url)) AS reviewImages`)
+
+        )
+
+        .groupBy(
+
+            'product_reviews.id',
+            'product_reviews.review',
+            'product_reviews.rating',
+            'product_reviews.is_approved',
+            'product_reviews.created_at',
+
+
+
+            'products.prd_name',
+
+            'users.usr_firstname',
+            'users.usr_lastname'
+        )
+
+
+    return reviews;
+}
 

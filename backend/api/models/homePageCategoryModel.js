@@ -40,6 +40,11 @@ export const deleteAHomePageCategory = async (homepageCategoryId) => {
         .where({ homepage_category_id: homepageCategoryId })
         .del();
 
+
+
+
+        
+
     return deletedProduct;
 };
 
