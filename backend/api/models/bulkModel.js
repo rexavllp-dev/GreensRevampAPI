@@ -224,11 +224,13 @@ export const getBulkOrderRequests = async () => {
     const bulks = await db('bulk_above_max_orders')
         .join('users', 'users.id', '=', 'bulk_above_max_orders.user_id')
         .join('products', 'products.id', '=', 'bulk_above_max_orders.product_id')
+        .leftJoin('product_inventory', 'products.id', '=', 'product_inventory.product_id')
         .select(
             'users.*',
             'users.id as userId',
             'bulk_above_max_orders.*',
             'bulk_above_max_orders.id as bulkId',
+            'product_inventory.max_qty',
             'products.*',
             'products.id as productId'
         );

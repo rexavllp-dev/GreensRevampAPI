@@ -331,8 +331,6 @@ export const getAllTotalSalesAmount = async (req, res) => {
 
 
     try {
-
-
         const totalSales = await getAllTotalSales({
 
             fromDate,

@@ -26,8 +26,6 @@ export const addReviewImage = async (reviewId, imageUrl) => {
 // update the review by user 
 export const updateReviewByUser = async (reviewId, reviewData) => {
 
-    reviewData.is_approved = false;
-
     const updateReview = await db('product_reviews')
         .where({ id: reviewId })
         .update(reviewData)
@@ -53,7 +51,7 @@ export const getsAllReviewsByUserId = async (userId, sortBy, page, perPage) => {
         .where({ 'product_reviews.is_approved': true })
 
         .select(
-
+            'product_reviews.id as reviewId',
             'users.usr_firstname',
             'users.usr_lastname',
 
@@ -63,6 +61,7 @@ export const getsAllReviewsByUserId = async (userId, sortBy, page, perPage) => {
             'products_price.product_price',
 
             'product_reviews.review',
+            'product_reviews.heading_review',
             'product_reviews.rating',
             'product_reviews.created_at',
 
@@ -223,6 +222,7 @@ export const getAllReviewsAdmin = async (sortBy, page, perPage) => {
 
             'product_reviews.id as reviewId',
             'product_reviews.review',
+            'product_reviews.heading_review',
             'product_reviews.rating',
             'product_reviews.is_approved',
             'product_reviews.created_at as createdAt',
