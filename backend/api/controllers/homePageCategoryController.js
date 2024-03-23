@@ -100,7 +100,7 @@ export const deleteHomePageCategory = async (req, res) => {
         res.status(200).json({
             status: 200,
             success: true,
-            message: 'categories deleted successfully',
+            message: 'categories deleted successfully', 
 
         });
 

@@ -70,7 +70,7 @@ export const getAllHomePageBrands = async (req, res) => {
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Home page brand created successfully",
+            message: "Home page brand list successfully",
             result: homePageBrand
         });
 
@@ -79,7 +79,7 @@ export const getAllHomePageBrands = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to create home page brand",
+            message: "Failed to list home page brand",
             error: error
         });
     }

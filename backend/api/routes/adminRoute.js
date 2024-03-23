@@ -170,7 +170,7 @@ router.get('/homepage_category/get_homepage_category/:homepageCategoryId', getHo
 router.get('/homepage_category/get_all_homepage_categories', getAllHomePageCategories);
 
 // delete homepage category
-router.delete('/homepage_category/delete_homepage_category/:homepageCategoryId', deleteHomePageCategory);
+router.delete('/homepage_category/delete_homepage_category', deleteHomePageCategory);
 
 
 // homepage brand routes
