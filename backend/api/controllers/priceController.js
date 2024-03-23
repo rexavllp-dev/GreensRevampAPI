@@ -133,7 +133,6 @@ export const updatePrice = async (req, res) => {
 
     console.log("this is product price",productPrice?.product_price)
 
-    console.log("this is bulk discount", bulkDiscountPrice)
 
 
     console.log(calculateMaxDiscountPrice)

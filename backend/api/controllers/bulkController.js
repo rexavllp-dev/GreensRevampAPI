@@ -1,4 +1,5 @@
 import { approveBulkMaxOrder, bulkInsert, createBulkAbove, deleteBulk, existingBulk, existingBulkForUpdate, getABulk, getAllBulk, getBulkAboveOrder, getBulkApproveStatusByProductId, getBulkByProductId, getBulkOrderRequests, getMaxQuantityByProductId, getMinQuantityByProductId, getPreviousBulk, getPriceByProductIdAndCalculate, getUserFromBulkOrder, isBulkOrderRequestExists, rejectBulkMaxOrder, saveBulkOrderRequest, updateBulk, updateBulkMaxOrderStatusAndQty } from "../models/bulkModel.js";
+import { getBulkDiscountPriceByProductId, getVat } from "../models/productPriceModel.js";
 import { sendVerificationBulkApproved, sendVerificationBulkRejected } from "../utils/emailer.js";
 
 
@@ -54,7 +55,7 @@ export const createABulk = async (req, res) => {
             return res.status(400).json({
                 status: 400,
                 success: false,
-                message:"Discounted price cannot be greater than the product price.",
+                message: "Discounted price cannot be greater than the product price.",
             });
         };
 
@@ -224,7 +225,7 @@ export const getSingleBulk = async (req, res) => {
     try {
         const bulk = await getABulk(bulkId);
 
-         console.log(bulk);
+        console.log(bulk);
 
         res.status(200).json({
             status: 200,
@@ -232,7 +233,7 @@ export const getSingleBulk = async (req, res) => {
             message: "Discounts fetched successfully",
             result: bulk
         });
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -438,6 +439,20 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
 
         // Update the bulk order status and quantity
         const updates = await updateBulkMaxOrderStatusAndQty(bulkId, newStatus, newQuantity);
+        const vat = await getVat();
+
+
+        const bulkDiscountPrice = await getBulkDiscountPriceByProductId(productId);
+
+
+        let lowestBulkDiscount = Math.min(...bulkDiscountPrice);
+
+        lowestBulkDiscount = lowestBulkDiscount + (lowestBulkDiscount * vat) / 100;
+
+
+
+
+
 
         let messages;
         console.log(bulkId)
@@ -451,7 +466,7 @@ export const updateAndApproveOrRejectBulkOrders = async (req, res) => {
             await approveBulkMaxOrder(bulkId);
 
             // Send verification for bulk approval
-            await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity);
+            await sendVerificationBulkApproved(user.usr_email, user.usr_firstname, user.prd_name, user.quantity, lowestBulkDiscount);
 
             messages = 'Bulk order approved successfully';
         } else if (newStatus === 'Reject') {
