@@ -28,7 +28,7 @@ export const getsAllHomePageBrands = async () => {
 
     const homePageBrands = await db('homepage_brand')
 
-        .leftJoin('brands', 'homepage_brand.homepage_brand_id', 'brands.id')
+        .leftJoin('brands', 'homepage_brand.brand_id', 'brands.id')
 
         .select('*')
 
