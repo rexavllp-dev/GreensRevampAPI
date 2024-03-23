@@ -15,17 +15,19 @@ const s3 = new aws.S3(awsConfig);
 export const createSeason = async (req, res) => {
     
     const seasonData = req.body;
-    const file = req.files.file; // Use the first file in the array
+    
 
     try {
 
-        if (!file) {
+        if (!req.files) {
             return res.status(400).json({
                 status: 400,
                 success: false,
                 message: "Image file is required for creating a season."
             });
         };
+
+        const file = req.files.season_image; // Use the first file in the array
 
         const uploadParams = {
             Bucket: process.env.S3_BUCKET_NAME,
@@ -64,49 +66,50 @@ export const createSeason = async (req, res) => {
 
 // update a season
 export const updateSeason = async (req, res) => {
+
     const seasonData = req.body;
+
     const seasonId = req.params.seasonId;
-    const file = req.files?.file;
+
 
     try {
 
-        if (!file) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: "Image file is required for creating a season."
-            });
+        if (req.files) {
+
+            const file = req.files?.season_image;
+
+            const uploadParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `seasons/${file.name}`, // Adjust the key/path as needed
+                Body: file?.data,
+                ContentType: file.mimetype,
+            };
+
+            const s3Data = await s3.upload(uploadParams).promise();
+
+            const imageUrl = s3Data.Location;
+
+            // Add the image URL to the season data
+            seasonData.season_image = imageUrl;
+
         };
 
-        const uploadParams = {
-            Bucket: process.env.S3_BUCKET_NAME,
-            Key: `seasons/${file.name}`, // Adjust the key/path as needed
-            Body: file?.data,
-            ContentType: file.mimetype,
-        };
-
-        const s3Data = await s3.upload(uploadParams).promise();
-
-        const imageUrl = s3Data.Location;
-
-        // Add the image URL to the season data
-        seasonData.season_image = imageUrl;
 
         const newseason = await updateASeason(seasonId, seasonData);
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "season created successfully",
+            message: "season update successfully",
             result: newseason
         });
 
     } catch (error) {
-        console.log(error);
+     
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to create season",
+            message: "Failed to update season",
             error: error
         });
     }
