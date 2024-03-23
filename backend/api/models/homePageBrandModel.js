@@ -36,7 +36,7 @@ export const deleteAHomePageBrand = async (homepageBrandId) => {
 
     const homePageBrand = await db('homepage_brand')
         .where({ homepage_brand_id: homepageBrandId })
-        .del()
+
 
     return homePageBrand;
 };

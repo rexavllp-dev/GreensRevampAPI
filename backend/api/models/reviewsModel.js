@@ -173,11 +173,14 @@ export const getsAllReviewsByProductId = async (productId) => {
             'product_reviews.created_at'
         );
 
+        // Count total ratings (total number of reviews)
+    const totalRatings = reviews.length;
 
-    const totalRatings = parseFloat(reviews.reduce((acc, review) => acc + review.total_ratings, 0));
+
+    // const totalRatings = parseFloat(reviews.reduce((acc, review) => acc + review.total_ratings, 0));
 
     // Calculate average rating
-    let averageRating = totalRatings > 0 ? parseFloat(reviews.reduce((acc, review) => acc + review.rating, 0) / totalRatings) : 0;
+    let averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / totalRatings;
     averageRating = parseFloat(averageRating.toFixed(1));
 
 

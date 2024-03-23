@@ -1,5 +1,5 @@
 import aws from 'aws-sdk';
-import { createASeason, deleteASeason, getASeason, getsAllSeasons, updateASeason } from '../models/seasonModel.js';
+import { createASeason,  deleteASeason,  getASeason, getsAllSeasons, updateASeason } from '../models/seasonModel.js';
 
 const awsConfig = ({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -164,26 +164,30 @@ export const getAllSeasons = async (req, res) => {
 
 
 export const deleteSeason = async (req, res) => {
-    const seasonId = req.params.seasonId;
+
+    const seasonId = req.query.data;
+
     try {
 
-        const deletedBanner = await deleteASeason(seasonId);
+        let seasons = JSON.parse(seasonId);
 
+        for (let i = 0; i < seasons.length; i++) {
+            await deleteASeason(seasons[i]);
+        }
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Deleted banner successfully",
-            result: deletedBanner
+            message: 'seasons deleted successfully',
+
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             status: 500,
             success: false,
             error: error,
-            message: "Failed to delete banner",
+            message: 'Failed to delete seasons. Please try again later.',
         });
     }
-
 };

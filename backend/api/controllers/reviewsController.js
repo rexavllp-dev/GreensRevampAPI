@@ -144,7 +144,7 @@ export const getAllUserProductReviews = async (req, res) => {
 
     try {
 
-        const reviews = await getsAllReviewsByUserId( 1, sortBy, parseInt(page), parseInt(perPage) );
+        const reviews = await getsAllReviewsByUserId( userId, sortBy, parseInt(page), parseInt(perPage) );
 
         res.status(200).json({
             status: 200,
