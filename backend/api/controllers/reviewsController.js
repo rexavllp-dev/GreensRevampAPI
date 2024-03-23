@@ -1,4 +1,4 @@
-import { addReview, addReviewImage, approveReview, getAllReviewsAdmin, getSingleReviewByReviewId, getUserPurchases, getsAllReviewsByProductId, getsAllReviewsByUserId, likeOrDislikeReview, updateReviewByUser } from "../models/reviewsModel.js";
+import { addReview, addReviewImage, approveReview, deleteAReviewImages, getAllReviewsAdmin, getSingleReviewByReviewId, getUserPurchases, getsAllReviewsByProductId, getsAllReviewsByUserId, likeOrDislikeReview, updateReviewByUser } from "../models/reviewsModel.js";
 import sharp from "sharp";
 import aws from 'aws-sdk';
 
@@ -18,6 +18,7 @@ const s3 = new aws.S3(awsConfig);
 export const addProductReview = async (req, res) => {
 
     try {
+
         const userId = req.user.userId;
         let files = req.files?.files;
         const reviewData = JSON.parse(req.body?.data);
@@ -55,6 +56,7 @@ export const addProductReview = async (req, res) => {
 
 
         for (let i = 0; i < files?.length; i++) {
+
             const file = files[i];
 
 
@@ -316,3 +318,103 @@ export const getAReview = async (req, res) => {
 
 
 
+export const uploadReviewImages = async (req, res) => {
+
+    try {
+
+        const reviewId = req.params.reviewId;
+        let files = req.files?.files;
+        // console.log(files);
+
+        if (!Array.isArray(files)) {
+            files = [files];
+        }
+
+
+
+        const reviewImages = [];
+
+        for (let i = 0; i < files?.length; i++) {
+
+            const file = files[i];
+
+            console.log(file);
+
+
+            const resizedBuffer = await sharp(file.data)
+                .resize({ width: 300, height: 300 })
+                .toBuffer();
+
+            const uploadParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `images/${file.name}`,
+                Body: resizedBuffer,
+                ContentType: file.mimetype,
+            };
+
+            const s3Data = await s3.upload(uploadParams).promise();
+
+            const imageUrl = s3Data.Location;
+
+            console.log("image url", imageUrl);
+
+            await addReviewImage(reviewId, imageUrl);
+
+            const imageDetails = {
+                review_id: reviewId,
+                url: s3Data.Location,
+            };
+
+            reviewImages.push(imageDetails);
+        };
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Review images uploaded successfully.",
+            reviewId: reviewId,
+            images: reviewImages
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to upload review images.",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+
+export const deleteReviewImage = async (req, res) => {
+
+    try {
+
+        const reviewGalleryId = req.params.reviewGalleryId;
+
+        const reviewGallery = await deleteAReviewImages(reviewGalleryId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Review image deleted successfully",
+            result: reviewGallery
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to delete review image",
+            error: error
+        });
+    }
+
+
+};
