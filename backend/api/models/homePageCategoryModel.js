@@ -38,17 +38,10 @@ export const deleteAHomePageCategory = async (homepageCategoryId) => {
     const deletedProduct = await db('homepage_category')
 
         .where({ homepage_category_id: homepageCategoryId })
+        .del();
 
     return deletedProduct;
 };
 
 
 
-// export const deleteAHomePageCategory = async (homepageCategoryId) => {
-
-//     const homePageCategory = await db('homepage_category')
-//         .where({ homepage_category_id: homepageCategoryId })
-//         .del()
-
-//     return homePageCategory;
-// };
