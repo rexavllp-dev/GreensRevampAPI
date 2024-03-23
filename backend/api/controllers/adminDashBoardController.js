@@ -10,9 +10,13 @@ dayjs.extend(timezone);
 
 export const getAllTotalOrders = async (req, res) => {
 
+   
+
     try {
 
-        const totalOrders = await getsAllTotalOrders();
+        const { filter } = req.query;
+
+        const totalOrders = await getsAllTotalOrders(filter);
 
         res.status(200).json({
             status: 200,

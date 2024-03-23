@@ -24,6 +24,10 @@ import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo
 import { addDiscount } from '../controllers/adminDiscountController.js';
 import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
 import { createRole, getAllRoles, updateRole } from '../controllers/userRolesController.js';
+import { createRecipe, deleteRecipeProduct, getAllRecipeProductsByRecipeId } from '../controllers/recipeController.js';
+import { createHomePageCategory, deleteHomePageCategory, getAllHomePageCategories, getHomePageCategory } from '../controllers/homePageCategoryController.js';
+import { createHomePageBrand, deleteHomePageBrand, getAllHomePageBrands, getHomePageBrand } from '../controllers/homePageBrandController.js';
+
 
 
 const router = express.Router();
@@ -113,7 +117,7 @@ router.get('/seasons/get_season/:seasonId', getSingleSeason);
 router.get('/seasons/get_all_seasons', getAllSeasons);
 
 //delete seasons
-router.delete('/seasons/delete_season/:seasonId', deleteSeason);
+router.delete('/seasons/delete_season', deleteSeason);
 
 
 
@@ -140,7 +144,7 @@ router.delete('/feeds/delete_feed/:feedId', deleteFeed);
 // create a feed
 router.post('/ads/create_ads', createAds);
 
-// update feed
+// update ads
 router.put('/ads/update_ads/:adsId', updateAds);
 
 // get a single feed
@@ -151,6 +155,36 @@ router.get('/ads/get_all_ads', getAllAds);
 
 //delete feed
 router.delete('/ads/delete_ads/:adsId', deleteAds);
+
+
+// homepage category routes
+
+
+// create homepage category
+router.post('/homepage_category/create_homepage_category', createHomePageCategory);
+
+// get a homepage category
+router.get('/homepage_category/get_homepage_category/:homepageCategoryId', getHomePageCategory);
+
+// get all homepage category
+router.get('/homepage_category/get_all_homepage_categories', getAllHomePageCategories);
+
+// delete homepage category
+router.delete('/homepage_category/delete_homepage_category', deleteHomePageCategory);
+
+
+// homepage brand routes
+
+// create homepage brand
+router.post('/homepage_brand/create_homepage_brand', createHomePageBrand);
+// get a homepage brand
+router.get('/homepage_brand/get_homepage_brand/:homepageBrandId', getHomePageBrand);
+
+// get all homepage brand
+router.get('/homepage_brand/get_all_homepage_brands', getAllHomePageBrands);
+
+// delete homepage brand
+router.delete('/homepage_Brand/delete_homepage_Brand', deleteHomePageBrand);
 
 
 
@@ -392,6 +426,22 @@ router.put('/roles/update_role/:roleId', updateRole);
 
 // get all roles
 router.get('/roles/get_all_roles', getAllRoles);
+
+
+// Admin Recipes API ROUTES
+
+// create recipe
+router.post('/recipes/create_recipe', createRecipe);
+
+
+
+// Admin Recipe Products API ROUTES
+
+//get all recipe products by recipe id
+router.get('/recipes/get_all_recipe_products/:recipeId', getAllRecipeProductsByRecipeId); 
+
+// delete recipe product
+router.delete('/recipes/delete_recipe_product/:recipeProductId', deleteRecipeProduct);
 
 
 

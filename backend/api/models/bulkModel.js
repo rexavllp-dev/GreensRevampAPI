@@ -73,6 +73,7 @@ export const getABulk = async (bulkId) => {
     return bulk;
 };
 
+
 export const getAllBulk = async () => {
     const bulk = await db('products_bulks')
         .select('*');
