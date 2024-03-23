@@ -117,7 +117,7 @@ router.get('/seasons/get_season/:seasonId', getSingleSeason);
 router.get('/seasons/get_all_seasons', getAllSeasons);
 
 //delete seasons
-router.delete('/seasons/delete_season/:seasonId', deleteSeason);
+router.delete('/seasons/delete_season', deleteSeason);
 
 
 
@@ -184,7 +184,7 @@ router.get('/homepage_brand/get_homepage_brand/:homepageBrandId', getHomePageBra
 router.get('/homepage_brand/get_all_homepage_brands', getAllHomePageBrands);
 
 // delete homepage brand
-router.delete('/homepage_Brand/delete_homepage_Brand/:homepageBrandId', deleteHomePageBrand);
+router.delete('/homepage_Brand/delete_homepage_Brand', deleteHomePageBrand);
 
 
 

@@ -1,4 +1,4 @@
-import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, fetchAllOptionProducts, getAllProducts, getProductById, getProductsByCategory, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, fetchAllOptionProducts, getAllProducts, getProductById, getProductsByCategory, getsAllTopTrendingProducts, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
 // import { joiOptions } from '../helpers/joiOptions.js';
 // import Joi from 'joi';
 // import getErrorsInArray from '../helpers/getErrors.js';
@@ -602,3 +602,29 @@ export const getProductsOfCategory = async (req, res) => {
     }
 };
 
+
+
+export const getAllTopTrendingProducts = async (req, res) => {
+
+
+    try {
+
+        const topTrendingProducts = await getsAllTopTrendingProducts();
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Top trending products fetched successfully",
+            result: topTrendingProducts
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch top trending products",
+            error: error
+        });
+    }
+};

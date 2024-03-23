@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllOptionProducts, getAllProduct, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
+import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllOptionProducts, getAllProduct, getAllTopTrendingProducts, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, modifyStock, updateProductInventory } from '../controllers/inventoryController.js';
@@ -40,6 +40,8 @@ router.delete('/delete-product', deleteProduct);
 router.get('/get-products', verifyLogged, getAllProduct);
 
 router.get('/get-all-option-products', getAllOptionProducts);
+
+router.get('/get_all_top_tending_products', getAllTopTrendingProducts);
 
 // _________________________________________________________________________________________________________________
 

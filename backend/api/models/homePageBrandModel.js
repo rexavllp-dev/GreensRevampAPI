@@ -13,6 +13,9 @@ export const createAHomePageBrand = async (data) => {
 export const getAHomePageBrand = async (homepageBrandId) => {
 
     const homePageBrand = await db('homepage_brand')
+
+        .leftJoin('brands', 'homepage_brand.homepage_brand_id', 'brands.id')
+
         .where({ homepage_brand_id: homepageBrandId })
         .select('*')
 
@@ -24,6 +27,9 @@ export const getAHomePageBrand = async (homepageBrandId) => {
 export const getsAllHomePageBrands = async () => {
 
     const homePageBrands = await db('homepage_brand')
+
+        .leftJoin('brands', 'homepage_brand.homepage_brand_id', 'brands.id')
+
         .select('*')
 
     return homePageBrands;

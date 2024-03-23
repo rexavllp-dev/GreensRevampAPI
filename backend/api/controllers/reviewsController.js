@@ -1,4 +1,4 @@
-import { addReview, addReviewImage, approveReview, getAllReviewsAdmin, getUserPurchases, getsAllReviewsByProductId, getsAllReviewsByUserId, likeOrDislikeReview, updateReviewByUser } from "../models/reviewsModel.js";
+import { addReview, addReviewImage, approveReview, getAllReviewsAdmin, getSingleReviewByReviewId, getUserPurchases, getsAllReviewsByProductId, getsAllReviewsByUserId, likeOrDislikeReview, updateReviewByUser } from "../models/reviewsModel.js";
 import sharp from "sharp";
 import aws from 'aws-sdk';
 
@@ -21,7 +21,7 @@ export const addProductReview = async (req, res) => {
         const userId = req.user.userId;
         let files = req.files?.files;
         const reviewData = JSON.parse(req.body?.data);
-    
+
         console.log(files);
         console.log(reviewData)
 
@@ -83,8 +83,8 @@ export const addProductReview = async (req, res) => {
             reviewImages.push(imageDetails);
         };
 
-          // Save product images to the database
-       
+        // Save product images to the database
+
 
         console.log(reviewImages);
 
@@ -140,11 +140,11 @@ export const getAllUserProductReviews = async (req, res) => {
 
     const userId = req.user.userId;
     const { sortBy, page, perPage } = req.query;
-    
+
 
     try {
 
-        const reviews = await getsAllReviewsByUserId( userId, sortBy, parseInt(page), parseInt(perPage) );
+        const reviews = await getsAllReviewsByUserId(userId, sortBy, parseInt(page), parseInt(perPage));
 
         res.status(200).json({
             status: 200,
@@ -285,6 +285,34 @@ export const getAllReviewsForAdmin = async (req, res) => {
     }
 };
 
+
+
+export const getAReview = async (req, res) => {
+
+    const reviewId = req.params.reviewId;
+
+    try {
+
+        const review = await getSingleReviewByReviewId(reviewId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Review fetched successfully",
+            result: review
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch review",
+            error: error
+        });
+    }
+
+};
 
 
 

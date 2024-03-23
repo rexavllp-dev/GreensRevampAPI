@@ -70,7 +70,7 @@ export const getAllHomePageBrands = async (req, res) => {
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Home page brand list successfully",
+            message: "Home page brand fetched successfully",
             result: homePageBrand
         });
 
