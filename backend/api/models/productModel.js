@@ -988,19 +988,11 @@ export const getsAllTopTrendingProducts = async () => {
 
 
 
-            db.raw(`
-            jsonb_agg(
-                jsonb_build_object(
-                    'url', product_gallery.url,
-                    'id', product_gallery.id,
-                    'is_baseimage', product_gallery.is_baseimage
-                )
-            ) as product_img
-        `),
+            db.raw(`jsonb_agg(distinct jsonb_build_object('id', product_gallery.id, 'url', product_gallery.url)) AS productImages`),
 
 
             db.raw(`
-        jsonb_agg(
+        jsonb_agg( distinct
             jsonb_build_object(
                 'productOptionId', product_options.id,
                 'optionId', product_options.option_id,

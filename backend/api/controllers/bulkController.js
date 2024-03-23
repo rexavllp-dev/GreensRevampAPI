@@ -44,6 +44,7 @@ export const createABulk = async (req, res) => {
         };
 
         const productPrice = await getPriceByProductIdAndCalculate(bulkData.product_id);
+
         // Format the computed price to two decimal places
         const computedPrice = parseFloat(productPrice.computed_price).toFixed(2);
         console.log("checking_prices", bulkData.discounted_price, computedPrice);
