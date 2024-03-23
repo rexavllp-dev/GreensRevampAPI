@@ -518,3 +518,48 @@ export const userPasswordChanged = async (usr_email, usr_firstname) => {
 
 
 
+export const sendEmailForBackInStock = async (usr_email, usr_firstname, prd_name) => {
+    console.log(usr_email, usr_firstname, prd_name);
+
+    const emailData = {
+        email: usr_email,
+        subject: `Product Back in Stock: ${prd_name}`,
+        html: `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title> Product ${prd_name} back in stock </title>
+  </head>
+  <body>
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+
+      <!-- Logo -->
+      <div style="text-align: center;">
+          <img src="https://greensintl.com/storage/media/oWVP03O95iplNIxRs1bWbeosliSihixTXN0tg8dT.png" alt="Company Logo" style="max-width: 50%;">
+      </div>
+  
+          <h2>Product back in stock</h2>
+  
+          <p> Hello <b> ${usr_firstname} </b></p>
+  
+          <p> Your product <b> ${prd_name} </b>  is now back in stock.</p>
+
+  
+          <p>Best regards,<br> <b>Greens International </b> </p>
+  
+      </div>
+  </body>
+  </html>`,
+    };
+
+    try {
+        await sendEmail(emailData);
+    } catch (error) {
+        throw error
+    }
+
+}
+
+
+
