@@ -7,7 +7,7 @@ import { getAllReplacementsForAdmin, getSingleReplacement, updateReplacementStat
 import { createBanner, deleteBanner, getAllBanners, getSingleBanner, updateBanner } from '../controllers/homePageBannerController.js';
 import { createSeason, deleteSeason, getAllSeasons, getSingleSeason, updateSeason } from '../controllers/seasonController.js';
 import { createFeed, deleteFeed, getAllFeeds, getSingleFeed, updateFeed } from '../controllers/feedController.js';
-import { createAds, deleteAds, getAllAds, getSingleAds, updateAds } from '../controllers/adsController.js';
+import { createAds,  deleteAds,  getAllAds, getSingleAds, updateAds } from '../controllers/adsController.js';
 import { getAllActivityOfUser } from '../controllers/generateActivityLogController.js';
 import { createMaintenance, getAllMaintenance, getMaintenance, updateMaintenance } from '../controllers/adminMaintenanceController.js';
 import { createStore, getAllStore, getStore, updateStore } from '../controllers/adminStoreController.js';
@@ -135,7 +135,7 @@ router.get('/feeds/get_feed/:feedId', getSingleFeed);
 router.get('/feeds/get_all_feeds', getAllFeeds);
 
 //delete feed
-router.delete('/feeds/delete_feed/:feedId', deleteFeed);
+router.delete('/feeds/delete_feed', deleteFeed);
 
 
 
@@ -154,7 +154,7 @@ router.get('/ads/get_ads/:adsId', getSingleAds);
 router.get('/ads/get_all_ads', getAllAds);
 
 //delete feed
-router.delete('/ads/delete_ads/:adsId', deleteAds);
+router.delete('/ads/delete_ads', deleteAds);
 
 
 // homepage category routes

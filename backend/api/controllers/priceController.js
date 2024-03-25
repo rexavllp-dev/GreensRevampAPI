@@ -17,7 +17,7 @@ export const createPrice = async (req, res) => {
 
     // calculate bulk discount price and product price minus it
 
-    const calculateMaxDiscountPrice = parent(priceData?.product_price) - parseInt(bulkDiscountPrice?.discounted_price) 
+    const calculateMaxDiscountPrice = parseInt(priceData?.product_price) - parseInt(bulkDiscountPrice?.discounted_price) 
     
 
 

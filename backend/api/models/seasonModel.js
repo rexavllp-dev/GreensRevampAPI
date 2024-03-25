@@ -11,6 +11,7 @@ export const createASeason = async (seasonData) => {
 
 
 export const updateASeason = async (seasonId, seasonData) => {
+    
     const season = await db('seasons')
         .where({ season_id: seasonId })
         .update(seasonData)

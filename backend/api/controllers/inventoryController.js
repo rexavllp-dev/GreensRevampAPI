@@ -4,6 +4,8 @@ import Joi from 'joi';
 import getErrorsInArray from '../helpers/getErrors.js';
 import { updateAProduct } from "../models/productModel.js";
 import { getBulkRangesByProductId } from "../models/bulkModel.js";
+import { getUsersSubscribedToProduct } from "../models/notifyProductModel.js";
+import { sendEmailForBackInStock } from "../utils/emailer.js";
 
 
 
@@ -130,6 +132,7 @@ export const createProductInventory = async (req, res) => {
 export const updateProductInventory = async (req, res) => {
 
   const { productId } = req.params;
+
   const userId = req.user.userId;
 
   const {
@@ -176,12 +179,17 @@ export const updateProductInventory = async (req, res) => {
 
     let updatedStockAvailability = stock_availability;
 
-    //  if (product_quantity > 0) {
-    //   updatedStockAvailability = "In stock";
-    // } else if (product_quantity === 0) {
-    //   // If product_quantity is 0, update stock_availability to "Out of stock"
-    //   updatedStockAvailability = "Out of stock";
-    // }
+    // Check if the product became available
+    if (product.stock_availability === 'Out of stock' && stock_availability === 'In stock') {
+      // Fetch users subscribed to this product
+      const users = await getUsersSubscribedToProduct(productId);
+      console.log(users);
+      // Send email notifications to users
+      users.forEach(user => {
+        sendEmailForBackInStock(user.usr_email, user.usr_firstname, user.prd_name);
+      });
+    }
+
 
 
     //  update the inventory

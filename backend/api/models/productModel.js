@@ -252,8 +252,13 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     `),
 
 
+            db.raw(`similarity(products.prd_name, ?) as name_similarity`, [search]),
+
+
+
 
         )
+
 
         .distinct('products.id')
         .groupBy(
@@ -286,17 +291,19 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .countDistinct('products.id as total')
         .whereNull('products.deleted_at');
 
-    //   search query
-    if (search) {
-
-        query.where(function () {
-            this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
-                .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
-                .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]); // Search similarity in SKU
-        });
 
 
-    };
+        if (search) {
+            const trimmedSearch = search.trim(); // Trim spaces from the search query
+            query.where(function () {
+                this.whereRaw(`similarity(LOWER(TRIM(products.prd_name)), LOWER(?)) > ?`, [trimmedSearch.toLowerCase(), 0.2]) // Adjust similarity threshold and make search case-insensitive and space-insensitive
+                    .orWhereRaw(`to_tsvector('english', TRIM(products.prd_name)) @@ plainto_tsquery('english', ?)`, [trimmedSearch.toLowerCase()])
+                    .orWhereRaw(`similarity(LOWER(TRIM(product_inventory.sku)), LOWER(?)) > 0.2`, [trimmedSearch.toLowerCase()]); // Search similarity in SKU
+            })
+        };
+        
+
+
 
     // Execute count query for search results
     const [{ total: searchResultCount }] = await countQuery.clone().where(function () {

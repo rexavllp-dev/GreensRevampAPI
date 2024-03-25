@@ -168,26 +168,30 @@ export const getAllFeeds = async (req, res) => {
 
 
 export const deleteFeed = async (req, res) => {
-    const feedId = req.params.feedId;
+
+    const feedId = req.query.data;
+
     try {
 
-        const deletedFeed = await deleteAFeed(feedId);
+        let feeds = JSON.parse(feedId);
 
+        for (let i = 0; i < feeds.length; i++) {
+            await deleteAFeed(feeds[i]);
+        }
         res.status(200).json({
             status: 200,
             success: true,
-            message: "Deleted feed successfully",
-            result: deletedFeed
+            message: 'feeds deleted successfully', 
+
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             status: 500,
             success: false,
             error: error,
-            message: "Failed to delete feed",
+            message: 'Failed to delete feeds. Please try again later.',
         });
     }
-
 };
