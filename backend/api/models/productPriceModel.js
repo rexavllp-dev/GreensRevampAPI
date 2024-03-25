@@ -109,16 +109,6 @@ export const getPrdPrice = async (priceId,res) => {
         .then(async (rows) => {
             const result = await Promise.all(rows.map(async (row) => {
 
-                const bulk_discount_price = row.discounted_price 
-                const bulk_product_id = row.product_id
-                const bulk_start_range = row.start_range
-                const bulk_end_range = row.end_range
-                
-
-
-                
-        
-
                 // console.log(row);
                 const price = parseFloat(row.product_price);
                 const specialPriceType = row.special_price_type;
@@ -276,14 +266,14 @@ export const getPrdPrice = async (priceId,res) => {
 
                 // compare which is greater special price or brandSpecialPrice or categorySpecialPrice that will apply as the price if there is no discount apply the regular price
 
-                // if ((brandSpecialPrice > specialPrice) && (brandSpecialPrice > categorySpecialPrice)) {
-                //     console.log('brandSpecialPricefff:', brandSpecialPrice);
+               //     console.log('brandSpecialPricefff:', brandSpecialPrice);
                 //     specialPrice = brandSpecialPrice
                 // } else if ((categorySpecialPrice > specialPrice) && (categorySpecialPrice > brandSpecialPrice)) {
                 //     specialPrice = categorySpecialPrice
 
                 // }
-
+ // if ((brandSpecialPrice > specialPrice) && (brandSpecialPrice > categorySpecialPrice)) {
+                
                 console.log('specialPrice:', specialPrice);
 
 
