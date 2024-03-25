@@ -17,7 +17,7 @@ const s3 = new aws.S3(awsConfig);
 export const createAds = async (req, res) => {
 
     const adsData = req.body;
-    const file = req.files.file; // Use the first file in the array
+    const file = req.files.ads_image; // Use the first file in the array
 
     try {
 
@@ -25,7 +25,7 @@ export const createAds = async (req, res) => {
             return res.status(400).json({
                 status: 400,
                 success: false,
-                message: "Image file is required for creating a feed."
+                message: "Image file is required for creating a Ads."
             });
         };
 
@@ -51,7 +51,7 @@ export const createAds = async (req, res) => {
         res.status(200).json({
             status: 200,
             success: true,
-            message: "feed created successfully",
+            message: "Ads created successfully",
             result: newfeed
         });
 
@@ -60,7 +60,7 @@ export const createAds = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to create feed",
+            message: "Failed to create Ads",
             error: error
         });
     }
@@ -71,38 +71,35 @@ export const createAds = async (req, res) => {
 export const updateAds = async (req, res) => {
     const adsData = req.body;
     const adsId = req.params.adsId;
-    const file = req.files.file;
+  
 
     try {
 
-        if (!file) {
-            return res.status(400).json({
-                status: 400,
-                success: false,
-                message: "Image file is required for creating a feed."
-            });
-        };
+        if (req.files) {
 
-        const uploadParams = {
-            Bucket: process.env.S3_BUCKET_NAME,
-            Key: `ads/${file.name}`, // Adjust the key/path as needed
-            Body: file?.data,
-            ContentType: file.mimetype,
-        };
+                    const file = req.files.ads_image;
+                    const uploadParams = {
+                        Bucket: process.env.S3_BUCKET_NAME,
+                        Key: `ads/${file.name}`, // Adjust the key/path as needed
+                        Body: file?.data,
+                        ContentType: file.mimetype,
+                    };
 
-        const s3Data = await s3.upload(uploadParams).promise();
+                    const s3Data = await s3.upload(uploadParams).promise();
 
-        const imageUrl = s3Data.Location;
+                    const imageUrl = s3Data.Location;
 
-        // Add the image URL to the feed data
-        adsData.ads_image = imageUrl;
+                    // Add the image URL to the feed data
+                    adsData.ads_image = imageUrl;
+
+         };
 
         const newfeed = await updateAAds(adsId, adsData);
 
         res.status(200).json({
             status: 200,
             success: true,
-            message: "feed created successfully",
+            message: "Ads created successfully",
             result: newfeed
         });
 
@@ -111,7 +108,7 @@ export const updateAds = async (req, res) => {
         res.status(500).json({
             status: 500,
             success: false,
-            message: "Failed to create feed",
+            message: "Failed to create Ads",
             error: error
         });
     }
