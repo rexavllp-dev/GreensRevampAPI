@@ -1,3 +1,5 @@
+
+import { getsOrderByRecommendedProducts } from "../models/orderModel.js";
 import { getUserRecommendedProducts } from "../models/searchHistoryModel.js";
 
 
@@ -32,4 +34,38 @@ export const getAllRecommendedProducts = async (req, res) => {
         });
     }
 
+};
+
+
+
+
+
+
+export const getAllOrderRecommendedProducts = async (req, res) => {
+
+    try {
+
+        const userId = req.user?.userId;
+
+
+        const orderedProducts = await getsOrderByRecommendedProducts(userId);
+
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Recommended order products fetched successfully",
+            result: orderedProducts
+        });
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch recommended order products",
+            error: error
+        });
+    }
 };

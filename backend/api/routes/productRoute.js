@@ -1,5 +1,5 @@
 import express from 'express';
-import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllOptionProducts, getAllProduct, getAllTopTrendingProducts, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
+import { addProductImages, createProduct, deleteProduct, deleteProductImage, getAllOptionProducts, getAllProduct, getAllTopTrendingProducts, getProductsByBrands, getProductsOfCategory, getProductsWithSorting, getSingleProduct, updateProduct } from '../controllers/productController.js';
 import { createPrice, deletePrice, getAllPrice, getPrice, updatePrice } from '../controllers/priceController.js';
 import { addSeo, deleteSeo, getAllSeo, getSingleSeo, updateSeo } from '../controllers/productSeoController.js';
 import { createProductInventory, modifyStock, updateProductInventory } from '../controllers/inventoryController.js';
@@ -15,7 +15,7 @@ import { addProductVariantValues, deleteVariantLabel, getVariantsValues, getVari
 import { createABulk, createBulkAboveMaxOrders, deleteABulk, getBulkOrderRequestsHandler, getBulkStatusWithProductStatus, getBulkWithProductId, getPriceByProductId, getSingleBulk, getSingleBulkAboveMaxOrder, getsAllBulks, submitBulkOrderRequest, updateABulk } from '../controllers/bulkController.js';
 import verifyToken from '../middleware/verifyToken.js';
 import verifyLogged from '../middleware/verifyLogged.js';
-import { getAllRecommendedProducts } from '../controllers/recommendedProductController.js';
+import { getAllOrderRecommendedProducts, getAllRecommendedProducts } from '../controllers/recommendedProductController.js';
 
 
 
@@ -39,9 +39,14 @@ router.delete('/delete-product', deleteProduct);
 // get all products.
 router.get('/get-products', verifyLogged, getAllProduct);
 
+
 router.get('/get-all-option-products', getAllOptionProducts);
 
+
 router.get('/get_all_top_tending_products', getAllTopTrendingProducts);
+
+// get all product with brand
+router.get('/get_all_product_brand/:productId', getProductsByBrands);
 
 // _________________________________________________________________________________________________________________
 
@@ -235,6 +240,8 @@ router.post('/create-product-variant', addProductVariantValues);
 // get variants values by variant id
 router.get('/get-variant-values/:variantId', getVariantsValues);
 
+// get all variants by product
+
 router.get('/get-variants-by-product/:productId', getVariantsWithProductId);
 
 
@@ -306,6 +313,9 @@ router.get('/get-all-bulk-request', getBulkOrderRequestsHandler);
 
 // get all recommended products
 router.get('/get_all_recommended_products', verifyLogged, getAllRecommendedProducts);
+
+// get all order recommended products
+router.get('/get_all_order_recommended_products', verifyLogged, getAllOrderRecommendedProducts);
 
 
 export default router;

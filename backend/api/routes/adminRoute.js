@@ -408,11 +408,13 @@ router.get('/menus/get_menu/:menuId', getMenu);
 // get all menu
 router.get('/menus/get_all_menu', getAllMenus);
 
-// create brand discount 
-router.post('/discount/create_discount', addDiscount); 
-
 // delete menu
 router.delete('/menus/delete_menu/:menuId', deleteMenu);
+
+
+
+// create brand discount 
+router.post('/discount/create_discount', addDiscount); 
 
 
 

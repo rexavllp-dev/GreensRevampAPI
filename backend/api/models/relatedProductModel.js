@@ -12,6 +12,7 @@ export const addRelatedProduct = async (relatedProductData) => {
 // get related products by product id
 
 export const getRelatedProductsByProductId = async (productId) => {
+    
     const relatedProducts = await db('related_products')
         .distinct('products.id')
         .leftJoin('products', 'related_products.related_product_id', 'products.id')
@@ -28,6 +29,7 @@ export const getRelatedProductsByProductId = async (productId) => {
 
 
         .select(
+
             'products.*',
             'products.id as productId',
             'brands.*',

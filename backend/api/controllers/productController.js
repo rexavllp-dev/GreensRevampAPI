@@ -1,4 +1,4 @@
-import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, fetchAllOptionProducts, getAllProducts, getProductById, getProductsByCategory, getsAllTopTrendingProducts, getSortedProducts, saveImageUrl, updateAProduct } from "../models/productModel.js";
+import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, fetchAllOptionProducts, getAllProducts, getProductById, getProductsByCategory, getsAllTopTrendingProducts, getSortedProducts, getsProductsByBrand, saveImageUrl, updateAProduct } from "../models/productModel.js";
 // import { joiOptions } from '../helpers/joiOptions.js';
 // import Joi from 'joi';
 // import getErrorsInArray from '../helpers/getErrors.js';
@@ -628,3 +628,38 @@ export const getAllTopTrendingProducts = async (req, res) => {
         });
     }
 };
+
+
+
+export const getProductsByBrands = async (req, res) => {
+
+    try {
+
+        const productId = req.params.productId;
+      
+        const product = await getProductById(productId);
+        console.log(product);
+
+        const productWithBrand = await getsProductsByBrand(product.prd_brand_id);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Product Brands fetched successfully",
+            result: productWithBrand
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch product brands",
+            error: error
+        });
+    }
+};
+
+
+
+

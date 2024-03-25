@@ -25,11 +25,11 @@ export const getUserRecommendedProducts = async (userId) => {
     const mostRecentSearch = await db('search_history')
         .where('user_id', userId)
         .orderBy('searched_at', 'desc')
-        .first(); 
+        .first();
 
 
     if (!mostRecentSearch) {
-       
+
         return [];
     };
 
