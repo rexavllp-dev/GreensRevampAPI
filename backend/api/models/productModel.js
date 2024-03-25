@@ -334,19 +334,23 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             "vat.id as vat_id",
 
 
-           db.raw(`similarity(products.prd_name, ?) as similarity_score`, [search])
-    )
-    .where(function () {
-        this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
-            .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
-            // .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`])
-            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search])
-            
-            .orWhere(function () {
-                this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7])
-            });
-    })
-    .orderBy('similarity_score', 'DESC');
+            db.raw(`similarity(products.prd_name, ?) as similarity_score`, [search])
+        )
+            .where(function () {
+
+                this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
+
+                    .whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7])
+
+                    .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+                    .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`])
+                    .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search])
+
+                // .orWhere(function () {
+                //     this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7])
+                // });
+            })
+            .orderBy('similarity_score', 'DESC');
     }
 
 
