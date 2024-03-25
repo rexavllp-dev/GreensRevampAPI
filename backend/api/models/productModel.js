@@ -340,7 +340,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
                 this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
 
-                    .whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7])
+                  
 
                     .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
                     .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`])
