@@ -48,7 +48,7 @@ export const getallSaveForLater = async (userId) => {
             .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
             .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
             .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
-            .leftJoin('wishlist', function () {
+            .leftJoin('wishlist', function () {          
                 if (userId != undefined) {
                     this.on('save_for_later.product_id', '=', 'wishlist.product_id')
                         .andOn('wishlist.user_id', '=', userId);

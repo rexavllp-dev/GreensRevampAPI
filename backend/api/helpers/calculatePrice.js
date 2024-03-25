@@ -66,6 +66,7 @@ export const calculatePrice = async ({
             cart[i].image = product.image_url;
             cart[i].description = product.prd_description;
             cart[i].product_price = product.product_price;
+            
             productCount++;
             nonActiveProductsCount++;
             const basePrice = parseFloat(product.product_price);
@@ -93,6 +94,7 @@ export const calculatePrice = async ({
                 const currentDate = new Date();
                 const isDiscount = product.is_discount;
 
+                // Check if special price is applicable
                 if (isDiscount === true && currentDate >= offerStartDate && currentDate <= offerEndDate) {
                     discountedProducts.push(product.id);
                     if (specialPriceType === 'percentage') {
@@ -176,7 +178,7 @@ export const calculatePrice = async ({
 
     // Grand Total formula =((sub total-Discount)+Service charges+Delivery charge))+vat 5%
     const grandTotalWithVAT = nonActiveProductsCount === 0 ? 0 : ((subTotal - totalDiscount) + shippingCharge + codCharge + storePickupCharge) + totalProductVAT;
-    const totalProductPriceWithVAT = nonActiveProductsCount === 0 ? 0 : subTotal  + taxPrice
+    const totalProductPriceWithVAT = nonActiveProductsCount === 0 ? 0 : cart[0].totalPriceWithVat;
 
     const totals = {
 
