@@ -4,6 +4,7 @@ import sharp from 'sharp';
 import aws from 'aws-sdk';
 import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById, updateACategory, getMainCategoriesByTree, getCategoryIdWithCatUrl, getsAllCategoriesForCatUrl } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
+import slugify from 'slugify';
 
 
 
@@ -19,7 +20,9 @@ const s3 = new aws.S3(awsConfig)
 
 // create category
 export const createCategory = async (req, res) => {
+
     const { cat_parent_id, cat_name, cat_description } = req.body;
+
     try {
         const schema = Joi.object({
             cat_parent_id: Joi.number().required().label("cat_parent_id"),
@@ -43,10 +46,15 @@ export const createCategory = async (req, res) => {
             });
         };
 
+        const cat_url = slugify(cat_name, { lower: true });
+
         const newCategory = await createACategory({
+
             cat_parent_id,
             cat_name,
             cat_description,
+            cat_url
+        
         });
 
         res.status(200).json({
