@@ -123,3 +123,5 @@ export const deleteCategoryImageById = async (categoryId, type) => {
 
     
 };
+
+

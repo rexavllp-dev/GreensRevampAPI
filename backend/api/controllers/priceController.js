@@ -12,28 +12,30 @@ export const createPrice = async (req, res) => {
 
     // check if i gave special price is greater than bulk discount
 
-    const bulkDiscountPrice = await getBulkDiscountPriceByProductId(priceData?.product_id);
-    console.log(bulkDiscountPrice)
+    // const bulkDiscountPrice = await getBulkDiscountPriceByProductId(priceData?.product_id);
+    // console.log(bulkDiscountPrice)
 
-    // calculate bulk discount price and product price minus it
+    // // calculate bulk discount price and product price minus it
 
-    const calculateMaxDiscountPrice = parseInt(priceData?.product_price) - parseInt(bulkDiscountPrice?.discounted_price) 
+    // const calculateMaxDiscountPrice = parseInt(priceData?.product_price) - parseInt(bulkDiscountPrice?.discounted_price) 
     
 
 
 
 
-    if (bulkDiscountPrice) {
+    // if (bulkDiscountPrice) {
 
-      if (priceData?.special_price > calculateMaxDiscountPrice) {
-        return res.status(400).json({
-          status: 400,
-          success: false,
-          message: "discount price must be less than bulk discount price",
-        });
-      }
-    }
+    //   if (priceData?.special_price > calculateMaxDiscountPrice) {
+    //     return res.status(400).json({
+    //       status: 400,
+    //       success: false,
+    //       message: "discount price must be less than bulk discount price",
+    //     });
+    //   }
+    // }
 
+
+    const productId = priceData?.product_id;
 
 
     const product = await getProductPriceById(priceData?.product_id);
@@ -61,6 +63,49 @@ export const createPrice = async (req, res) => {
         result: newPrice,
       });
     } else {
+
+
+       // check if i gave special price is greater than bulk discount
+
+    const bulkDiscountPrice = await getBulkDiscountPriceByProductId(productId);
+    const productPrice = await getProductPriceById(productId);
+    
+
+    const greatestBulkDiscount = Math.max(...bulkDiscountPrice);
+
+    console.log(greatestBulkDiscount)
+
+    // calculate bulk discount price and product price minus it
+
+    const calculateMaxDiscountPrice = parseInt(productPrice?.product_price) - parseInt(greatestBulkDiscount)
+
+    console.log("this is product price",productPrice?.product_price)
+
+
+
+    console.log("cal",calculateMaxDiscountPrice)
+
+
+// bulk discount price must be less than product price
+
+    if (bulkDiscountPrice) {
+      console.log("this is bulk discount price", bulkDiscountPrice)
+      console.log("this is product price", productPrice?.product_price)
+      console.log("this is special price", priceData?.special_price)
+      console.log("this is greatestBulkDiscount", greatestBulkDiscount)
+
+      console.log(priceData?.special_price < greatestBulkDiscount)
+
+      if (!(priceData?.special_price < calculateMaxDiscountPrice)) {
+        console.log(priceData?.special_price < greatestBulkDiscount) // Log special price and discounted price
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "discount price must be less than bulk discount price",
+        });
+      }
+    }
+
 
       // Apply the special price
       await updatePrdPrice(priceData?.product_id, priceData, prd_status, prd_dashboard_status);
@@ -111,10 +156,14 @@ export const createPrice = async (req, res) => {
 // update price 
 
 export const updatePrice = async (req, res) => {
+
   const { productId } = req.params;
   const { prd_status, prd_dashboard_status, ...priceData } = req.body;
+
   console.log(prd_status);
+  
   try {
+
 
 
     // check if i gave special price is greater than bulk discount
@@ -135,7 +184,7 @@ export const updatePrice = async (req, res) => {
 
 
 
-    console.log(calculateMaxDiscountPrice)
+    console.log("cal",calculateMaxDiscountPrice)
 
 
 // bulk discount price must be less than product price
