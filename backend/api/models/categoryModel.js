@@ -142,7 +142,6 @@ export const getCategoryIdWithCatUrl = async (catUrl) => {
 
 
 export const getsAllCategoriesForCatUrl = async (categoryId) => {
-
   const category = await db('categories')
     .select('*')
     .where({ cat_parent_id: categoryId })
