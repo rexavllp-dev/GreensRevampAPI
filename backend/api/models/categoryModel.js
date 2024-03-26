@@ -18,6 +18,7 @@ export const updateACategory = async (categoryId, updatedData) => {
 // get single category
 export const getCategoryById = async (categoryId) => {
   const category = await db('categories').select('*').where({ id: categoryId }).first();
+
   return category;
 };
 
@@ -130,10 +131,23 @@ export const deleteCategoryImageById = async (categoryId, type) => {
 export const getCategoryIdWithCatUrl = async (catUrl) => {
 
   const category = await db('categories')
-    .select('*').
+    .select('id').
     where({ cat_url: catUrl })
     .first();
 
   return category;
 
 };
+
+
+
+export const getsAllCategoriesForCatUrl = async (categoryId) => {
+
+  const category = await db('categories')
+    .select('*')
+    .where({ cat_parent_id: categoryId })
+    .first();
+
+  return category;
+};
+

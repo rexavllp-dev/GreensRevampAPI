@@ -2,7 +2,7 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
-import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById, updateACategory, getMainCategoriesByTree } from '../models/categoryModel.js';
+import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById, updateACategory, getMainCategoriesByTree, getCategoryIdWithCatUrl, getsAllCategoriesForCatUrl } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
 
@@ -409,13 +409,15 @@ export const getAllCategoriesByCatUrl = async (req, res) => {
 
         const catUrl = req.params.catUrl;
 
-        const category = await getCategoryWithCatUrl(catUrl);
+        const category = await getCategoryIdWithCatUrl(catUrl);
+
+        const categories = await getsAllCategoriesForCatUrl(category.id);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Fetched category successfully",
-            result: category
+            result: categories
         });
 
     } catch (error) {
@@ -429,3 +431,7 @@ export const getAllCategoriesByCatUrl = async (req, res) => {
     }
 
 };
+
+
+
+
