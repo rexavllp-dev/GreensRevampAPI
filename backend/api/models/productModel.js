@@ -291,12 +291,9 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
     if (search) {
-
         search = search.trim();
 
         query.select(
-
-
             'products.*',
             'products.created_at as product_created_at',
             'products.updated_at as product_updated_at',
@@ -332,26 +329,38 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             "product_category.updated_at as product_category_updated_at",
             "vat.*",
             "vat.id as vat_id",
+            db.raw(`similarity(products.prd_name, ?) as similarity_score`, [search]),
+            db.raw(`
+        CASE
+            WHEN products.prd_name ILIKE ? THEN 1
+            WHEN products.prd_name ILIKE '%' || ? || '%' THEN 2
+            ELSE 3
+        END AS search_priority
+    `, [search, search]
 
-
-            db.raw(`similarity(products.prd_name, ?) as similarity_score`, [search])
+            )
         )
+
             .where(function () {
-
-                this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
-
-                  
-
-                    .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
-                    .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`])
+                this.where(function () {
+                    this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.07])
+                        .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+                        .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`]);
+                })
                     .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search])
-
-                // .orWhere(function () {
-                //     this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7])
-                // });
+                    .orWhere(function () {
+                        this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7]);
+                    });
             })
-            .orderBy('similarity_score', 'DESC');
+
+            .orderByRaw(
+                `
+            search_priority,
+            similarity_score DESC
+        `
+            );
     }
+
 
 
     // Execute count query for search results
