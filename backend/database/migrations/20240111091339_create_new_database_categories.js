@@ -11,8 +11,6 @@ export const up = async (knex) => {
 
     });
 
- 
-
 };
 
 /**

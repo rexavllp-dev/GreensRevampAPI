@@ -21,6 +21,7 @@ import { getAllOrderRecommendedProducts, getAllRecommendedProducts } from '../co
 
 
 
+
 const router = express.Router();
 
 
@@ -67,6 +68,8 @@ router.get('/public/get-related-products/:productId', getAllRelatedProductPublic
 
 // get product by category
 router.get('/get-products-category/:categoryId', getProductsOfCategory);
+
+
 
 // __________________________________________________________________________________________________________________________________________________________________________
 // __________________________________________________________________________________________________________________________________________________________________________

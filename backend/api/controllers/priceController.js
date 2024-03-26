@@ -7,35 +7,8 @@ export const createPrice = async (req, res) => {
 
   try {
     const { prd_status, prd_dashboard_status, ...priceData } = req.body;
-    
+
     console.log(req.body)
-
-    // check if i gave special price is greater than bulk discount
-
-    // const bulkDiscountPrice = await getBulkDiscountPriceByProductId(priceData?.product_id);
-    // console.log(bulkDiscountPrice)
-
-    // // calculate bulk discount price and product price minus it
-
-    // const calculateMaxDiscountPrice = parseInt(priceData?.product_price) - parseInt(bulkDiscountPrice?.discounted_price) 
-    
-
-
-
-
-    // if (bulkDiscountPrice) {
-
-    //   if (priceData?.special_price > calculateMaxDiscountPrice) {
-    //     return res.status(400).json({
-    //       status: 400,
-    //       success: false,
-    //       message: "discount price must be less than bulk discount price",
-    //     });
-    //   }
-    // }
-
-
-    const productId = priceData?.product_id;
 
 
     const product = await getProductPriceById(priceData?.product_id);
@@ -64,47 +37,33 @@ export const createPrice = async (req, res) => {
       });
     } else {
 
+      // check if i gave special price is greater than bulk discount
 
-       // check if i gave special price is greater than bulk discount
+      const bulkDiscountPrice = await getBulkDiscountPriceByProductId(priceData?.product_id);
+      console.log(bulkDiscountPrice)
 
-    const bulkDiscountPrice = await getBulkDiscountPriceByProductId(productId);
-    const productPrice = await getProductPriceById(productId);
-    
+      const greatestBulkDiscount = Math.max(...bulkDiscountPrice);
 
-    const greatestBulkDiscount = Math.max(...bulkDiscountPrice);
+      // calculate bulk discount price and product price minus it
 
-    console.log(greatestBulkDiscount)
+      const calculateMaxDiscountPrice = parseFloat(priceData?.product_price) - parseFloat(greatestBulkDiscount)
+      console.log('parseFloat(bulkDiscountPrice?.discounted_price): ', parseFloat(bulkDiscountPrice?.discounted_price));
+      console.log('parseFloat(priceData?.product_price): ', parseFloat(priceData?.product_price));
 
-    // calculate bulk discount price and product price minus it
-
-    const calculateMaxDiscountPrice = parseInt(productPrice?.product_price) - parseInt(greatestBulkDiscount)
-
-    console.log("this is product price",productPrice?.product_price)
+      console.log(calculateMaxDiscountPrice)
 
 
+      if (bulkDiscountPrice) {
 
-    console.log("cal",calculateMaxDiscountPrice)
-
-
-// bulk discount price must be less than product price
-
-    if (bulkDiscountPrice) {
-      console.log("this is bulk discount price", bulkDiscountPrice)
-      console.log("this is product price", productPrice?.product_price)
-      console.log("this is special price", priceData?.special_price)
-      console.log("this is greatestBulkDiscount", greatestBulkDiscount)
-
-      console.log(priceData?.special_price < greatestBulkDiscount)
-
-      if (!(priceData?.special_price < calculateMaxDiscountPrice)) {
-        console.log(priceData?.special_price < greatestBulkDiscount) // Log special price and discounted price
-        return res.status(400).json({
-          status: 400,
-          success: false,
-          message: "discount price must be less than bulk discount price",
-        });
+        if (priceData?.is_discount === true && priceData?.special_price >= calculateMaxDiscountPrice) {
+          return res.status(400).json({
+            status: 400,
+            success: false,
+            message: "discount price must be less than bulk discount price",
+          });
+        }
       }
-    }
+
 
 
       // Apply the special price
@@ -156,21 +115,17 @@ export const createPrice = async (req, res) => {
 // update price 
 
 export const updatePrice = async (req, res) => {
-
   const { productId } = req.params;
   const { prd_status, prd_dashboard_status, ...priceData } = req.body;
-
   console.log(prd_status);
-  
   try {
-
 
 
     // check if i gave special price is greater than bulk discount
 
     const bulkDiscountPrice = await getBulkDiscountPriceByProductId(productId);
     const productPrice = await getProductPriceById(productId);
-    
+
 
     const greatestBulkDiscount = Math.max(...bulkDiscountPrice);
 
@@ -180,14 +135,14 @@ export const updatePrice = async (req, res) => {
 
     const calculateMaxDiscountPrice = parseInt(productPrice?.product_price) - parseInt(greatestBulkDiscount)
 
-    console.log("this is product price",productPrice?.product_price)
+    console.log("this is product price", productPrice?.product_price)
 
 
 
-    console.log("cal",calculateMaxDiscountPrice)
+    console.log(calculateMaxDiscountPrice)
 
 
-// bulk discount price must be less than product price
+    // bulk discount price must be less than product price
 
     if (bulkDiscountPrice) {
       console.log("this is bulk discount price", bulkDiscountPrice)
@@ -211,7 +166,7 @@ export const updatePrice = async (req, res) => {
     const productComputedPrice = await getPriceByProductIdAndCalculate(productId);
     console.log("product computed  data", productComputedPrice);
 
-      // Retrieve discounted prices array
+    // Retrieve discounted prices array
     const bulkDiscountedPrices = await getBulkDiscountPriceByProductId(productId);
     console.log("bulk data", bulkDiscountedPrices);
 
@@ -227,7 +182,7 @@ export const updatePrice = async (req, res) => {
     // Format the computed price to two decimal places
     // const computedPrice = parseFloat(productComputedPrice.computed_price).toFixed(2);
 
-  
+
     // // Find the maximum discounted price
     // const maxDiscountedPrice = Math.max(...bulkDiscountedPrices);
     // console.log("max discounted price", maxDiscountedPrice);
@@ -291,7 +246,7 @@ export const getPrice = async (req, res) => {
   const priceId = req.params.priceId;
   console.log(priceId)
   try {
-    const price = await getPrdPrice(priceId,res);
+    const price = await getPrdPrice(priceId, res);
     console.log("price", price)
     if (!price) {
       res.status(404).json({ error: 'Price not found' });
@@ -317,7 +272,7 @@ export const getPrice = async (req, res) => {
 
 // get all price
 
-export const getAllPrice = async (req, res) => { 
+export const getAllPrice = async (req, res) => {
 
   try {
     const price = await getAllPrdPrice();
@@ -359,10 +314,3 @@ export const deletePrice = async (req, res) => {
     });
   }
 }
-
-
-
-
-
-
-

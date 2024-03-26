@@ -2,7 +2,7 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
-import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById,  updateACategory, getMainCategoriesByTree } from '../models/categoryModel.js';
+import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById, updateACategory, getMainCategoriesByTree } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
 
@@ -19,7 +19,7 @@ const s3 = new aws.S3(awsConfig)
 
 // create category
 export const createCategory = async (req, res) => {
-    const {  cat_parent_id, cat_name, cat_description } = req.body;
+    const { cat_parent_id, cat_name, cat_description } = req.body;
     try {
         const schema = Joi.object({
             cat_parent_id: Joi.number().required().label("cat_parent_id"),
@@ -83,7 +83,7 @@ export const uploadCategoryImages = async (req, res) => {
         };
 
         const categories = await getCategoryById(categoryId);
-      
+
 
         // Check if the brand is not found
         if (!categories) {
@@ -142,12 +142,12 @@ export const uploadCategoryImages = async (req, res) => {
             }
         };
 
-         await updateACategory(categoryId, {
+        await updateACategory(categoryId, {
             cat_logo,
             cat_banner,
         })
 
-        
+
         const category = await getCategoryById(categoryId);
 
         res.status(201).json({
@@ -171,35 +171,35 @@ export const uploadCategoryImages = async (req, res) => {
 // delete category image
 export const deleteCategoryImage = async (req, res) => {
     const imageId = req.params.categoryId;
-    const type    = req.body.type;
+    const type = req.body.type;
 
     try {
         const deletedImage = await deleteCategoryImageById(imageId, type);
-        const category     = await getCategoryById(imageId);
+        const category = await getCategoryById(imageId);
 
-        if(!deletedImage){
+        if (!deletedImage) {
             return res.status(404).json({
-              status:404,
-              success:false,
-              message:"Category image not found"
+                status: 404,
+                success: false,
+                message: "Category image not found"
             });
         }
-        
+
         res.status(200).json({
-          status:200,
-          success:true,
-          message:"Category image deleted successfully",
-          result:category
+            status: 200,
+            success: true,
+            message: "Category image deleted successfully",
+            result: category
         });
     } catch (error) {
 
         console.log(error);
-        
+
         res.status(500).json({
-          status:500,
-          success:false,
-          message:"Failed to delete category image",
-          error: error
+            status: 500,
+            success: false,
+            message: "Failed to delete category image",
+            error: error
         });
     }
 };
@@ -252,17 +252,17 @@ export const getCategoriesWithParentId = async (req, res) => {
         };
 
         res.status(200).json({
-          status:200,
-          success:true,
-          message:"Category fetched successfully",
-          result: categories
+            status: 200,
+            success: true,
+            message: "Category fetched successfully",
+            result: categories
         });
     } catch (error) {
         res.status(500).json({
-          status:500,
-          success:false,
-          message:"Failed to fetch category",
-          error: error
+            status: 500,
+            success: false,
+            message: "Failed to fetch category",
+            error: error
         });
     }
 
@@ -280,12 +280,12 @@ export const getSingleCategory = async (req, res) => {
                 message: "category not found",
             });
         };
-        
+
         res.status(200).json({
-          status:200,
-          success:true,
-          message:"Category fetched successfully",
-          result: category
+            status: 200,
+            success: true,
+            message: "Category fetched successfully",
+            result: category
         });
     } catch (error) {
         console.error(error);
@@ -325,7 +325,7 @@ export const getAllCategories = async (req, res) => {
 
 
 
-export const deleteCategory = async (req,res) => {
+export const deleteCategory = async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
         const deletedCategory = await deleteACategory(categoryId);
@@ -339,10 +339,10 @@ export const deleteCategory = async (req,res) => {
         };
 
         res.status(200).json({
-          status:200,
-          success:true,
-          message:"Category deleted successfully",
-          result: deletedCategory
+            status: 200,
+            success: true,
+            message: "Category deleted successfully",
+            result: deletedCategory
         });
     } catch (error) {
         console.error(error);
@@ -365,7 +365,7 @@ export const getCategoriesByTree = async (req, res) => {
             success: true,
             message: 'Categories fetched successfully',
             data: categoryTree,
-            
+
         });
     } catch (error) {
         console.log(error);
@@ -388,7 +388,7 @@ export const getMainTree = async (req, res) => {
             success: true,
             message: 'Categories fetched successfully',
             data: categoryTree,
-            
+
         });
     } catch (error) {
         console.log(error);
@@ -399,4 +399,33 @@ export const getMainTree = async (req, res) => {
             error: error,
         });
     }
-}
+};
+
+
+
+export const getAllCategoriesByCatUrl = async (req, res) => {
+
+    try {
+
+        const catUrl = req.params.catUrl;
+
+        const category = await getCategoryWithCatUrl(catUrl);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Fetched category successfully",
+            result: category
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetch category",
+            error: error
+        });
+    }
+
+};
