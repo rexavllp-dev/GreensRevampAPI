@@ -34,7 +34,7 @@ router.get('/get-categories-tree', getCategoriesByTree);
 router.get('/get-main-tree', getMainTree);
 
 // get categories with cat url
-router.get('/get_category_url/:catUrl', getAllCategoriesByCatUrl);
+router.get('/get-sub-categories/:catUrl', getAllCategoriesByCatUrl);
 
 
 

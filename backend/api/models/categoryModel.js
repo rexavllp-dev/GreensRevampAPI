@@ -93,7 +93,7 @@ function buildMainTree(categories, parentId = 0) {
         icon: category.cat_logo,
         isIcon: false,
         isActive: false,
-        link: '/ingredients',
+        link: category.cat_url,
         children: buildMainTree(categories, category.id)
       });
     });
@@ -131,7 +131,7 @@ export const deleteCategoryImageById = async (categoryId, type) => {
 export const getCategoryIdWithCatUrl = async (catUrl) => {
 
   const category = await db('categories')
-    .select('id').
+    .select('*').
     where({ cat_url: catUrl })
     .first();
 
@@ -144,8 +144,7 @@ export const getCategoryIdWithCatUrl = async (catUrl) => {
 export const getsAllCategoriesForCatUrl = async (categoryId) => {
   const category = await db('categories')
     .select('*')
-    .where({ cat_parent_id: categoryId })
-    .first();
+    .where({ cat_parent_id: categoryId });
 
   return category;
 };

@@ -410,14 +410,24 @@ export const getAllCategoriesByCatUrl = async (req, res) => {
         const catUrl = req.params.catUrl;
 
         const category = await getCategoryIdWithCatUrl(catUrl);
+        if (!category) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "category not found",
+            });
+        };
 
-        const categories = await getsAllCategoriesForCatUrl(category.id);
+        const categories = await getsAllCategoriesForCatUrl(category?.id);
 
         res.status(200).json({
             status: 200,
             success: true,
             message: "Fetched category successfully",
-            result: categories
+            result: {
+                category: category,
+                subCategories: categories
+            }
         });
 
     } catch (error) {
