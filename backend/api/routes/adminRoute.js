@@ -27,6 +27,7 @@ import { createRole, getAllRoles, updateRole } from '../controllers/userRolesCon
 import { createRecipe, deleteRecipeProduct, getAllRecipeProductsByRecipeId } from '../controllers/recipeController.js';
 import { createHomePageCategory, deleteHomePageCategory, getAllHomePageCategories, getHomePageCategory } from '../controllers/homePageCategoryController.js';
 import { createHomePageBrand, deleteHomePageBrand, getAllHomePageBrands, getHomePageBrand } from '../controllers/homePageBrandController.js';
+import { getAllCustomerOrderReports } from '../controllers/reportsController.js';
 
 
 
@@ -444,6 +445,12 @@ router.get('/recipes/get_all_recipe_products/:recipeId', getAllRecipeProductsByR
 
 // delete recipe product
 router.delete('/recipes/delete_recipe_product/:recipeProductId', deleteRecipeProduct);
+
+
+// reports API ROUTES
+
+// get all customer order reports 
+router.get('/reports/get_all_customer_order_reports', getAllCustomerOrderReports);
 
 
 
