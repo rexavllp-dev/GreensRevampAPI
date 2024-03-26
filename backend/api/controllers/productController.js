@@ -175,6 +175,7 @@ export const updateProduct = async (req, res) => {
 
         // Call the model function to update the product
         const updatedProduct = await updateAProduct(productId, {
+            
             user_id: userId,
             prd_name,
             prd_description,

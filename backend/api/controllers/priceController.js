@@ -25,7 +25,7 @@ export const createPrice = async (req, res) => {
 
     if (bulkDiscountPrice) {
 
-      if (price?.special_price > bulkDiscountPrice?.discounted_price) {
+      if (priceData?.special_price > calculateMaxDiscountPrice) {
         return res.status(400).json({
           status: 400,
           success: false,

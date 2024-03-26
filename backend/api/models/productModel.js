@@ -173,6 +173,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
         .select(
+
             'products.*',
             'products.created_at as product_created_at',
             'products.updated_at as product_updated_at',
@@ -271,7 +272,10 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             'vat.id'
 
         )
+
+        .where('products.prd_status', true)
         .whereNull('products.deleted_at')
+
 
 
     // Count query to get total number of products
@@ -285,6 +289,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .crossJoin('vat')
         .countDistinct('products.id as total')
+        .where('products.prd_status', true)
         .whereNull('products.deleted_at');
 
 
@@ -340,6 +345,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
             )
         )
+            .distinct('products.id')
 
             .where(function () {
                 this.where(function () {
@@ -350,7 +356,9 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                     .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search])
                     .orWhere(function () {
                         this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7]);
-                    });
+                    })
+
+                    .orWhereRaw(`similarity(products.search_keywords, ?) > 0.07`, [search])
             })
 
             .orderByRaw(
@@ -365,9 +373,17 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
     // Execute count query for search results
     const [{ total: searchResultCount }] = await countQuery.clone().where(function () {
-        this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
-            .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
-            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]);
+
+        this.where(function () {
+            this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.07])
+                .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+                .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`]);
+        })
+            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search])
+            .orWhere(function () {
+                this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7]);
+            });
+
     });
 
     // Get the total product count for the search
