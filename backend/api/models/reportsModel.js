@@ -15,6 +15,7 @@ export const getsAllCustomerOrderCount = async () => {
 
 export const getsAllCustomerOrderReports = async () => {
     const query = await db('user_orders')
+    
         .select(
 
             'user_orders.customer_id',

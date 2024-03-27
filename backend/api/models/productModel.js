@@ -35,26 +35,37 @@ export const updateAProduct = async (productId, updatedData) => {
 export const getProductById = async (productId) => {
 
     const products = await db('products')
+
+    
+    
         .select(
+
             'products.*',
+
             'brands.*',
             'brands.id as brand_id',
-            'categories.*',
-            'categories.id as category_id',
+
+            // 'categories.*',
+            // 'categories.id as category_id',
+            
             'products_price.*',
             'products_price.id as products_price_id',
+
             'product_inventory.*',
             'product_inventory.id as product_inventory_id',
+
             'product_seo.*',
             'product_seo.id as product_seo_id',
+
             'product_badge.*',
             'product_badge.id as product_badge_id',
-            'product_category.*',
-            'product_category.id as product_category_id',
+
             "products_bulks.*",
             "products_bulks.id as product_bulks_id",
+
             "bulk_above_max_orders.*",
             "bulk_above_max_orders.id as bulkAboveMaxOrderId",
+            
             'wishlist.*',
             'wishlist.id as wishlist_id',
 
@@ -86,9 +97,21 @@ export const getProductById = async (productId) => {
                     'discounted_price', products_bulks.discounted_price
                 )
             ) as bulk_options
-        `)
+        `),
+
+        db.raw(`
+        jsonb_agg(
+            jsonb_build_object(
+
+                'category_id', product_category.category_id,
+                'category_name', categories.cat_name
+            )
+        ) as product_category
+    `)
+
         )
         .from('products')
+
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
@@ -102,15 +125,20 @@ export const getProductById = async (productId) => {
         .leftJoin('wishlist', 'products.id', 'wishlist.product_id')
         .where('products.id', productId)
         .whereNull('products.deleted_at')
+
+        .distinct('products.id')
+
         .groupBy(
+
+
             'products.id',
             'brands.id',
-            'categories.id',
+            // 'categories.id',
             'products_price.id',
             'product_inventory.id',
             'product_seo.id',
             'product_badge.id',
-            'product_category.id',
+            // 'product_category.id',
             'products_bulks.id',
             'bulk_above_max_orders.id',
             'wishlist.id',
@@ -353,12 +381,15 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
                         .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
                         .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`]);
                 })
-                    .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search])
+                    .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.07`, [search])
                     .orWhere(function () {
                         this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7]);
                     })
 
                     .orWhereRaw(`similarity(products.search_keywords, ?) > 0.07`, [search])
+
+                    .orWhereRaw(`similarity(products.item_code, ?) > 0.07`, [search])
+
             })
 
             .orderByRaw(
@@ -1263,6 +1294,8 @@ export const getsProductsByBrand = async (brandId) => {
         products: productsWithPrice,
     };
 };
+
+
 
 
 

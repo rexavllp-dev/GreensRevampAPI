@@ -149,3 +149,80 @@ export const getsAllCategoriesForCatUrl = async (categoryId) => {
   return category;
 };
 
+
+
+export const getProductsByCategoryUrl = async (catUrl) => {
+  console.log(catUrl)
+
+  const product = await db('categories')
+
+  .leftJoin('product_category', 'categories.id', 'product_category.category_id')
+  .leftJoin('products', 'products.id', 'product_category.product_id')
+  
+  .select(
+
+    'categories.id as categoryId',
+    'categories.cat_name as category_name',
+    'categories.cat_url as category_url',
+
+    'products.id as productId',
+    'products.prd_name',
+
+    
+    )
+
+  .where({ 'categories.cat_url': catUrl })
+
+  return product
+
+};
+
+
+// _______________________________________________________Product category_______________________________________________________
+
+export const addProductCategories = async (productId, categoryIds) => {
+
+  const productCategories = categoryIds.map(categoryId => ({
+
+    product_id: productId,
+    category_id: categoryId
+
+  }));
+
+  const newCategory = await db('product_category')
+    .insert(productCategories)
+    .returning('*');
+
+  return newCategory;
+
+};
+
+
+
+
+export const updateProductCategories = async (productId, categoryIds) => {
+
+  // Delete existing product-category 
+  await db('product_category')
+    .where({ product_id: productId })
+    .del();
+
+  // Insert updated product-category
+  const productCategories = categoryIds.map(categoryId => ({
+
+    product_id: productId,
+    category_id: categoryId
+
+  }));
+
+  const updatedProductCategories = await db('product_category').insert(productCategories);
+
+  return updatedProductCategories;
+
+};
+
+
+
+
+
+

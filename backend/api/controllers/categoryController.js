@@ -2,9 +2,10 @@ import { joiOptions } from '../helpers/joiOptions.js';
 import Joi from 'joi';
 import sharp from 'sharp';
 import aws from 'aws-sdk';
-import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById, updateACategory, getMainCategoriesByTree, getCategoryIdWithCatUrl, getsAllCategoriesForCatUrl } from '../models/categoryModel.js';
+import { createACategory, deleteACategory, deleteCategoryImageById, getCategories, getCategoriesByParentId, getCategoriesTree, getCategoryById, updateACategory, getMainCategoriesByTree, getCategoryIdWithCatUrl, getsAllCategoriesForCatUrl, getProductsByCategoryUrl } from '../models/categoryModel.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 import slugify from 'slugify';
+
 
 
 
@@ -54,7 +55,7 @@ export const createCategory = async (req, res) => {
             cat_name,
             cat_description,
             cat_url
-        
+
         });
 
         res.status(200).json({
@@ -450,6 +451,38 @@ export const getAllCategoriesByCatUrl = async (req, res) => {
 
 };
 
+
+
+
+export const getProductsByCatUrl = async (req, res) => {
+
+    try {
+
+        const catUrl = req.params.catUrl;
+
+
+
+        const product = await getProductsByCategoryUrl(catUrl)
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Product fetched successfully",
+            result: product
+       
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed to fetched product",
+            error: error
+        });
+    }
+
+};
 
 
 

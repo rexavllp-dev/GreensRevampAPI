@@ -1,11 +1,8 @@
 import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, fetchAllOptionProducts, getAllProducts, getProductById, getProductsByCategory, getsAllTopTrendingProducts, getSortedProducts, getsProductsByBrand, saveImageUrl, updateAProduct } from "../models/productModel.js";
-// import { joiOptions } from '../helpers/joiOptions.js';
-// import Joi from 'joi';
-// import getErrorsInArray from '../helpers/getErrors.js';
-import sharp from "sharp";
 import aws from 'aws-sdk';
 import { getPrdPrice } from "../models/productPriceModel.js";
 import { saveSearchHistory } from "../models/searchHistoryModel.js";
+import { addProductCategories, updateProductCategories } from "../models/categoryModel.js";
 
 
 
@@ -41,9 +38,7 @@ export const createProduct = async (req, res) => {
         dimensions_and_more_info,
         ein_code,
         show_expiry_on_dashboard,
-
-
-
+        categories,
 
 
     } = req.body;
@@ -52,57 +47,10 @@ export const createProduct = async (req, res) => {
 
         const userId = req.user?.userId;
 
-        // const schema = Joi.object({
-        //     prd_name: Joi.string().required().label("prd_name"),
-        //     prd_description: Joi.string().required().label("prd_description"),
-        //     prd_storage_type: Joi.string().required().label("prd_storage_type"),
-        //     prd_tax_class: Joi.string().valid('vat5%').required().label("prd_tax_class"),
-        //     prd_tags: Joi.string().required().label("prd_tags"),
-        //     prd_expiry_date: Joi.date().required().label("prd_expiry_date"),
-        //     prd_dashboard_status: Joi.boolean().label("prd_dashboard_status"),
-        //     prd_status: Joi.boolean().required().label("prd_status "),
-        //     prd_sales_unit: Joi.string().required().label("prd_sales_unit"),
-        //     prd_return_type: Joi.string().required().label("prd_return_type"),
-        //     prd_brand_id: Joi.number().integer().required().label(" prd_brand_id"),
-
-        // });
-
-
-
-        // product validation data
-
-        // const validate_data = {
-
-        //     prd_name,
-        //     prd_description,
-        //     prd_storage_type,
-        //     prd_tax_class,
-        //     prd_tags,
-        //     prd_expiry_date,
-        //     prd_dashboard_status,
-        //     prd_status,
-        //     prd_sales_unit,
-        //     prd_return_type,
-        //     prd_brand_id,
-
-
-
-        // };
-
-        // const { error } = schema.validate(validate_data, joiOptions);
-        // console.log(error)
-        // if (error) {
-        //     return res.status(500).json({
-        //         status: 500,
-        //         success: false,
-        //         message: "Validation Error",
-        //         error: getErrorsInArray(error?.details),
-        //     });
-        // };
-
 
         // create a product
         const newProduct = await createAProduct({
+
             user_id: userId,
             prd_name,
             prd_description,
@@ -123,6 +71,11 @@ export const createProduct = async (req, res) => {
 
 
         })
+
+        const productId = newProduct[0]?.id;
+
+        // Add categories to the product
+        await addProductCategories(productId, categories);
 
         res.status(201).json({
             status: 201,
@@ -166,7 +119,11 @@ export const updateProduct = async (req, res) => {
             dimensions_and_more_info,
             ein_code,
             show_expiry_on_dashboard,
-            search_keywords
+            search_keywords,
+            categories,
+
+
+
         } = req.body;
 
         const userId = req.user?.userId;
@@ -175,7 +132,7 @@ export const updateProduct = async (req, res) => {
 
         // Call the model function to update the product
         const updatedProduct = await updateAProduct(productId, {
-            
+
             user_id: userId,
             prd_name,
             prd_description,
@@ -193,10 +150,14 @@ export const updateProduct = async (req, res) => {
             dimensions_and_more_info,
             ein_code,
             show_expiry_on_dashboard,
-            search_keywords
+            search_keywords,
 
 
         });
+
+        // Update product categories
+        await updateProductCategories(productId, categories);
+
 
         res.status(200).json({
             status: 200,
@@ -637,7 +598,7 @@ export const getProductsByBrands = async (req, res) => {
     try {
 
         const productId = req.params.productId;
-      
+
         const product = await getProductById(productId);
         console.log(product);
 

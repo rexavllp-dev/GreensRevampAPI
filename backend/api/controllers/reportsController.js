@@ -3,23 +3,18 @@ import { getsAllCustomerOrderCount, getsAllCustomerOrderReports } from "../model
 
 
 
-
-
-
-
-
 export const getAllCustomerOrderReports = async (req, res) => {
     try {
-        // Fetch all customer order reports
+       
         const orders = await getsAllCustomerOrderReports();
 
-        // Fetch count of orders for each customer
+        
         const orderCounts = await getsAllCustomerOrderCount();
 
-        // Create a map to store the total order count for each customer
+        // store the total order count for each customer
         const orderCountMap = new Map();
 
-        // Iterate through the order counts and populate the map
+        //  order counts and populate the map
         orderCounts.forEach(count => {
             orderCountMap.set(count.customer_id, count.total_orders);
         });
@@ -54,4 +49,6 @@ export const getAllCustomerOrderReports = async (req, res) => {
         });
     }
 };
+
+
 
