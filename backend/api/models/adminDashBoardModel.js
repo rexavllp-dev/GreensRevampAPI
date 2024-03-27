@@ -430,13 +430,11 @@ export const getSalesBarChart = async () => {
 export const getsAllCompanyPendingApproval = async () => {
 
     const users = await db("users")
-
-
         .leftJoin("company", "users.usr_company", "company.id")
         .leftJoin('user_approval_status', 'users.usr_approval_id', 'user_approval_status.id')
         .where('user_approval_status.status_name', 'Pending Approval')
         .select(
-
+            'users.id',
             'users.usr_firstname',
             'users.usr_lastname',
             'users.usr_email',
@@ -448,8 +446,6 @@ export const getsAllCompanyPendingApproval = async () => {
 
         )
         .orderBy('company.created_at', 'desc');
-
-
     return users;
 
 };
