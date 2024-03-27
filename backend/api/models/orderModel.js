@@ -205,6 +205,8 @@ export const getOrderItems = async (orderId) => {
         .leftJoin('return_products', 'order_items.id', 'return_products.order_item_id')
         // .leftJoin('product_price', 'order_items.product_id', 'product_price.product_id')
         .leftJoin('replace_products', 'order_items.id', 'replace_products.order_item_id')
+        .leftJoin('replace_statuses', 'replace_products.replace_status', 'replace_statuses.id')
+        .leftJoin('return_statuses', 'return_products.return_status', 'return_statuses.id')
 
         .select(
             'order_items.*',
@@ -216,8 +218,9 @@ export const getOrderItems = async (orderId) => {
             'return_products.*',
             'return_products.id as returnId',
             'replace_products.*',
-            'replace_products.id as replaceId'
-
+            'replace_products.id as replaceId',
+            'replace_statuses.replace_status_name',
+            'return_statuses.return_status_name'
         );
 
     return orderItems;
@@ -893,8 +896,8 @@ export const getsOrderByRecommendedProducts = async (userId) => {
         )
 
 
-     // Integrate getPrdPrice for each product
-     const productsWithPrice = await Promise.all(recommendedProductOrder.map(async (product) => {
+    // Integrate getPrdPrice for each product
+    const productsWithPrice = await Promise.all(recommendedProductOrder.map(async (product) => {
         const prdPrice = await getPrdPrice(product.products_price_id);
         return { ...product, prdPrice };
     }));

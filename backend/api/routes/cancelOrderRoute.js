@@ -10,7 +10,4 @@ router.post('/cancel-order', createCancelOrders);
 // cancel individual order
 router.post('/cancel-individual-order', cancelIndividualItems);
 
-
-
-
 export default router;
