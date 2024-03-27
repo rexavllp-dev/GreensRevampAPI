@@ -75,7 +75,7 @@ export const createProduct = async (req, res) => {
         const productId = newProduct[0]?.id;
 
         // Add categories to the product
-        await addProductCategories(productId, categories);
+        // await addProductCategories(productId, categories);
 
         res.status(201).json({
             status: 201,
