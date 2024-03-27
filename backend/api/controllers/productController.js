@@ -1,5 +1,6 @@
 import { createAProduct, createProductGallery, deleteAProduct, deleteProductImageById, fetchAllOptionProducts, getAllProducts, getProductById, getProductsByCategory, getsAllTopTrendingProducts, getSortedProducts, getsProductsByBrand, saveImageUrl, updateAProduct } from "../models/productModel.js";
 import aws from 'aws-sdk';
+import sharp from "sharp";
 import { getPrdPrice } from "../models/productPriceModel.js";
 import { saveSearchHistory } from "../models/searchHistoryModel.js";
 import { addProductCategories, updateProductCategories } from "../models/categoryModel.js";
@@ -413,9 +414,12 @@ export const addProductImages = async (req, res) => {
             const file = files[i];
 
 
-            const resizedBuffer = await sharp(file.data)
-                .resize({ width: 300, height: 300 })
-                .toBuffer();
+            const resizedBuffer = await sharp(file.data)    
+            .resize(2000)
+            .webp({ quality: 100 })  // Adjust quality as needed
+            .jpeg({ quality: 100, progressive: true, force: false })  // Adjust quality and other options as needed
+            .png({ quality: 100, force: false })  // Adjust compression level and other options as needed
+            .toBuffer();
 
             const uploadParams = {
                 Bucket: process.env.S3_BUCKET_NAME,

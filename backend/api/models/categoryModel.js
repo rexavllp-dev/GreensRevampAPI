@@ -178,7 +178,7 @@ export const getProductsByCategoryUrl = async (catUrl) => {
 };
 
 
-// _______________________________________________________Product category_______________________________________________________
+// ______________________________________________________________________ Product Category __________________________________________________________________
 
 export const addProductCategories = async (productId, categoryIds) => {
 
