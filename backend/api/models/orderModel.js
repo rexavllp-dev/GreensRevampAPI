@@ -37,7 +37,8 @@ export const createUserOrder = async (trx, userId, orderData, totals) => {
                 ord_tax: totals?.totalProductVAT,
                 ord_sub_total: totals?.subTotal,
                 ord_discount: totals?.totalDiscount,
-                ord_service_charge: totals?.storePickupCharge
+                ord_service_charge: totals?.storePickupCharge,
+                ord_order_status: orderData?.payment_method === 'Cash on Delivery' ? 1 : null,
             })
             .returning('*');
 
@@ -703,6 +704,34 @@ export const assignDriver = async (userId, orderId, driverId, boxes) => {
         const updatePicker = await db('user_orders').where({ id: orderId })
             .update({ 'ord_delivery_accepted_by': driverId, 'ord_qc_confirmed': userId, 'no_boxes': boxes }).returning('*')
         return updatePicker;
+
+        // Commit the transaction if everything is successful
+    } catch (error) {
+        // Rollback the transaction if there's an error
+        throw error; // Rethrow the error for the caller to handle
+    }
+
+};
+
+export const assignReturnReplaceDrivers = async (orderId, driverId, isReturn, itemId) => {
+
+    try {
+        if (isReturn) {
+            const updatePicker = await db('user_orders').where({ id: orderId })
+                .update({ 'ord_return_assign_to': driverId }).returning('*')
+
+            const updateReturnStatus = await db('return_products').where({ order_item_id: itemId })
+                .update({ 'return_status': 3 }).returning('*')
+
+            return updatePicker;
+        } else {
+            const updatePicker = await db('user_orders').where({ id: orderId })
+                .update({ 'ord_replace_assign_to': driverId }).returning('*')
+            const updateReplaceStatus = await db('replace_products').where({ order_item_id: itemId })
+                .update({ 'replace_status': 3 }).returning('*')
+
+            return updatePicker;
+        }
 
         // Commit the transaction if everything is successful
     } catch (error) {

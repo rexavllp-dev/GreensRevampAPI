@@ -5,6 +5,7 @@ import { calculatePrice } from '../helpers/calculatePrice.js';
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 import { updateAnOrder } from "../models/orderModel.js";
 import { createATransaction, findTransaction, getTransactions } from '../models/transactionModel.js';
+import { updateOrder } from './orderController.js';
 
 export const handlePaymentRequest = async (req, res) => {
 
@@ -109,6 +110,7 @@ export const handlePaymentRequestCompletion = async (req, res) => {
         }
 
         const transaction = await createATransaction({ order_id: orderId, stripe_transaction_id: stripeTransactionId });
+        const updateOrderStatus = await updateAnOrder(orderId, { ord_order_status: 1});
 
         res.status(200).json({
             status: 200,
@@ -120,6 +122,43 @@ export const handlePaymentRequestCompletion = async (req, res) => {
     } catch (error) {
         console.log(error);
 
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed something went wrong",
+            error: error
+        });
+
+    }
+};
+
+export const handlePaymentFailed = async (req, res) => {
+
+    try {
+        const orderId = req.body.order_id;
+        const isTransactionExist = await findTransaction({ order_id: orderId });
+
+        if (isTransactionExist?.length) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Order cannot be failed because already transaction exist",
+                result: isTransactionExist
+            });
+        }
+        
+ 
+        const updateOrderStatus = await updateAnOrder(orderId, { ord_order_status: 7});
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Success",
+            result: updateOrderStatus
+        });
+        
+    } catch (error) {
+        console.log(error);
         res.status(500).json({
             status: 500,
             success: false,

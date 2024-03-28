@@ -1,5 +1,5 @@
 import express from "express";
-import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin, updateOrderItemQty, getOrderItem, getAllOrderItems } from "../controllers/orderController.js";
+import { createOrder, getASingleOrder, getAllOrders, updateOrder, getAllDashboardOrders, assignPickers, getAllAssinedOrders, verifyItems, assignDrivers, downloadTripsheet, addRemarks, sendOrderInvoiceMailByAdmin, getInvoicesByAdmin, updateOrderItemQty, getOrderItem, getAllOrderItems, assignReturnReplaceDriver } from "../controllers/orderController.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { getOrderDetails, getUserOrders } from "../controllers/userOrderDashbordController.js";
 import { getCancelledOrders } from "../controllers/cancelOrderController.js";
@@ -45,6 +45,8 @@ router.post('/get-assigned-orders', getAllAssinedOrders);
 router.post('/verify-item', verifyItems);
 
 router.post('/assigndriver', assignDrivers);
+
+router.post('/assign-return-replace-driver', assignReturnReplaceDriver);
 
 router.post('/download_tripsheet', downloadTripsheet);
 

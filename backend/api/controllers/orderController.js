@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { joiOptions } from '../helpers/joiOptions.js';
 import getErrorsInArray from '../helpers/getErrors.js';
 
-import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks, updateItemQty, getOrderIdByOrderItems, getOrderItemsByItemId, getOrderItems } from "../models/orderModel.js";
+import { createOrderItems, createUserOrder, getAOrder, getAOrderData, getAllUserOrders, insertNewAddressIntoDatabase, updateAnOrder, updateInventoryQty, updateStockHistoryWhenOrder, getDashboardOrders, assignPicker, getAssinedOrders, verifyItem, assignDriver, ordersByDriver, addARemarks, updateItemQty, getOrderIdByOrderItems, getOrderItemsByItemId, getOrderItems, assignReturnReplaceDrivers } from "../models/orderModel.js";
 import { getUserAddress } from '../models/addressModel.js';
 import { sendEmailQueueManager } from '../utils/queueManager.js';
 import { getProductInventoryById } from '../models/inventoryModel.js';
@@ -506,6 +506,36 @@ export const assignDrivers = async (req, res) => {
     });
 
 };
+
+export const assignReturnReplaceDriver = async (req, res) => {
+
+    try {
+
+
+        const orderId = req.body.orderId;
+        const driverId = req.body.driverId;
+        const isReturn = req.body.isReturn;
+        const itemId = req.body.orderItemId;
+
+        const drivers = await assignReturnReplaceDrivers(orderId, driverId, isReturn, itemId);
+
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Driver assigned successfully",
+            result: drivers
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Failed something went wrong",
+            error: error
+        });
+    };
+}
 
 
 export const downloadTripsheet = async (req, res) => {

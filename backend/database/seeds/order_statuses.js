@@ -14,7 +14,7 @@ export async function seed(knex) {
     { id: 3, status_name: 'Ready To Dispatch' },
     { id: 4, status_name: 'Out For Delivery' },
     { id: 5, status_name: 'Completed' },
-    { id: 6, status_name: 'Canceled' },
+    { id: 6, status_name: 'Canceled' }
 
   ]);
 
