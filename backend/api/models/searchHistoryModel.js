@@ -1,5 +1,5 @@
 import db from '../../config/dbConfig.js';
-import { getAllProducts, getsAllRecommendedProducts } from './productModel.js';
+import { getsAllRecommendedProducts } from './productModel.js';
 
 
 // create search history

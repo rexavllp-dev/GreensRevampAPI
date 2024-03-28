@@ -7,7 +7,7 @@ import { getAllReplacementsForAdmin, getSingleReplacement, updateReplacementStat
 import { createBanner, deleteBanner, getAllBanners, getSingleBanner, updateBanner } from '../controllers/homePageBannerController.js';
 import { createSeason, deleteSeason, getAllSeasons, getSingleSeason, updateSeason } from '../controllers/seasonController.js';
 import { createFeed, deleteFeed, getAllFeeds, getSingleFeed, updateFeed } from '../controllers/feedController.js';
-import { createAds,  deleteAds,  getAllAds, getSingleAds, updateAds } from '../controllers/adsController.js';
+import { createAds, deleteAds, getAllAds, getSingleAds, updateAds } from '../controllers/adsController.js';
 import { getAllActivityOfUser } from '../controllers/generateActivityLogController.js';
 import { createMaintenance, getAllMaintenance, getMaintenance, updateMaintenance } from '../controllers/adminMaintenanceController.js';
 import { createStore, getAllStore, getStore, updateStore } from '../controllers/adminStoreController.js';
@@ -24,10 +24,10 @@ import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo
 import { addDiscount } from '../controllers/adminDiscountController.js';
 import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
 import { createRole, getAllRoles, updateRole } from '../controllers/userRolesController.js';
-import { createRecipe, deleteRecipeProduct, getAllRecipeProductsByRecipeId } from '../controllers/recipeController.js';
+import { createRecipe, createRecipeCategory, deleteRecipeCategory, deleteRecipeProduct, getAllRecipeCategories, getAllRecipeProductsByRecipeId, getSingleRecipeCategory, updateRecipeCategory } from '../controllers/recipeController.js';
 import { createHomePageCategory, deleteHomePageCategory, getAllHomePageCategories, getHomePageCategory } from '../controllers/homePageCategoryController.js';
 import { createHomePageBrand, deleteHomePageBrand, getAllHomePageBrands, getHomePageBrand } from '../controllers/homePageBrandController.js';
-import { getAllCustomerOrderReports } from '../controllers/reportsController.js';
+import { getAllBrandReports, getAllCancelReports, getAllCouponReports, getAllCustomerOrderReports, getAllProductStocks, getAllReplaceReports, getAllReturnReports, getAllSearchReports, getDeadStockReports } from '../controllers/reportsController.js';
 
 
 
@@ -415,7 +415,7 @@ router.delete('/menus/delete_menu/:menuId', deleteMenu);
 
 
 // create brand discount 
-router.post('/discount/create_discount', addDiscount); 
+router.post('/discount/create_discount', addDiscount);
 
 
 
@@ -436,15 +436,30 @@ router.get('/roles/get_all_roles', getAllRoles);
 // create recipe
 router.post('/recipes/create_recipe', createRecipe);
 
-
-
 // Admin Recipe Products API ROUTES
 
 //get all recipe products by recipe id
-router.get('/recipes/get_all_recipe_products/:recipeId', getAllRecipeProductsByRecipeId); 
+router.get('/recipes/get_all_recipe_products/:recipeId', getAllRecipeProductsByRecipeId);
 
 // delete recipe product
 router.delete('/recipes/delete_recipe_product/:recipeProductId', deleteRecipeProduct);
+
+// recipe categories Api routes
+// create cat
+router.post('/recipes/create_recipe_category', createRecipeCategory);
+
+// update cat
+router.put('/recipes/update_recipe_category/:recipeCategoryId', updateRecipeCategory);
+
+// get cat
+router.get('/recipes/get_recipe_category/:recipeCategoryId', getSingleRecipeCategory);
+
+// get all recipe categories
+router.get('/recipes/get_all_recipe_categories', getAllRecipeCategories);
+
+// delete cat
+router.delete('/recipes/delete_recipe_category/:recipeCategoryId', deleteRecipeCategory);
+
 
 
 // reports API ROUTES
@@ -452,6 +467,29 @@ router.delete('/recipes/delete_recipe_product/:recipeProductId', deleteRecipePro
 // get all customer order reports 
 router.get('/reports/get_all_customer_order_reports', getAllCustomerOrderReports);
 
+// get all product stocks
+router.get('/reports/get_all_product_stocks', getAllProductStocks);
+
+// get all return reports
+router.get('/reports/get_all_return_reports', getAllReturnReports);
+
+// get all replacement reports
+router.get('/reports/get_all_replacement_reports', getAllReplaceReports);
+
+// get all cancelled orders reports
+router.get('/reports/get_all_cancelled_orders_reports', getAllCancelReports);
+
+// get all search reports
+router.get('/reports/get_all_search_reports', getAllSearchReports);
+
+// get all brands reports
+router.get('/reports/get_all_brands_reports', getAllBrandReports);
+
+// get all coupons reports
+router.get('/reports/get_all_coupons_reports', getAllCouponReports);
+
+// get all dead stock reports
+router.get('/reports/get_all_dead_stock_reports', getDeadStockReports);
 
 
 export default router;
