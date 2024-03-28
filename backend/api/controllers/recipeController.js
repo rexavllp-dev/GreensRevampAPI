@@ -1,4 +1,4 @@
-import { createARecipeCategories, getARecipeCategories, getsAllRecipeCategories, updateARecipeCategories } from "../models/recipeCategoryModel.js";
+import { createARecipeCategories, deleteARecipeCategories, getARecipeCategories, getsAllRecipeCategories, updateARecipeCategories } from "../models/recipeCategoryModel.js";
 import { createARecipe, deleteARecipe, getARecipe, getsAllRecipes, updateARecipe } from "../models/recipeModel.js";
 import { createARecipeProducts, deleteARecipeProducts, getsAllRecipeProductByRecipeId } from "../models/recipeProductsModel.js";
 import uploadAndResizeImage from "../utils/uploadImage.js";
@@ -345,7 +345,7 @@ export const deleteRecipeCategory = async (req, res) => {
 
     try {
 
-        const deletedRecipeProduct = await deleteARecipeProducts(recipeCategoryId);
+        const deletedRecipeProduct = await deleteARecipeCategories(recipeCategoryId);
 
         res.status(200).json({
             status: 200,

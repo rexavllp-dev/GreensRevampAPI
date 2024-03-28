@@ -53,7 +53,7 @@ export const getsAllRecipeCategories = async () => {
 export const deleteARecipeCategories = async (recipeCategoryId) => {
 
     const recipeProduct = await db("recipe_categories")
-        .where({ recipe_product_id: recipeCategoryId })
+        .where({ recipe_category_id: recipeCategoryId })
         .del();
 
     return recipeProduct;
