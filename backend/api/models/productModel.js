@@ -33,27 +33,39 @@ export const updateAProduct = async (productId, updatedData) => {
 
 
 export const getProductById = async (productId) => {
+
     const products = await db('products')
+
+    
+    
         .select(
+
             'products.*',
+
             'brands.*',
             'brands.id as brand_id',
-            'categories.*',
-            'categories.id as category_id',
+
+            // 'categories.*',
+            // 'categories.id as category_id',
+            
             'products_price.*',
             'products_price.id as products_price_id',
+
             'product_inventory.*',
             'product_inventory.id as product_inventory_id',
+
             'product_seo.*',
             'product_seo.id as product_seo_id',
+
             'product_badge.*',
             'product_badge.id as product_badge_id',
-            'product_category.*',
-            'product_category.id as product_category_id',
+
             "products_bulks.*",
             "products_bulks.id as product_bulks_id",
+
             "bulk_above_max_orders.*",
             "bulk_above_max_orders.id as bulkAboveMaxOrderId",
+            
             'wishlist.*',
             'wishlist.id as wishlist_id',
 
@@ -85,9 +97,21 @@ export const getProductById = async (productId) => {
                     'discounted_price', products_bulks.discounted_price
                 )
             ) as bulk_options
-        `)
+        `),
+
+        db.raw(`
+        jsonb_agg(
+            jsonb_build_object(
+
+                'category_id', product_category.category_id,
+                'category_name', categories.cat_name
+            )
+        ) as product_category
+    `)
+
         )
         .from('products')
+
         .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
         .leftJoin('product_category', 'products.id', 'product_category.product_id')
         .leftJoin('categories', 'product_category.category_id', 'categories.id')
@@ -101,15 +125,20 @@ export const getProductById = async (productId) => {
         .leftJoin('wishlist', 'products.id', 'wishlist.product_id')
         .where('products.id', productId)
         .whereNull('products.deleted_at')
+
+        .distinct('products.id')
+
         .groupBy(
+
+
             'products.id',
             'brands.id',
-            'categories.id',
+            // 'categories.id',
             'products_price.id',
             'product_inventory.id',
             'product_seo.id',
             'product_badge.id',
-            'product_category.id',
+            // 'product_category.id',
             'products_bulks.id',
             'bulk_above_max_orders.id',
             'wishlist.id',
@@ -172,6 +201,7 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
         .select(
+
             'products.*',
             'products.created_at as product_created_at',
             'products.updated_at as product_updated_at',
@@ -229,7 +259,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
 
 
 
-
             db.raw(`
             jsonb_agg(
                 jsonb_build_object(
@@ -252,10 +281,6 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
     `),
 
 
-            db.raw(`similarity(products.prd_name, ?) as name_similarity`, [search]),
-
-
-
 
         )
 
@@ -275,7 +300,10 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
             'vat.id'
 
         )
+
+        .where('products.prd_status', true)
         .whereNull('products.deleted_at')
+
 
 
     // Count query to get total number of products
@@ -289,27 +317,104 @@ export const getAllProducts = async (page, per_page, search, filters, sort, minP
         .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
         .crossJoin('vat')
         .countDistinct('products.id as total')
+        .where('products.prd_status', true)
         .whereNull('products.deleted_at');
 
 
 
-        if (search) {
-            const trimmedSearch = search.trim(); // Trim spaces from the search query
-            query.where(function () {
-                this.whereRaw(`similarity(LOWER(TRIM(products.prd_name)), LOWER(?)) > ?`, [trimmedSearch.toLowerCase(), 0.2]) // Adjust similarity threshold and make search case-insensitive and space-insensitive
-                    .orWhereRaw(`to_tsvector('english', TRIM(products.prd_name)) @@ plainto_tsquery('english', ?)`, [trimmedSearch.toLowerCase()])
-                    .orWhereRaw(`similarity(LOWER(TRIM(product_inventory.sku)), LOWER(?)) > 0.2`, [trimmedSearch.toLowerCase()]); // Search similarity in SKU
+
+    if (search) {
+        search = search.trim();
+
+        query.select(
+            'products.*',
+            'products.created_at as product_created_at',
+            'products.updated_at as product_updated_at',
+            'brands.*',
+            'brands.id as brand_id',
+            'brands.updated_at as brand_updated_at',
+            'brands.created_at as brand_created_at',
+            'categories.*',
+            "categories.id as category_id",
+            'categories.updated_at as category_updated_at',
+            'categories.created_at as category_created_at',
+            "wishlist.*",
+            "wishlist.id as wishlist_id",
+            "wishlist.created_at as wishlist_created_at",
+            "wishlist.updated_at as wishlist_updated_at",
+            "products_price.*",
+            "products_price.id as products_price_id",
+            'products_price.created_at as product_price_created_at',
+            'products_price.updated_at as product_price_updated_at',
+            "product_inventory.*",
+            'product_inventory.created_at as product_inventory_created_at',
+            'product_inventory.updated_at as product_inventory_updated_at',
+            "product_inventory.id as product_inventory_id",
+            "product_seo.*",
+            "product_seo.id as product_seo_id",
+            "product_seo.created_at as product_seo_created_at",
+            "product_seo.updated_at as product_seo_updated_at",
+            "product_badge.*",
+            "product_badge.id as product_badge_id",
+            "product_category.*",
+            "product_category.id as product_category_id",
+            "product_category.created_at as product_category_created_at",
+            "product_category.updated_at as product_category_updated_at",
+            "vat.*",
+            "vat.id as vat_id",
+            db.raw(`similarity(products.prd_name, ?) as similarity_score`, [search]),
+            db.raw(`
+        CASE
+            WHEN products.prd_name ILIKE ? THEN 1
+            WHEN products.prd_name ILIKE '%' || ? || '%' THEN 2
+            ELSE 3
+        END AS search_priority
+    `, [search, search]
+
+            )
+        )
+            .distinct('products.id')
+
+            .where(function () {
+                this.where(function () {
+                    this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.07])
+                        .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+                        .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`]);
+                })
+                    .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.07`, [search])
+                    .orWhere(function () {
+                        this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7]);
+                    })
+
+                    .orWhereRaw(`similarity(products.search_keywords, ?) > 0.07`, [search])
+
+                    .orWhereRaw(`similarity(products.item_code, ?) > 0.07`, [search])
+
             })
-        };
-        
+
+            .orderByRaw(
+                `
+            search_priority,
+            similarity_score DESC
+        `
+            );
+    }
 
 
 
     // Execute count query for search results
     const [{ total: searchResultCount }] = await countQuery.clone().where(function () {
-        this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.2])
-            .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
-            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search]);
+
+        this.where(function () {
+            this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.07])
+                .orWhereRaw(`to_tsvector('english', products.prd_name) @@ plainto_tsquery('english', ?)`, [search])
+                .orWhereRaw(`products.prd_name ILIKE ?`, [`%${search}%`]);
+        })
+            .orWhereRaw(`similarity(product_inventory.sku, ?) > 0.2`, [search])
+            .orWhere(function () {
+                this.whereRaw(`similarity(products.prd_name, ?) > ?`, [search, 0.7]);
+            });
+
     });
 
     // Get the total product count for the search
@@ -897,10 +1002,6 @@ export const getsAllRecommendedProducts = async (userId, search) => {
 
 
 
-
-
-
-
     // Execute the main query
     const products = await query;
 
@@ -1050,6 +1151,150 @@ export const getsAllTopTrendingProducts = async () => {
 
     return topTrendingProducts;
 };
+
+
+
+
+export const getsProductsByBrand = async (brandId) => {
+
+    let query = db('products')
+
+        .leftJoin('brands', 'products.prd_brand_id', 'brands.id')
+        .leftJoin('product_category', 'products.id', 'product_category.product_id')
+        .leftJoin('categories', 'product_category.category_id', 'categories.id')
+        .leftJoin('products_price', 'products.id', 'products_price.product_id')
+        .leftJoin('product_options', 'products.id', 'product_options.product_id')
+        .leftJoin('product_gallery', 'products.id', 'product_gallery.product_id')
+        .leftJoin('product_inventory', 'products.id', 'product_inventory.product_id')
+        .leftJoin('product_seo', 'products.id', 'product_seo.product_id')
+        .leftJoin('product_badge', 'products.id', 'product_badge.product_id')
+        .crossJoin('vat')
+
+        .where({ 'products.prd_brand_id': brandId })
+        .select(
+
+            'products.*',
+            'products.created_at as product_created_at',
+            'products.updated_at as product_updated_at',
+            'brands.*',
+            'brands.id as brand_id',
+            'brands.updated_at as brand_updated_at',
+            'brands.created_at as brand_created_at',
+            'categories.*',
+            "categories.id as category_id",
+            'categories.updated_at as category_updated_at',
+            'categories.created_at as category_created_at',
+
+            // "wishlist.*",
+            // "wishlist.id as wishlist_id",
+            // "wishlist.created_at as wishlist_created_at",
+            // "wishlist.updated_at as wishlist_updated_at",
+
+            "products_price.*",
+            "products_price.id as products_price_id",
+            'products_price.created_at as product_price_created_at',
+            'products_price.updated_at as product_price_updated_at',
+            "product_inventory.*",
+            'product_inventory.created_at as product_inventory_created_at',
+            'product_inventory.updated_at as product_inventory_updated_at',
+            "product_inventory.id as product_inventory_id",
+            "product_seo.*",
+            "product_seo.id as product_seo_id",
+            "product_seo.created_at as product_seo_created_at",
+            "product_seo.updated_at as product_seo_updated_at",
+            "product_badge.*",
+            "product_badge.id as product_badge_id",
+            "product_category.*",
+            "product_category.id as product_category_id",
+            "product_category.created_at as product_category_created_at",
+            "product_category.updated_at as product_category_updated_at",
+            "vat.*",
+            "vat.id as vat_id",
+
+
+
+            db.raw(`
+        CASE 
+            WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+            WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                CASE 
+                    WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                    WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                    ELSE 0
+                END
+            ELSE products_price.product_price * (1 + vat.vat / 100)
+        END AS compute_price
+`),
+
+
+            db.raw(`COALESCE(product_inventory.stock_availability, 'Out of stock') as stock_availability`),
+
+
+
+
+            db.raw(`
+            jsonb_agg(
+                jsonb_build_object(
+                    'url', product_gallery.url,
+                    'id', product_gallery.id,
+                    'is_baseimage', product_gallery.is_baseimage
+                )
+            ) as product_img
+        `),
+
+
+            db.raw(`
+        jsonb_agg(
+            jsonb_build_object(
+                'productOptionId', product_options.id,
+                'optionId', product_options.option_id,
+                'optionLabel', product_options.option_label
+            )
+        ) as productOptions
+    `),
+
+
+        )
+
+
+        .distinct('products.id')
+        .groupBy(
+            'products.id',
+            'brands.id',
+            'categories.id',
+            // 'wishlist.id',
+            // 'product_options.id',
+            'products_price.id',
+            'product_inventory.id',
+            'product_seo.id',
+            'product_badge.id',
+            'product_category.id',
+            'vat.id'
+
+        )
+        .whereNull('products.deleted_at')
+
+
+
+    // Execute the main query
+    const products = await query;
+
+
+    // Integrate getPrdPrice for each product
+    const productsWithPrice = await Promise.all(products.map(async (product) => {
+        const prdPrice = await getPrdPrice(product.products_price_id);
+        return { ...product, prdPrice };
+    }));
+
+
+
+
+
+    return {
+        products: productsWithPrice,
+    };
+};
+
 
 
 

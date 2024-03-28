@@ -282,7 +282,7 @@ export const getPrdPrice = async (priceId,res) => {
 
             }));
 
-            console.log(result);
+            // console.log(result);
 
             return result; // Return the calculated result
         }

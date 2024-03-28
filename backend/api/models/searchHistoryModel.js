@@ -1,5 +1,5 @@
 import db from '../../config/dbConfig.js';
-import { getAllProducts, getsAllRecommendedProducts } from './productModel.js';
+import { getsAllRecommendedProducts } from './productModel.js';
 
 
 // create search history
@@ -25,11 +25,11 @@ export const getUserRecommendedProducts = async (userId) => {
     const mostRecentSearch = await db('search_history')
         .where('user_id', userId)
         .orderBy('searched_at', 'desc')
-        .first(); 
+        .first();
 
 
     if (!mostRecentSearch) {
-       
+
         return [];
     };
 

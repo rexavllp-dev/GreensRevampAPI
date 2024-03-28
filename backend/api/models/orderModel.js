@@ -1,4 +1,5 @@
 import db from '../../config/dbConfig.js';
+import { getPrdPrice } from './productPriceModel.js';
 import { createStockHistory } from './stockHistoryModel.js';
 
 
@@ -204,6 +205,8 @@ export const getOrderItems = async (orderId) => {
         .leftJoin('return_products', 'order_items.id', 'return_products.order_item_id')
         // .leftJoin('product_price', 'order_items.product_id', 'product_price.product_id')
         .leftJoin('replace_products', 'order_items.id', 'replace_products.order_item_id')
+        .leftJoin('replace_statuses', 'replace_products.replace_status', 'replace_statuses.id')
+        .leftJoin('return_statuses', 'return_products.return_status', 'return_statuses.id')
 
         .select(
             'order_items.*',
@@ -215,8 +218,9 @@ export const getOrderItems = async (orderId) => {
             'return_products.*',
             'return_products.id as returnId',
             'replace_products.*',
-            'replace_products.id as replaceId'
-
+            'replace_products.id as replaceId',
+            'replace_statuses.replace_status_name',
+            'return_statuses.return_status_name'
         );
 
     return orderItems;
@@ -830,3 +834,76 @@ export const getOrderIdByOrderItems = async (orderItemId) => {
     return result ? result.order_id : null;
 };
 
+
+
+export const getsOrderByRecommendedProducts = async (userId) => {
+
+    console.log("userId", userId);
+
+    const recommendedProductOrder = await db('user_orders')
+
+
+
+        .leftJoin('order_items', 'order_items.order_id', 'user_orders.id')
+        .leftJoin('related_products', 'related_products.product_id', 'order_items.product_id')
+        .leftJoin('products', 'products.id', 'related_products.related_product_id')
+        .leftJoin('products_price', 'products_price.product_id', 'related_products.related_product_id')
+        .leftJoin('product_inventory', 'products.id', 'related_products.related_product_id')
+        .crossJoin('vat')
+
+
+
+        .where({ 'user_orders.customer_id': userId })
+
+        .select(
+
+            'products.*',
+            'products.id as productId',
+
+
+            "related_products.*",
+            "related_products.id as relatedProductId",
+
+            "products_price.*",
+            "products_price.id as products_price_id",
+
+            "product_inventory.*",
+            "product_inventory.id as product_inventory_id",
+
+
+            db.raw(`
+            CASE 
+                WHEN products_price.is_discount = 'false' THEN products_price.product_price * (1 + vat.vat / 100)
+                WHEN products_price.is_discount = true AND CURRENT_TIMESTAMP BETWEEN DATE(products_price.special_price_start) AND DATE(products_price.special_price_end) THEN
+                    CASE 
+                        WHEN products_price.special_price_type = 'percentage' THEN products_price.product_price * (1 - (products_price.special_price / 100)) * (1 + vat.vat / 100)
+                        WHEN products_price.special_price_type = 'fixed' THEN (products_price.product_price - products_price.special_price) * (1 + vat.vat / 100)
+                        ELSE 0
+                    END
+                ELSE products_price.product_price * (1 + vat.vat / 100)
+            END AS compute_price
+    `),
+
+        )
+
+        .groupBy(
+            'products.id',
+            'products_price.id',
+            'product_inventory.id',
+            'related_products.id',
+            'vat.id'
+
+        )
+
+
+    // Integrate getPrdPrice for each product
+    const productsWithPrice = await Promise.all(recommendedProductOrder.map(async (product) => {
+        const prdPrice = await getPrdPrice(product.products_price_id);
+        return { ...product, prdPrice };
+    }));
+
+    return {
+        recommendedProductOrder: productsWithPrice,
+    }
+
+};

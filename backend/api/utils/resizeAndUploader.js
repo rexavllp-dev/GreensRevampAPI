@@ -19,7 +19,7 @@ const resizeAndUpload = async (file) => {
         if (file.mimetype === 'image/pdf' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
             // Resize only if it's a PDF, JPEG, PNG 
             const resizedBuffer = await sharp(file.data)
-                .resize(2000)
+                .resize(2800)
                 .webp({ quality: 100 })  // Adjust quality as needed
                 .jpeg({ quality: 100, progressive: true, force: false })  // Adjust quality and other options as needed
                 .png({ quality: 100, force: false })  // Adjust compression level and other options as needed

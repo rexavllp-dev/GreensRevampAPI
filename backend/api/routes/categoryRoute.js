@@ -1,5 +1,6 @@
 import express from 'express';
-import { createCategory, deleteCategory, deleteCategoryImage, getAllCategories, getCategoriesByTree, getCategoriesWithParentId, getSingleCategory, updateCategory, uploadCategoryImages, getMainTree } from '../controllers/categoryController.js';
+import { createCategory, deleteCategory, deleteCategoryImage, getAllCategories, getCategoriesByTree, getCategoriesWithParentId, getSingleCategory, updateCategory, uploadCategoryImages, getMainTree, getAllCategoriesByCatUrl, getProductsByCatUrl } from '../controllers/categoryController.js';
+
 
 
 const router = express.Router();
@@ -32,6 +33,14 @@ router.get('/get-categories', getAllCategories)
 router.get('/get-categories-tree', getCategoriesByTree);
 
 router.get('/get-main-tree', getMainTree);
+
+// get categories with cat url
+router.get('/get-sub-categories/:catUrl', getAllCategoriesByCatUrl);
+
+// get product by category url 
+router.get('/get_product_category_url/:catUrl', getProductsByCatUrl);
+
+
 
 
 

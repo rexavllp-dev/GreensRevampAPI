@@ -6,9 +6,6 @@ import { getCancelledOrders } from "../controllers/cancelOrderController.js";
 import { cancelIndividualItemsByAdmin, createCancelOrdersByAdmin } from "../controllers/cancelOrderController.js";
 
 
-
-
-
 const router = express.Router();
 
 // create orders
