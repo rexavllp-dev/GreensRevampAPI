@@ -230,7 +230,9 @@ export const getAllProduct = async (req, res) => {
 
         // Save search history
         if (search_query) {
+
             await saveSearchHistory(userId, search_query, products.searchResultCount);
+            
         };
 
         res.status(200).json({
