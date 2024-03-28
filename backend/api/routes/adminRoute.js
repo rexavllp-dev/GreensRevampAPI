@@ -24,7 +24,7 @@ import { createPageSeo, deletePageSeo, getAllPageSeos, getPageSeo, updatePageSeo
 import { addDiscount } from '../controllers/adminDiscountController.js';
 import { createMenu, deleteMenu, getAllMenus, getMenu, updateMenu } from '../controllers/menuController.js';
 import { createRole, getAllRoles, updateRole } from '../controllers/userRolesController.js';
-import { createRecipe, deleteRecipeProduct, getAllRecipeProductsByRecipeId } from '../controllers/recipeController.js';
+import { createRecipe, createRecipeCategory, deleteRecipeProduct, getAllRecipeCategories, getAllRecipeProductsByRecipeId, getSingleRecipeCategory, updateRecipeCategory } from '../controllers/recipeController.js';
 import { createHomePageCategory, deleteHomePageCategory, getAllHomePageCategories, getHomePageCategory } from '../controllers/homePageCategoryController.js';
 import { createHomePageBrand, deleteHomePageBrand, getAllHomePageBrands, getHomePageBrand } from '../controllers/homePageBrandController.js';
 import { getAllBrandReports, getAllCancelReports, getAllCouponReports, getAllCustomerOrderReports, getAllProductStocks, getAllReplaceReports, getAllReturnReports, getAllSearchReports, getDeadStockReports } from '../controllers/reportsController.js';
@@ -443,6 +443,21 @@ router.get('/recipes/get_all_recipe_products/:recipeId', getAllRecipeProductsByR
 
 // delete recipe product
 router.delete('/recipes/delete_recipe_product/:recipeProductId', deleteRecipeProduct);
+
+// recipe categories Api routes
+// create cat
+router.post('/recipes/create_recipe_category', createRecipeCategory);
+
+// update cat
+router.put('/recipes/update_recipe_category/:recipeCategoryId', updateRecipeCategory);
+
+// get cat
+router.get('/recipes/get_recipe_category/:recipeCategoryId', getSingleRecipeCategory);
+
+
+// get all recipe categories
+router.get('/recipes/get_all_recipe_categories', getAllRecipeCategories);
+
 
 
 // reports API ROUTES
