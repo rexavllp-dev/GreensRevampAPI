@@ -8,7 +8,7 @@ export default {
     client: 'postgresql',
     connection: {
       host: '127.0.0.1',
-      database: 'greens_international_server',
+      database: 'greensinternational',
       user:     'postgres',
       password: 'postgres',
     }
